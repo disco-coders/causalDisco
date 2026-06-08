@@ -126,7 +126,6 @@
 </div>
 </div>
 <p>Different node layouts, node styles, and edge styles can be controlled via the <code>layout</code>, <code>node_style</code>, and <code>edge_style</code> parameters. We illustrate this with a simple example below. For a full description of available options, see the documentation for <code><a href="../reference/plot.html">causalDisco::plot()</a></code>, as well as the underlying <code><a href="https://caugi.org/reference/plot.html" class="external-link">caugi::plot()</a></code> function and its visualization vignette (<code><a href="https://caugi.org/articles/visualization.html" class="external-link">vignette("visualization", "caugi")</a></code>).</p>
-<p>In this example, we use the <code>"fruchterman-reingold"</code> layout and customize both node and edge styles:</p>
 <p>Here we use the <code>"fruchterman-reingold"</code> layout and customize node and edge styles:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
@@ -342,7 +341,7 @@
 <span><span class="co">#&gt; \end{tikzpicture}</span></span></code></pre></div>
 </div>
 <p>Setting <code>full_doc = TRUE</code> generates a complete standalone LaTeX document that can be compiled directly. Using <code>full_doc = FALSE</code> instead returns only the tikzpicture environment, which is convenient for inclusion inside an existing LaTeX document.</p>
-<p>The TikZ export also supports edge bending, which can substantially improve readability when edges passes thorugh other nodes, as can easily happen in tiered knowledge structures. This feature is not available in the standard <code><a href="https://caugi.org/reference/plot.html" class="external-link">caugi::plot()</a></code> function. Here is an example, where the edge using the standard straight style edge overlaps the node <code>youth_x3</code>, while the bent edge avoids this overlap:</p>
+<p>The TikZ export also supports edge bending, which can substantially improve readability when edges pass through other nodes, as can easily happen in tiered knowledge structures. This feature is not available in the standard <code><a href="https://caugi.org/reference/plot.html" class="external-link">caugi::plot()</a></code> function. Here is an example, where the edge using the standard straight style edge overlaps the node <code>youth_x3</code>, while the bent edge avoids this overlap:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span>

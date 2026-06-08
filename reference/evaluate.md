@@ -1,8 +1,8 @@
 # Evaluate Causal Graph Estimates
 
-Computes various metrics to evaluate the difference between estimated
-and truth causal graph. Designed primarily for assessing the performance
-of causal discovery algorithms.
+Computes various metrics to evaluate the difference between the
+estimated and true causal graph. Designed primarily for assessing the
+performance of causal discovery algorithms.
 
 Metrics are supplied as a list with three slots: `$adj`, `$dir`, and
 `$other`.

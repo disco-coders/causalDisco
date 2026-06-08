@@ -102,7 +102,7 @@ plot(pc_result_pcalg, layout = plot_layout, main = "PC Fisher Z (pcalg)")
 ![](causalDisco_files/figure-html/pc-algorithm-fisher-z-pcalg-1.png)
 
 We see that the results using the PC algorithm implemented in bnlearn
-and pcalg gives the same output on this dataset.
+and pcalg give the same output on this dataset.
 
 You can also use a different algorithm altogether, such as the GES
 algorithm. It follows the same pattern, however GES is a score-based

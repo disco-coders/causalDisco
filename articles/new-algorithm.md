@@ -84,7 +84,7 @@ plot(hpc_bnlearn_result)
 To implement a **score-based** algorithm instead, the structure would
 remain the same. The main difference is that the method would accept a
 `score` argument rather than `test` and `alpha`. A **hybrid** algorithm
-algorithm would accept `test`, `alpha`, and `score` arguments.
+would accept `test`, `alpha`, and `score` arguments.
 
 To implement an algorithm from pcalg rather than bnlearn, we would
 follow the same structure but change all instances of `"bnlearn"` to

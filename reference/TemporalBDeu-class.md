@@ -39,8 +39,8 @@ it is used in the causal discovery function
 
 The class implements a score which scores all edges contradicting the
 ordering (edge going from a later tier to an earlier) to minus
-\\\infty\\. If the the edges does not contradict, the score is equal to
-that of the standard BDeu.
+\\\infty\\. If the edges do not contradict, the score is equal to that
+of the standard BDeu.
 
 ## Extends
 

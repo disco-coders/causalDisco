@@ -69,9 +69,6 @@ as well as the underlying
 its visualization vignette
 ([`vignette("visualization", "caugi")`](https://caugi.org/articles/visualization.html)).
 
-In this example, we use the `"fruchterman-reingold"` layout and
-customize both node and edge styles:
-
 Here we use the `"fruchterman-reingold"` layout and customize node and
 edge styles:
 
@@ -321,7 +318,7 @@ only the tikzpicture environment, which is convenient for inclusion
 inside an existing LaTeX document.
 
 The TikZ export also supports edge bending, which can substantially
-improve readability when edges passes thorugh other nodes, as can easily
+improve readability when edges pass through other nodes, as can easily
 happen in tiered knowledge structures. This feature is not available in
 the standard [`caugi::plot()`](https://caugi.org/reference/plot.html)
 function. Here is an example, where the edge using the standard straight

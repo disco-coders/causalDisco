@@ -43,7 +43,7 @@ plotting. The main effect is the plot.
   via `required_col`).
 
 - **Forbidden edges** are drawn in **red** by default (can be changed
-  via `forbidden_col`). If A to B and B to a is forbidden, a edge `<->`
+  via `forbidden_col`). If A to B and B to A is forbidden, an edge `<->`
   is drawn.
 
 - If tiered knowledge is provided, nodes are arranged according to their

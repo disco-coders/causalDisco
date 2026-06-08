@@ -188,7 +188,7 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
 #> 
 #>   from      edge  to       
 #>   <chr>     <chr> <chr>    
-#> 1 child_x2  -->   child_x1 
+#> 1 child_x1  -->   child_x2 
 #> 2 child_x2  -->   oldage_x5
 #> 3 child_x2  -->   youth_x4 
 #> 4 oldage_x5 -->   oldage_x6

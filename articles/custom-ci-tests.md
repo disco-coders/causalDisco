@@ -34,7 +34,7 @@ engines in a future release.
 
 ### causalDisco and pcalg engines
 
-A custom tests takes the signature
+A custom test takes the signature
 `function(x, y, conditioning_set, suff_stat, args)`, (`args` is an
 optional). `x` and `y` are the variables being tested for independence,
 `conditioning_set` is the conditioning set, and `suff_stat` is a list of

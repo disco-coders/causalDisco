@@ -29,8 +29,8 @@ CRAN release: 2026-04-13
   to view the custom registered Tetrad algorithms.
 
 - Allows the user to specify custom conditional independence tests for
-  use with for the engines bnlearn, causalDisco, and pcalg. The custom
-  test should have the signature
+  use with the engines bnlearn, causalDisco, and pcalg. The custom test
+  should have the signature
   `function(x, y, conditioning_set, suff_stat)` (optionally with an
   additional `args` argument for additional parameters), and return a
   p-value. See the documentation and the associated vignette for

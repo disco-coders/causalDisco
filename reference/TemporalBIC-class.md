@@ -47,7 +47,7 @@ is used in the causal discovery function
 
 The class implements a score which scores all edges contradicting the
 ordering (edge going from a later tier to an earlier) to minus
-\\\infty\\. If the edges does not contradict, the score is equal to that
+\\\infty\\. If the edges do not contradict, the score is equal to that
 of the standard BIC. The class implements an \\\ell_0\\-penalized
 Gaussian maximum likelihood estimator. The penalization is a constant
 (specified by the argument `lambda` in the constructor) times the number
