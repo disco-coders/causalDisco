@@ -47,6 +47,10 @@
 <ul><li>Added support for the RFCI algorithm via <code><a href="../reference/rfci.html">rfci()</a></code>, interfacing with implementations from pcalg and Tetrad.</li>
 </ul></div>
 <div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>Fixed <code><a href="../reference/knowledge.html">knowledge()</a></code> dropping variables from <code>tier()</code> formulas when infix edge operators (<code>%--&gt;%</code>, <code>%!--&gt;%</code>) appeared before the <code>tier()</code> call and had already registered some (but not all) of the tier’s variables. This only affected the no-data-frame form of <code><a href="../reference/knowledge.html">knowledge()</a></code>.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="improvements-development-version">Improvements<a class="anchor" aria-label="anchor" href="#improvements-development-version"></a></h3>
 <ul><li><p>Improved the documentation.</p></li>
 <li><p>Reduced the number of package dependencies.</p></li>

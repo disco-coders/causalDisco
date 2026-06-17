@@ -8,6 +8,16 @@
   [`rfci()`](https://disco-coders.github.io/causalDisco/reference/rfci.md),
   interfacing with implementations from pcalg and Tetrad.
 
+### Bug fixes
+
+- Fixed
+  [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)
+  dropping variables from `tier()` formulas when infix edge operators
+  (`%-->%`, `%!-->%`) appeared before the `tier()` call and had already
+  registered some (but not all) of the tier’s variables. This only
+  affected the no-data-frame form of
+  [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md).
+
 ### Improvements
 
 - Improved the documentation.
