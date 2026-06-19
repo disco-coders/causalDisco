@@ -100,33 +100,12 @@
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">kn_converted</span> <span class="op">&lt;-</span> <span class="fu">convert_tiers_to_forbidden</span><span class="op">(</span><span class="va">kn</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">kn_converted</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Knowledge object</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Variables</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="font-weight: bold;">var</span>       <span style="font-weight: bold;">tier</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child_x1  <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> child_x2  <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> youth_x3  <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> youth_x4  <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> oldage_x5 <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> oldage_x6 <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Edges</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  oldage_x5 → child_x1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  oldage_x5 → child_x2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  oldage_x5 → youth_x3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  oldage_x5 → youth_x4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  oldage_x6 → child_x1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  oldage_x6 → child_x2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  oldage_x6 → youth_x3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  oldage_x6 → youth_x4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  youth_x3 → child_x1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  youth_x3 → child_x2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  youth_x4 → child_x1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BB0000;">✖</span>  youth_x4 → child_x2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;Knowledge: 6 vars | 12 forbidden&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   vars: child_x1, child_x2, youth_x3, youth_x4, oldage_x5, oldage_x6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   oldage_x5 %!--&gt;% child_x1 + child_x2 + youth_x3 + youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   oldage_x6 %!--&gt;% child_x1 + child_x2 + youth_x3 + youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   youth_x3 %!--&gt;% child_x1 + child_x2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   youth_x4 %!--&gt;% child_x1 + child_x2</span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">kn_converted</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="convert_tiers_to_forbidden-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>

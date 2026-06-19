@@ -82,23 +82,15 @@
 <span class="r-in"><span><span class="va">cd_tges</span> <span class="op">&lt;-</span> <span class="fu"><a href="tpc.html">tpc</a></span><span class="op">(</span>engine <span class="op">=</span> <span class="st">"causalDisco"</span>, test <span class="op">=</span> <span class="st">"fisher_z"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">disco_cd_tges</span> <span class="op">&lt;-</span> <span class="fu"><a href="disco.html">disco</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">tpc_example</span>, method <span class="op">=</span> <span class="va">cd_tges</span>, knowledge <span class="op">=</span> <span class="va">kn</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">disco_cd_tges</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">caugi graph summary</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Graph class: <span style="font-weight: bold;">PDAG</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nodes: <span style="font-weight: bold;">6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Edges: <span style="font-weight: bold;">6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Knowledge summary</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Tiers: <span style="font-weight: bold;">3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Variables: <span style="font-weight: bold;">6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Required edges: <span style="font-weight: bold;">0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forbidden edges: <span style="font-weight: bold;">0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Variables per Tier </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> child: <span style="font-weight: bold;">2</span> variables</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> old: <span style="font-weight: bold;">2</span> variables</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> youth: <span style="font-weight: bold;">2</span> variables</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;Disco PDAG: 6 nodes | 6 edges | Knowledge: 3 tiers&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Learned graph:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   edges: child_x1---child_x2, child_x2--&gt;oldage_x5, child_x2--&gt;youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          oldage_x5--&gt;oldage_x6, youth_x3--&gt;oldage_x5, youth_x4--&gt;oldage_x6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Knowledge:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(child): child_x1, child_x2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(youth): youth_x3, youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(old): oldage_x5, oldage_x6</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

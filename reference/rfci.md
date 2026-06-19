@@ -105,59 +105,17 @@ data(tpc_example)
 # Recommended path using disco()
 rfci_pcalg <- rfci(engine = "pcalg", test = "fisher_z", alpha = 0.05)
 disco(tpc_example, rfci_pcalg)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  o-o   child_x1 
-#> 2 child_x2  o->   oldage_x5
-#> 3 child_x2  o-o   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  o->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco UNKNOWN: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o-oyouth_x4
+#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
 
 # or using rfci_pcalg directly
 rfci_pcalg(tpc_example)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  o-o   child_x1 
-#> 2 child_x2  o->   oldage_x5
-#> 3 child_x2  o-o   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  o->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco UNKNOWN: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o-oyouth_x4
+#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
 
 # With all algorithm arguments specified
 rfci_pcalg <- rfci(
@@ -176,31 +134,10 @@ rfci_pcalg <- rfci(
   verbose = FALSE
 )
 disco(tpc_example, rfci_pcalg)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  o-o   child_x1 
-#> 2 child_x2  o->   oldage_x5
-#> 3 child_x2  o-o   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  o->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco UNKNOWN: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o-oyouth_x4
+#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
 
 #### Using tetrad engine with tier knowledge ####
 # Requires Tetrad to be installed
@@ -222,31 +159,10 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
   rfci_tetrad <- rfci_tetrad |> set_knowledge(kn)
   rfci_tetrad(tpc_example)
 }
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  o-o   child_x1 
-#> 2 child_x2  o->   oldage_x5
-#> 3 child_x2  o-o   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  o->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco UNKNOWN: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o-oyouth_x4
+#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
 
 # With all algorithm arguments specified
 if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
@@ -261,29 +177,8 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
   )
   disco(tpc_example, rfci_tetrad)
 }
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  o-o   child_x1 
-#> 2 child_x2  o->   oldage_x5
-#> 3 child_x2  o-o   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  o->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco UNKNOWN: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o-oyouth_x4
+#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
 ```

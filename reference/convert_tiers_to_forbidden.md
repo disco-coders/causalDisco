@@ -57,33 +57,12 @@ kn <- knowledge(
 )
 kn_converted <- convert_tiers_to_forbidden(kn)
 print(kn_converted)
-#> 
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Variables ──
-#> 
-#>   var       tier 
-#>   <chr>     <chr>
-#> 1 child_x1  NA   
-#> 2 child_x2  NA   
-#> 3 youth_x3  NA   
-#> 4 youth_x4  NA   
-#> 5 oldage_x5 NA   
-#> 6 oldage_x6 NA   
-#> ── Edges ──
-#> 
-#>  ✖  oldage_x5 → child_x1
-#>  ✖  oldage_x5 → child_x2
-#>  ✖  oldage_x5 → youth_x3
-#>  ✖  oldage_x5 → youth_x4
-#>  ✖  oldage_x6 → child_x1
-#>  ✖  oldage_x6 → child_x2
-#>  ✖  oldage_x6 → youth_x3
-#>  ✖  oldage_x6 → youth_x4
-#>  ✖  youth_x3 → child_x1
-#>  ✖  youth_x3 → child_x2
-#>  ✖  youth_x4 → child_x1
-#>  ✖  youth_x4 → child_x2
+#> <Knowledge: 6 vars | 12 forbidden>
+#>   vars: child_x1, child_x2, youth_x3, youth_x4, oldage_x5, oldage_x6
+#>   oldage_x5 %!-->% child_x1 + child_x2 + youth_x3 + youth_x4
+#>   oldage_x6 %!-->% child_x1 + child_x2 + youth_x3 + youth_x4
+#>   youth_x3 %!-->% child_x1 + child_x2
+#>   youth_x4 %!-->% child_x1 + child_x2
 plot(kn_converted)
 
 ```

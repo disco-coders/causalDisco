@@ -35,16 +35,8 @@ kn <- knowledge(
   )
 )
 summary(kn)
-#> 
-#> ── Knowledge summary ──
-#> 
-#> Tiers: 3
-#> Variables: 6
-#> Required edges: 0
-#> Forbidden edges: 0
-#> 
-#> ── Variables per Tier 
-#> child: 2 variables
-#> old: 2 variables
-#> youth: 2 variables
+#> <Knowledge: 3 tiers | 6 vars>
+#>   tier(child): child_x1, child_x2
+#>   tier(youth): youth_x3, youth_x4
+#>   tier(old): oldage_x5, oldage_x6
 ```

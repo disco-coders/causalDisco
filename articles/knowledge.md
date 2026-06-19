@@ -259,32 +259,12 @@ forbidden edges using
 
 kn_converted <- convert_tiers_to_forbidden(kn)
 print(kn_converted)
-#> 
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Variables ──
-#> 
-#>   [1mvar[22m   [1mtier[22m 
-#>   <chr> <chr>
-#> 1 A1    <NA> 
-#> 2 A2    <NA> 
-#> 3 B1    <NA> 
-#> 4 B2    <NA> 
-#> 5 C1    <NA> 
-#> 6 C2    <NA>
-#> ── Edges ──
-#>  ✖  B1 → A1
-#>  ✖  B1 → A2
-#>  ✖  B2 → A1
-#>  ✖  B2 → A2
-#>  ✖  C1 → A1
-#>  ✖  C1 → A2
-#>  ✖  C1 → B1
-#>  ✖  C1 → B2
-#>  ✖  C2 → A1
-#>  ✖  C2 → A2
-#>  ✖  C2 → B1
-#>  ✖  C2 → B2
+#> <Knowledge: 6 vars | 12 forbidden>
+#>   vars: A1, A2, B1, B2, C1, C2
+#>   B1 %!-->% A1 + A2
+#>   B2 %!-->% A1 + A2
+#>   C1 %!-->% A1 + A2 + B1 + B2
+#>   C2 %!-->% A1 + A2 + B1 + B2
 plot(kn_converted)
 ```
 

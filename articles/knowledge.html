@@ -268,32 +268,12 @@
 <div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">kn_converted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_tiers_to_forbidden.html">convert_tiers_to_forbidden</a></span><span class="op">(</span><span class="va">kn</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">kn_converted</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Knowledge object ────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Variables ──</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   [1mvar[22m   [1mtier[22m </span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;</span></span>
-<span><span class="co">#&gt; 1 A1    &lt;NA&gt; </span></span>
-<span><span class="co">#&gt; 2 A2    &lt;NA&gt; </span></span>
-<span><span class="co">#&gt; 3 B1    &lt;NA&gt; </span></span>
-<span><span class="co">#&gt; 4 B2    &lt;NA&gt; </span></span>
-<span><span class="co">#&gt; 5 C1    &lt;NA&gt; </span></span>
-<span><span class="co">#&gt; 6 C2    &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; ── Edges ──</span></span>
-<span><span class="co">#&gt;  ✖  B1 → A1</span></span>
-<span><span class="co">#&gt;  ✖  B1 → A2</span></span>
-<span><span class="co">#&gt;  ✖  B2 → A1</span></span>
-<span><span class="co">#&gt;  ✖  B2 → A2</span></span>
-<span><span class="co">#&gt;  ✖  C1 → A1</span></span>
-<span><span class="co">#&gt;  ✖  C1 → A2</span></span>
-<span><span class="co">#&gt;  ✖  C1 → B1</span></span>
-<span><span class="co">#&gt;  ✖  C1 → B2</span></span>
-<span><span class="co">#&gt;  ✖  C2 → A1</span></span>
-<span><span class="co">#&gt;  ✖  C2 → A2</span></span>
-<span><span class="co">#&gt;  ✖  C2 → B1</span></span>
-<span><span class="co">#&gt;  ✖  C2 → B2</span></span>
+<span><span class="co">#&gt; &lt;Knowledge: 6 vars | 12 forbidden&gt;</span></span>
+<span><span class="co">#&gt;   vars: A1, A2, B1, B2, C1, C2</span></span>
+<span><span class="co">#&gt;   B1 %!--&gt;% A1 + A2</span></span>
+<span><span class="co">#&gt;   B2 %!--&gt;% A1 + A2</span></span>
+<span><span class="co">#&gt;   C1 %!--&gt;% A1 + A2 + B1 + B2</span></span>
+<span><span class="co">#&gt;   C2 %!--&gt;% A1 + A2 + B1 + B2</span></span>
 <span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">kn_converted</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">

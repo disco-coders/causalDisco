@@ -38,21 +38,13 @@ kn <- knowledge(
 cd_tges <- tpc(engine = "causalDisco", test = "fisher_z")
 disco_cd_tges <- disco(data = tpc_example, method = cd_tges, knowledge = kn)
 summary(disco_cd_tges)
-#> 
-#> ── caugi graph summary ─────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> Nodes: 6
-#> Edges: 6
-#> 
-#> ── Knowledge summary ──
-#> 
-#> Tiers: 3
-#> Variables: 6
-#> Required edges: 0
-#> Forbidden edges: 0
-#> 
-#> ── Variables per Tier 
-#> child: 2 variables
-#> old: 2 variables
-#> youth: 2 variables
+#> <Disco PDAG: 6 nodes | 6 edges | Knowledge: 3 tiers>
+#> Learned graph:
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2-->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+#> Knowledge:
+#>   tier(child): child_x1, child_x2
+#>   tier(youth): youth_x3, youth_x4
+#>   tier(old): oldage_x5, oldage_x6
 ```

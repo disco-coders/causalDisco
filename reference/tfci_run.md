@@ -154,138 +154,38 @@ kn <- knowledge(
 my_tfci <- tfci(engine = "causalDisco", test = "fisher_z", alpha = 0.05)
 
 disco(tpc_example, my_tfci, knowledge = kn)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  o-o   child_x1 
-#> 2 child_x2  o->   oldage_x5
-#> 3 child_x2  o->   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  o->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Tiers ──
-#> 
-#>   tier  
-#>   <chr> 
-#> 1 child 
-#> 2 youth 
-#> 3 oldage
-#> ── Variables ──
-#> 
-#>   var       tier  
-#>   <chr>     <chr> 
-#> 1 child_x1  child 
-#> 2 child_x2  child 
-#> 3 youth_x3  youth 
-#> 4 youth_x4  youth 
-#> 5 oldage_x5 oldage
-#> 6 oldage_x6 oldage
+#> <Disco UNKNOWN: 6 nodes | 6 edges | Knowledge: 3 tiers>
+#> Learned graph:
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
+#> Knowledge:
+#>   tier(child): child_x1, child_x2
+#>   tier(youth): youth_x3, youth_x4
+#>   tier(oldage): oldage_x5, oldage_x6
 
 # or using my_tfci directly
 my_tfci <- my_tfci |> set_knowledge(kn)
 my_tfci(tpc_example)
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  o-o   child_x1 
-#> 2 child_x2  o->   oldage_x5
-#> 3 child_x2  o->   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  o->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Tiers ──
-#> 
-#>   tier  
-#>   <chr> 
-#> 1 child 
-#> 2 youth 
-#> 3 oldage
-#> ── Variables ──
-#> 
-#>   var       tier  
-#>   <chr>     <chr> 
-#> 1 child_x1  child 
-#> 2 child_x2  child 
-#> 3 youth_x3  youth 
-#> 4 youth_x4  youth 
-#> 5 oldage_x5 oldage
-#> 6 oldage_x6 oldage
+#> <Disco UNKNOWN: 6 nodes | 6 edges | Knowledge: 3 tiers>
+#> Learned graph:
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
+#> Knowledge:
+#>   tier(child): child_x1, child_x2
+#>   tier(youth): youth_x3, youth_x4
+#>   tier(oldage): oldage_x5, oldage_x6
 
 # Also possible: using tfci_run()
 tfci_run(tpc_example, test = cor_test, knowledge = kn)
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  o-o   child_x1 
-#> 2 child_x2  o->   oldage_x5
-#> 3 child_x2  o->   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  o->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Tiers ──
-#> 
-#>   tier  
-#>   <chr> 
-#> 1 child 
-#> 2 youth 
-#> 3 oldage
-#> ── Variables ──
-#> 
-#>   var       tier  
-#>   <chr>     <chr> 
-#> 1 child_x1  child 
-#> 2 child_x2  child 
-#> 3 youth_x3  youth 
-#> 4 youth_x4  youth 
-#> 5 oldage_x5 oldage
-#> 6 oldage_x6 oldage
+#> <Disco UNKNOWN: 6 nodes | 6 edges | Knowledge: 3 tiers>
+#> Learned graph:
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
+#> Knowledge:
+#>   tier(child): child_x1, child_x2
+#>   tier(youth): youth_x3, youth_x4
+#>   tier(oldage): oldage_x5, oldage_x6
 ```
