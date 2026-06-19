@@ -234,13 +234,44 @@ Tetrad Setup Instructions
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pc_result_bnlearn</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;Disco PDAG: 5 nodes | 6 edges&gt;</span></span>
-<span><span class="co">#&gt;   nodes: X1, X2, X3, Z, Y</span></span>
-<span><span class="co">#&gt;   edges: X1--&gt;Y, X1---Z, X2---X3, X2--&gt;Y, X3--&gt;Y, Z--&gt;Y</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── caugi graph ─────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Graph class: PDAG</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Edges ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   from  edge  to   </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span></span>
+<span><span class="co">#&gt; 1 X1    --&gt;   Y    </span></span>
+<span><span class="co">#&gt; 2 X1    ---   Z    </span></span>
+<span><span class="co">#&gt; 3 X2    ---   X3   </span></span>
+<span><span class="co">#&gt; 4 X2    --&gt;   Y    </span></span>
+<span><span class="co">#&gt; 5 X3    --&gt;   Y    </span></span>
+<span><span class="co">#&gt; 6 Z     --&gt;   Y</span></span>
+<span><span class="co">#&gt; ── Nodes ──</span></span>
+<span><span class="co">#&gt;   name </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;</span></span>
+<span><span class="co">#&gt; 1 X1   </span></span>
+<span><span class="co">#&gt; 2 X2   </span></span>
+<span><span class="co">#&gt; 3 X3   </span></span>
+<span><span class="co">#&gt; 4 Z    </span></span>
+<span><span class="co">#&gt; 5 Y</span></span>
+<span><span class="co">#&gt; ── Knowledge object ────────────────────────────────────────────────────────────</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pc_result_bnlearn</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;Disco PDAG: 5 nodes | 6 edges&gt;</span></span>
-<span><span class="co">#&gt;   nodes: X1, X2, X3, Z, Y</span></span>
-<span><span class="co">#&gt;   edges: X1--&gt;Y, X1---Z, X2---X3, X2--&gt;Y, X3--&gt;Y, Z--&gt;Y</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── caugi graph summary ─────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Graph class: PDAG</span></span>
+<span><span class="co">#&gt; Nodes: 5</span></span>
+<span><span class="co">#&gt; Edges: 6</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Knowledge summary ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Tiers: 0</span></span>
+<span><span class="co">#&gt; Variables: 0</span></span>
+<span><span class="co">#&gt; Required edges: 0</span></span>
+<span><span class="co">#&gt; Forbidden edges: 0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Variables per Tier</span></span></code></pre></div>
 </div>
 </section><section class="section level2"><h2 id="incorporating-knowledge">Incorporating knowledge<a class="anchor" aria-label="anchor" href="#incorporating-knowledge"></a>
 </h2>
@@ -275,15 +306,36 @@ Tetrad Setup Instructions
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">kn</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;Knowledge: 3 tiers | 6 vars&gt;</span></span>
-<span><span class="co">#&gt;   tier(child): child_x1, child_x2</span></span>
-<span><span class="co">#&gt;   tier(youth): youth_x3, youth_x4</span></span>
-<span><span class="co">#&gt;   tier(oldage): oldage_x5, oldage_x6</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Knowledge object ────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Tiers ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   [1mtier[22m  </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; </span></span>
+<span><span class="co">#&gt; 1 child </span></span>
+<span><span class="co">#&gt; 2 youth </span></span>
+<span><span class="co">#&gt; 3 oldage</span></span>
+<span><span class="co">#&gt; ── Variables ──</span></span>
+<span><span class="co">#&gt;   [1mvar[22m       [1mtier[22m  </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt; </span></span>
+<span><span class="co">#&gt; 1 child_x1  child </span></span>
+<span><span class="co">#&gt; 2 child_x2  child </span></span>
+<span><span class="co">#&gt; 3 youth_x3  youth </span></span>
+<span><span class="co">#&gt; 4 youth_x4  youth </span></span>
+<span><span class="co">#&gt; 5 oldage_x5 oldage</span></span>
+<span><span class="co">#&gt; 6 oldage_x6 oldage</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">kn</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;Knowledge: 3 tiers | 6 vars&gt;</span></span>
-<span><span class="co">#&gt;   tier(child): child_x1, child_x2</span></span>
-<span><span class="co">#&gt;   tier(youth): youth_x3, youth_x4</span></span>
-<span><span class="co">#&gt;   tier(oldage): oldage_x5, oldage_x6</span></span>
+<span><span class="co">#&gt; ── Knowledge summary ──</span></span>
+<span><span class="co">#&gt; Tiers: 3</span></span>
+<span><span class="co">#&gt; Variables: 6</span></span>
+<span><span class="co">#&gt; Required edges: 0</span></span>
+<span><span class="co">#&gt; Forbidden edges: 0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Variables per Tier</span></span>
+<span><span class="co">#&gt; child: 2 variables</span></span>
+<span><span class="co">#&gt; oldage: 2 variables</span></span>
+<span><span class="co">#&gt; youth: 2 variables</span></span>
 <span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">kn</span>, main <span class="op">=</span> <span class="st">"Temporal Knowledge"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
@@ -306,25 +358,63 @@ Tetrad Setup Instructions
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">tpc_result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;Disco PDAG: 6 nodes | 6 edges | Knowledge: 3 tiers&gt;</span></span>
-<span><span class="co">#&gt; Learned graph:</span></span>
-<span><span class="co">#&gt;   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5</span></span>
-<span><span class="co">#&gt;   edges: child_x1---child_x2, child_x2--&gt;oldage_x5, child_x2--&gt;youth_x4</span></span>
-<span><span class="co">#&gt;          oldage_x5--&gt;oldage_x6, youth_x3--&gt;oldage_x5, youth_x4--&gt;oldage_x6</span></span>
-<span><span class="co">#&gt; Knowledge:</span></span>
-<span><span class="co">#&gt;   tier(child): child_x1, child_x2</span></span>
-<span><span class="co">#&gt;   tier(youth): youth_x3, youth_x4</span></span>
-<span><span class="co">#&gt;   tier(oldage): oldage_x5, oldage_x6</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── caugi graph ─────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Graph class: PDAG</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Edges ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   from      edge  to       </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;    </span></span>
+<span><span class="co">#&gt; 1 child_x1  ---   child_x2 </span></span>
+<span><span class="co">#&gt; 2 child_x2  --&gt;   oldage_x5</span></span>
+<span><span class="co">#&gt; 3 child_x2  --&gt;   youth_x4 </span></span>
+<span><span class="co">#&gt; 4 oldage_x5 --&gt;   oldage_x6</span></span>
+<span><span class="co">#&gt; 5 youth_x3  --&gt;   oldage_x5</span></span>
+<span><span class="co">#&gt; 6 youth_x4  --&gt;   oldage_x6</span></span>
+<span><span class="co">#&gt; ── Nodes ──</span></span>
+<span><span class="co">#&gt;   name     </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;    </span></span>
+<span><span class="co">#&gt; 1 child_x2 </span></span>
+<span><span class="co">#&gt; 2 child_x1 </span></span>
+<span><span class="co">#&gt; 3 youth_x4 </span></span>
+<span><span class="co">#&gt; 4 youth_x3 </span></span>
+<span><span class="co">#&gt; 5 oldage_x6</span></span>
+<span><span class="co">#&gt; 6 oldage_x5</span></span>
+<span><span class="co">#&gt; ── Knowledge object ────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; ── Tiers ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   [1mtier[22m  </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; </span></span>
+<span><span class="co">#&gt; 1 child </span></span>
+<span><span class="co">#&gt; 2 youth </span></span>
+<span><span class="co">#&gt; 3 oldage</span></span>
+<span><span class="co">#&gt; ── Variables ──</span></span>
+<span><span class="co">#&gt;   [1mvar[22m       [1mtier[22m  </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt; </span></span>
+<span><span class="co">#&gt; 1 child_x1  child </span></span>
+<span><span class="co">#&gt; 2 child_x2  child </span></span>
+<span><span class="co">#&gt; 3 youth_x3  youth </span></span>
+<span><span class="co">#&gt; 4 youth_x4  youth </span></span>
+<span><span class="co">#&gt; 5 oldage_x5 oldage</span></span>
+<span><span class="co">#&gt; 6 oldage_x6 oldage</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">tpc_result</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;Disco PDAG: 6 nodes | 6 edges | Knowledge: 3 tiers&gt;</span></span>
-<span><span class="co">#&gt; Learned graph:</span></span>
-<span><span class="co">#&gt;   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5</span></span>
-<span><span class="co">#&gt;   edges: child_x1---child_x2, child_x2--&gt;oldage_x5, child_x2--&gt;youth_x4</span></span>
-<span><span class="co">#&gt;          oldage_x5--&gt;oldage_x6, youth_x3--&gt;oldage_x5, youth_x4--&gt;oldage_x6</span></span>
-<span><span class="co">#&gt; Knowledge:</span></span>
-<span><span class="co">#&gt;   tier(child): child_x1, child_x2</span></span>
-<span><span class="co">#&gt;   tier(youth): youth_x3, youth_x4</span></span>
-<span><span class="co">#&gt;   tier(oldage): oldage_x5, oldage_x6</span></span>
+<span><span class="co">#&gt; ── caugi graph summary ─────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Graph class: PDAG</span></span>
+<span><span class="co">#&gt; Nodes: 6</span></span>
+<span><span class="co">#&gt; Edges: 6</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Knowledge summary ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Tiers: 3</span></span>
+<span><span class="co">#&gt; Variables: 6</span></span>
+<span><span class="co">#&gt; Required edges: 0</span></span>
+<span><span class="co">#&gt; Forbidden edges: 0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Variables per Tier</span></span>
+<span><span class="co">#&gt; child: 2 variables</span></span>
+<span><span class="co">#&gt; oldage: 2 variables</span></span>
+<span><span class="co">#&gt; youth: 2 variables</span></span>
 <span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">tpc_result</span>, main <span class="op">=</span> <span class="st">"TPC reg_test with Temporal Knowledge (causalDisco)"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>

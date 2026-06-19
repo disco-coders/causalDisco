@@ -349,9 +349,29 @@ If NULL, the currently set data will be used, i.e. <code>self$data</code>.</p></
 <span class="r-in"><span><span class="fu"><a href="disco.html">disco</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">num_data</span>, method <span class="op">=</span> <span class="va">my_pc2</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>vstructure X1 -&gt; Y &lt;- X3 is not applicable, because one or both arcs are oriented in the opposite direction.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>vstructure X1 -&gt; Y &lt;- X2 is not applicable, because one or both arcs are oriented in the opposite direction.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;Disco PDAG: 5 nodes | 5 edges&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   nodes: X1, X2, X3, Z, Y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   edges: X2---X3, X2---Y, X3---Y, Y--&gt;X1, Z--&gt;X1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">caugi graph</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────────────</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Graph class: <span style="font-weight: bold;">PDAG</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Edges</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   from  edge  to   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> X2    ---   X3   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> X2    ---   Y    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> X3    ---   Y    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Y     --&gt;   X1   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Z     --&gt;   X1   </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Nodes</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   name </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> X1   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> X2   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> X3   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Z    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Y    </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Knowledge object</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With knowledge</span></span></span>
 <span class="r-in"><span></span></span>
@@ -361,15 +381,44 @@ If NULL, the currently set data will be used, i.e. <code>self$data</code>.</p></
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="disco.html">disco</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">num_data</span>, method <span class="op">=</span> <span class="va">my_pc2</span>, knowledge <span class="op">=</span> <span class="va">kn</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;Disco PDAG: 5 nodes | 5 edges | Knowledge: 3 required&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Learned graph:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   nodes: X1, X2, X3, Z, Y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   edges: X1--&gt;Y, X1---Z, X2---X3, X2--&gt;Y, X3--&gt;Y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Knowledge:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   vars: X1, X2, X3, Y, Z</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   X1 %--&gt;% Y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   X2 %--&gt;% Y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   X3 %--&gt;% Y</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">caugi graph</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────────────</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Graph class: <span style="font-weight: bold;">PDAG</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Edges</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   from  edge  to   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> X1    --&gt;   Y    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> X1    ---   Z    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> X2    ---   X3   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> X2    --&gt;   Y    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> X3    --&gt;   Y    </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Nodes</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   name </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> X1   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> X2   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> X3   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Z    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Y    </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Knowledge object</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Variables</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="font-weight: bold;">var</span>   <span style="font-weight: bold;">tier</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> X1    <span style="color: #BB0000;">NA</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> X2    <span style="color: #BB0000;">NA</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> X3    <span style="color: #BB0000;">NA</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Y     <span style="color: #BB0000;">NA</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Z     <span style="color: #BB0000;">NA</span>   </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Edges</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">✔</span>  X1 → Y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">✔</span>  X2 → Y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #00BB00;">✔</span>  X3 → Y</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using additional test args (bootstrap samples)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -381,9 +430,29 @@ If NULL, the currently set data will be used, i.e. <code>self$data</code>.</p></
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="disco.html">disco</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">num_data</span>, method <span class="op">=</span> <span class="va">my_iamb</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;Disco PDAG: 5 nodes | 6 edges&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   nodes: X1, X2, X3, Z, Y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   edges: X1--&gt;Y, X1--&gt;Z, X2---X3, X2--&gt;Y, X3--&gt;Y, Y--&gt;Z</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">caugi graph</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────────────</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Graph class: <span style="font-weight: bold;">PDAG</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Edges</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   from  edge  to   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> X1    --&gt;   Y    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> X1    --&gt;   Z    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> X2    ---   X3   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> X2    --&gt;   Y    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> X3    --&gt;   Y    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Y     --&gt;   Z    </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Nodes</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   name </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> X1   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> X2   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> X3   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Z    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Y    </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Knowledge object</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Using R6 class:</span></span></span>
 <span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va">BnlearnSearch</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>

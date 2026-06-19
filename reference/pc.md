@@ -107,17 +107,59 @@ data(tpc_example)
 # Recommended path using disco()
 pc_pcalg <- pc(engine = "pcalg", test = "fisher_z", alpha = 0.05)
 disco(tpc_example, pc_pcalg)
-#> <Disco PDAG: 6 nodes | 6 edges>
-#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2---youth_x4
-#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from      edge  to       
+#>   <chr>     <chr> <chr>    
+#> 1 child_x1  ---   child_x2 
+#> 2 child_x2  -->   oldage_x5
+#> 3 child_x2  ---   youth_x4 
+#> 4 oldage_x5 -->   oldage_x6
+#> 5 youth_x3  -->   oldage_x5
+#> 6 youth_x4  -->   oldage_x6
+#> ── Nodes ──
+#> 
+#>   name     
+#>   <chr>    
+#> 1 child_x2 
+#> 2 child_x1 
+#> 3 youth_x4 
+#> 4 youth_x3 
+#> 5 oldage_x6
+#> 6 oldage_x5
+#> ── Knowledge object ────────────────────────────────────────────────────────────
 
 # or using pc_pcalg directly
 pc_pcalg(tpc_example)
-#> <Disco PDAG: 6 nodes | 6 edges>
-#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2---youth_x4
-#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from      edge  to       
+#>   <chr>     <chr> <chr>    
+#> 1 child_x1  ---   child_x2 
+#> 2 child_x2  -->   oldage_x5
+#> 3 child_x2  ---   youth_x4 
+#> 4 oldage_x5 -->   oldage_x6
+#> 5 youth_x3  -->   oldage_x5
+#> 6 youth_x4  -->   oldage_x6
+#> ── Nodes ──
+#> 
+#>   name     
+#>   <chr>    
+#> 1 child_x2 
+#> 2 child_x1 
+#> 3 youth_x4 
+#> 4 youth_x3 
+#> 5 oldage_x6
+#> 6 oldage_x5
+#> ── Knowledge object ────────────────────────────────────────────────────────────
 
 # With all algorithm arguments specified
 pc_pcalg <- pc(
@@ -148,26 +190,83 @@ kn <- knowledge(
 pc_bnlearn <- pc(engine = "bnlearn", test = "fisher_z", alpha = 0.05)
 disco(tpc_example, pc_bnlearn, knowledge = kn)
 #> Warning: vstructure youth_x4 -> oldage_x6 <- oldage_x5 is not applicable, because one or both arcs are oriented in the opposite direction.
-#> <Disco PDAG: 6 nodes | 9 edges | Knowledge: 4 required>
-#> Learned graph:
-#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x1---child_x2, child_x1-->youth_x3, child_x1-->youth_x4
-#>          child_x2---oldage_x5, child_x2-->youth_x3, child_x2-->youth_x4
-#>          oldage_x5---oldage_x6, oldage_x5-->youth_x3, oldage_x6-->youth_x4
-#> Knowledge:
-#>   vars: child_x1, child_x2, oldage_x5, oldage_x6, youth_x3, youth_x4
-#>   child_x1 %-->% youth_x3 + youth_x4
-#>   child_x2 %-->% youth_x3 + youth_x4
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from      edge  to       
+#>   <chr>     <chr> <chr>    
+#> 1 child_x1  ---   child_x2 
+#> 2 child_x1  -->   youth_x3 
+#> 3 child_x1  -->   youth_x4 
+#> 4 child_x2  ---   oldage_x5
+#> 5 child_x2  -->   youth_x3 
+#> 6 child_x2  -->   youth_x4 
+#> 7 oldage_x5 ---   oldage_x6
+#> 8 oldage_x5 -->   youth_x3 
+#> 9 oldage_x6 -->   youth_x4 
+#> ── Nodes ──
+#> 
+#>   name     
+#>   <chr>    
+#> 1 child_x2 
+#> 2 child_x1 
+#> 3 youth_x4 
+#> 4 youth_x3 
+#> 5 oldage_x6
+#> 6 oldage_x5
+#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> 
+#> ── Variables ──
+#> 
+#>   var       tier 
+#>   <chr>     <chr>
+#> 1 child_x1  NA   
+#> 2 child_x2  NA   
+#> 3 oldage_x5 NA   
+#> 4 oldage_x6 NA   
+#> 5 youth_x3  NA   
+#> 6 youth_x4  NA   
+#> ── Edges ──
+#> 
+#>  ✔  child_x1 → youth_x3
+#>  ✔  child_x1 → youth_x4
+#>  ✔  child_x2 → youth_x3
+#>  ✔  child_x2 → youth_x4
 
 # or using pc_bnlearn directly
 pc_bnlearn <- pc_bnlearn |> set_knowledge(kn)
 pc_bnlearn(tpc_example)
 #> Warning: vstructure youth_x4 -> oldage_x6 <- oldage_x5 is not applicable, because one or both arcs are oriented in the opposite direction.
-#> <Disco PDAG: 6 nodes | 9 edges>
-#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x1---child_x2, child_x1-->youth_x3, child_x1-->youth_x4
-#>          child_x2---oldage_x5, child_x2-->youth_x3, child_x2-->youth_x4
-#>          oldage_x5---oldage_x6, oldage_x5-->youth_x3, oldage_x6-->youth_x4
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from      edge  to       
+#>   <chr>     <chr> <chr>    
+#> 1 child_x1  ---   child_x2 
+#> 2 child_x1  -->   youth_x3 
+#> 3 child_x1  -->   youth_x4 
+#> 4 child_x2  ---   oldage_x5
+#> 5 child_x2  -->   youth_x3 
+#> 6 child_x2  -->   youth_x4 
+#> 7 oldage_x5 ---   oldage_x6
+#> 8 oldage_x5 -->   youth_x3 
+#> 9 oldage_x6 -->   youth_x4 
+#> ── Nodes ──
+#> 
+#>   name     
+#>   <chr>    
+#> 1 child_x2 
+#> 2 child_x1 
+#> 3 youth_x4 
+#> 4 youth_x3 
+#> 5 oldage_x6
+#> 6 oldage_x5
+#> ── Knowledge object ────────────────────────────────────────────────────────────
 
 
 # With all algorithm arguments specified
@@ -181,10 +280,31 @@ pc_bnlearn <- pc(
 )
 
 disco(tpc_example, pc_bnlearn)
-#> <Disco PDAG: 6 nodes | 6 edges>
-#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x1---child_x2, child_x2---oldage_x5, child_x2---youth_x4
-#>          oldage_x5---oldage_x6, oldage_x5---youth_x3, oldage_x6---youth_x4
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from      edge  to       
+#>   <chr>     <chr> <chr>    
+#> 1 child_x1  ---   child_x2 
+#> 2 child_x2  ---   oldage_x5
+#> 3 child_x2  ---   youth_x4 
+#> 4 oldage_x5 ---   oldage_x6
+#> 5 oldage_x5 ---   youth_x3 
+#> 6 oldage_x6 ---   youth_x4 
+#> ── Nodes ──
+#> 
+#>   name     
+#>   <chr>    
+#> 1 child_x2 
+#> 2 child_x1 
+#> 3 youth_x4 
+#> 4 youth_x3 
+#> 5 oldage_x6
+#> 6 oldage_x5
+#> ── Knowledge object ────────────────────────────────────────────────────────────
 
 #### Using tetrad engine with tier knowledge ####
 # Requires Tetrad to be installed
@@ -206,10 +326,31 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
   pc_tetrad <- pc_tetrad |> set_knowledge(kn)
   pc_tetrad(tpc_example)
 }
-#> <Disco UNKNOWN: 6 nodes | 6 edges>
-#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x2---child_x1, child_x2-->oldage_x5, child_x2-->youth_x4
-#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: UNKNOWN
+#> 
+#> ── Edges ──
+#> 
+#>   from      edge  to       
+#>   <chr>     <chr> <chr>    
+#> 1 child_x2  ---   child_x1 
+#> 2 child_x2  -->   oldage_x5
+#> 3 child_x2  -->   youth_x4 
+#> 4 oldage_x5 -->   oldage_x6
+#> 5 youth_x3  -->   oldage_x5
+#> 6 youth_x4  -->   oldage_x6
+#> ── Nodes ──
+#> 
+#>   name     
+#>   <chr>    
+#> 1 child_x2 
+#> 2 child_x1 
+#> 3 youth_x4 
+#> 4 youth_x3 
+#> 5 oldage_x6
+#> 6 oldage_x5
+#> ── Knowledge object ────────────────────────────────────────────────────────────
 
 # With all algorithm arguments specified
 if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
@@ -224,8 +365,29 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
   )
   disco(tpc_example, pc_tetrad)
 }
-#> <Disco PDAG: 6 nodes | 6 edges>
-#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x2---child_x1, child_x2-->oldage_x5, child_x2---youth_x4
-#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from      edge  to       
+#>   <chr>     <chr> <chr>    
+#> 1 child_x2  ---   child_x1 
+#> 2 child_x2  -->   oldage_x5
+#> 3 child_x2  ---   youth_x4 
+#> 4 oldage_x5 -->   oldage_x6
+#> 5 youth_x3  -->   oldage_x5
+#> 6 youth_x4  -->   oldage_x6
+#> ── Nodes ──
+#> 
+#>   name     
+#>   <chr>    
+#> 1 child_x2 
+#> 2 child_x1 
+#> 3 youth_x4 
+#> 4 youth_x3 
+#> 5 oldage_x6
+#> 6 oldage_x5
+#> ── Knowledge object ────────────────────────────────────────────────────────────
 ```

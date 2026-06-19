@@ -217,13 +217,44 @@ another way to view and analyze the results is to use the
 ``` r
 
 print(pc_result_bnlearn)
-#> <Disco PDAG: 5 nodes | 6 edges>
-#>   nodes: X1, X2, X3, Z, Y
-#>   edges: X1-->Y, X1---Z, X2---X3, X2-->Y, X3-->Y, Z-->Y
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from  edge  to   
+#>   <chr> <chr> <chr>
+#> 1 X1    -->   Y    
+#> 2 X1    ---   Z    
+#> 3 X2    ---   X3   
+#> 4 X2    -->   Y    
+#> 5 X3    -->   Y    
+#> 6 Z     -->   Y
+#> ── Nodes ──
+#>   name 
+#>   <chr>
+#> 1 X1   
+#> 2 X2   
+#> 3 X3   
+#> 4 Z    
+#> 5 Y
+#> ── Knowledge object ────────────────────────────────────────────────────────────
 summary(pc_result_bnlearn)
-#> <Disco PDAG: 5 nodes | 6 edges>
-#>   nodes: X1, X2, X3, Z, Y
-#>   edges: X1-->Y, X1---Z, X2---X3, X2-->Y, X3-->Y, Z-->Y
+#> 
+#> ── caugi graph summary ─────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> Nodes: 5
+#> Edges: 6
+#> 
+#> ── Knowledge summary ──
+#> 
+#> Tiers: 0
+#> Variables: 0
+#> Required edges: 0
+#> Forbidden edges: 0
+#> 
+#> ── Variables per Tier
 ```
 
 ## Incorporating knowledge
@@ -281,15 +312,36 @@ You can view the `Knowledge` object using
 ``` r
 
 print(kn)
-#> <Knowledge: 3 tiers | 6 vars>
-#>   tier(child): child_x1, child_x2
-#>   tier(youth): youth_x3, youth_x4
-#>   tier(oldage): oldage_x5, oldage_x6
+#> 
+#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> 
+#> ── Tiers ──
+#> 
+#>   [1mtier[22m  
+#>   <chr> 
+#> 1 child 
+#> 2 youth 
+#> 3 oldage
+#> ── Variables ──
+#>   [1mvar[22m       [1mtier[22m  
+#>   <chr>     <chr> 
+#> 1 child_x1  child 
+#> 2 child_x2  child 
+#> 3 youth_x3  youth 
+#> 4 youth_x4  youth 
+#> 5 oldage_x5 oldage
+#> 6 oldage_x6 oldage
 summary(kn)
-#> <Knowledge: 3 tiers | 6 vars>
-#>   tier(child): child_x1, child_x2
-#>   tier(youth): youth_x3, youth_x4
-#>   tier(oldage): oldage_x5, oldage_x6
+#> ── Knowledge summary ──
+#> Tiers: 3
+#> Variables: 6
+#> Required edges: 0
+#> Forbidden edges: 0
+#> 
+#> ── Variables per Tier
+#> child: 2 variables
+#> oldage: 2 variables
+#> youth: 2 variables
 plot(kn, main = "Temporal Knowledge")
 ```
 
@@ -321,25 +373,63 @@ Similarly, we can view the results using
 ``` r
 
 print(tpc_result)
-#> <Disco PDAG: 6 nodes | 6 edges | Knowledge: 3 tiers>
-#> Learned graph:
-#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2-->youth_x4
-#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
-#> Knowledge:
-#>   tier(child): child_x1, child_x2
-#>   tier(youth): youth_x3, youth_x4
-#>   tier(oldage): oldage_x5, oldage_x6
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from      edge  to       
+#>   <chr>     <chr> <chr>    
+#> 1 child_x1  ---   child_x2 
+#> 2 child_x2  -->   oldage_x5
+#> 3 child_x2  -->   youth_x4 
+#> 4 oldage_x5 -->   oldage_x6
+#> 5 youth_x3  -->   oldage_x5
+#> 6 youth_x4  -->   oldage_x6
+#> ── Nodes ──
+#>   name     
+#>   <chr>    
+#> 1 child_x2 
+#> 2 child_x1 
+#> 3 youth_x4 
+#> 4 youth_x3 
+#> 5 oldage_x6
+#> 6 oldage_x5
+#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> ── Tiers ──
+#> 
+#>   [1mtier[22m  
+#>   <chr> 
+#> 1 child 
+#> 2 youth 
+#> 3 oldage
+#> ── Variables ──
+#>   [1mvar[22m       [1mtier[22m  
+#>   <chr>     <chr> 
+#> 1 child_x1  child 
+#> 2 child_x2  child 
+#> 3 youth_x3  youth 
+#> 4 youth_x4  youth 
+#> 5 oldage_x5 oldage
+#> 6 oldage_x6 oldage
 summary(tpc_result)
-#> <Disco PDAG: 6 nodes | 6 edges | Knowledge: 3 tiers>
-#> Learned graph:
-#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2-->youth_x4
-#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
-#> Knowledge:
-#>   tier(child): child_x1, child_x2
-#>   tier(youth): youth_x3, youth_x4
-#>   tier(oldage): oldage_x5, oldage_x6
+#> ── caugi graph summary ─────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> Nodes: 6
+#> Edges: 6
+#> 
+#> ── Knowledge summary ──
+#> 
+#> Tiers: 3
+#> Variables: 6
+#> Required edges: 0
+#> Forbidden edges: 0
+#> 
+#> ── Variables per Tier
+#> child: 2 variables
+#> oldage: 2 variables
+#> youth: 2 variables
 plot(tpc_result, main = "TPC reg_test with Temporal Knowledge (causalDisco)")
 ```
 

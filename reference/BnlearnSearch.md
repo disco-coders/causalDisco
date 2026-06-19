@@ -398,9 +398,29 @@ my_pc2 <- pc(
 disco(data = num_data, method = my_pc2)
 #> Warning: vstructure X1 -> Y <- X3 is not applicable, because one or both arcs are oriented in the opposite direction.
 #> Warning: vstructure X1 -> Y <- X2 is not applicable, because one or both arcs are oriented in the opposite direction.
-#> <Disco PDAG: 5 nodes | 5 edges>
-#>   nodes: X1, X2, X3, Z, Y
-#>   edges: X2---X3, X2---Y, X3---Y, Y-->X1, Z-->X1
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from  edge  to   
+#>   <chr> <chr> <chr>
+#> 1 X2    ---   X3   
+#> 2 X2    ---   Y    
+#> 3 X3    ---   Y    
+#> 4 Y     -->   X1   
+#> 5 Z     -->   X1   
+#> ── Nodes ──
+#> 
+#>   name 
+#>   <chr>
+#> 1 X1   
+#> 2 X2   
+#> 3 X3   
+#> 4 Z    
+#> 5 Y    
+#> ── Knowledge object ────────────────────────────────────────────────────────────
 
 # With knowledge
 
@@ -410,15 +430,44 @@ kn <- knowledge(
 )
 
 disco(data = num_data, method = my_pc2, knowledge = kn)
-#> <Disco PDAG: 5 nodes | 5 edges | Knowledge: 3 required>
-#> Learned graph:
-#>   nodes: X1, X2, X3, Z, Y
-#>   edges: X1-->Y, X1---Z, X2---X3, X2-->Y, X3-->Y
-#> Knowledge:
-#>   vars: X1, X2, X3, Y, Z
-#>   X1 %-->% Y
-#>   X2 %-->% Y
-#>   X3 %-->% Y
+#> 
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from  edge  to   
+#>   <chr> <chr> <chr>
+#> 1 X1    -->   Y    
+#> 2 X1    ---   Z    
+#> 3 X2    ---   X3   
+#> 4 X2    -->   Y    
+#> 5 X3    -->   Y    
+#> ── Nodes ──
+#> 
+#>   name 
+#>   <chr>
+#> 1 X1   
+#> 2 X2   
+#> 3 X3   
+#> 4 Z    
+#> 5 Y    
+#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> 
+#> ── Variables ──
+#> 
+#>   var   tier 
+#>   <chr> <chr>
+#> 1 X1    NA   
+#> 2 X2    NA   
+#> 3 X3    NA   
+#> 4 Y     NA   
+#> 5 Z     NA   
+#> ── Edges ──
+#> 
+#>  ✔  X1 → Y
+#>  ✔  X2 → Y
+#>  ✔  X3 → Y
 
 # Using additional test args (bootstrap samples)
 
@@ -430,9 +479,29 @@ my_iamb <- iamb(
 )
 
 disco(data = num_data, method = my_iamb)
-#> <Disco PDAG: 5 nodes | 6 edges>
-#>   nodes: X1, X2, X3, Z, Y
-#>   edges: X1-->Y, X1-->Z, X2---X3, X2-->Y, X3-->Y, Y-->Z
+#> ── caugi graph ─────────────────────────────────────────────────────────────────
+#> Graph class: PDAG
+#> 
+#> ── Edges ──
+#> 
+#>   from  edge  to   
+#>   <chr> <chr> <chr>
+#> 1 X1    -->   Y    
+#> 2 X1    -->   Z    
+#> 3 X2    ---   X3   
+#> 4 X2    -->   Y    
+#> 5 X3    -->   Y    
+#> 6 Y     -->   Z    
+#> ── Nodes ──
+#> 
+#>   name 
+#>   <chr>
+#> 1 X1   
+#> 2 X2   
+#> 3 X3   
+#> 4 Z    
+#> 5 Y    
+#> ── Knowledge object ────────────────────────────────────────────────────────────
 
 # Using R6 class:
 s <- BnlearnSearch$new()

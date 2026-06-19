@@ -8,11 +8,6 @@
   [`rfci()`](https://disco-coders.github.io/causalDisco/reference/rfci.md),
   interfacing with implementations from pcalg and Tetrad.
 
-- The infix edge operators `%-->%` and `%!-->%` in
-  [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)
-  now accept `+` on both sides to specify multiple variables, e.g.
-  `A + B %-->% C + D` is equivalent to `c(A, B) %-->% c(C, D)`.
-
 ### Bug fixes
 
 - Fixed
