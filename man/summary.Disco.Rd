@@ -6,31 +6,9 @@
 \usage{
 \method{summary}{Disco}(object, ...)
 }
-\arguments{
-\item{object}{A \code{Disco} object.}
-
-\item{...}{Additional arguments (not used).}
-}
-\value{
-Invisibly returns the \code{Disco} object.
-}
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 
 \code{summary()} for \code{Disco} objects is deprecated. Use \code{\link[=print]{print()}} instead.
 }
-\examples{
-data(tpc_example)
-kn <- knowledge(
-  tpc_example,
-  tier(
-    child ~ starts_with("child"),
-    youth ~ starts_with("youth"),
-    old ~ starts_with("old")
-  )
-)
-cd_tges <- tpc(engine = "causalDisco", test = "fisher_z")
-disco_cd_tges <- disco(data = tpc_example, method = cd_tges, knowledge = kn)
-print(disco_cd_tges)
-
-}
+\keyword{internal}

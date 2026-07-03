@@ -14,73 +14,9 @@ generate_dag_data(
   seed = NULL
 )
 }
-\arguments{
-\item{cg}{A \code{caugi} graph object representing a DAG.}
-
-\item{n}{Integer. Number of observations to simulate.}
-
-\item{...}{Optional named node equations to override automatic linear generation.
-Each should be an expression referencing all parent nodes.}
-
-\item{standardize}{Logical. If \code{TRUE}, each column of the output is standardized
-to mean 0 and standard deviation 1.}
-
-\item{coef_range}{Numeric vector of length 2 specifying the minimum and maximum
-absolute value of edge coefficients. For each edge, an absolute value is sampled
-uniformly from this range and then assigned a positive or negative sign with equal
-probability. Must satisfy \code{coef_range[1] > 0} and \code{coef_range[2] >= coef_range[1]}.}
-
-\item{error_sd}{Numeric vector of length 2 specifying the minimum and maximum
-standard deviation of the additive Gaussian noise at each node. For each node,
-a standard deviation is sampled from a log-uniform distribution over this range.
-Must satisfy \code{error_sd[1] > 0} and \code{error_sd[2] >= error_sd[1]}.}
-
-\item{seed}{Optional integer. Sets the random seed for reproducibility.}
-}
-\value{
-A \code{tibble} of simulated data with one column per node in the DAG,
-ordered according to the graph's node order. Standardization is applied
-if \code{standardize = TRUE}.
-
-The returned tibble has an attribute \code{generating_model}, which is a list containing:
-\itemize{
-\item \code{sd}: Named numeric vector of node-specific noise standard deviations.
-\item \code{coef}: Named list of numeric vectors, where each element corresponds
-to a child node. For a child node, the vector stores the coefficients of
-its parent nodes in the linear structural equation. That is:
-\code{generating_model$coef[[child]][parent]} gives the coefficient
-of \code{parent} in the equation for \code{child}.
-}
-}
 \description{
-Generates synthetic data from a directed acyclic graph (DAG) specified as a
-\code{caugi} graph object. Each node is modeled as a linear combination of its
-parents plus additive Gaussian noise. Coefficients are randomly signed with
-a minimum absolute value, and noise standard deviations are sampled
-log-uniformly from a specified range. Custom node equations can override
-automatic linear generation.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+This function has been renamed to \code{\link[=sim_data]{sim_data()}} instead.
 }
-\examples{
-cg <- caugi::caugi(A \%-->\% B, B \%-->\% C, A \%-->\% C, class = "DAG")
-
-# Simulate 1000 observations
-sim_data <- generate_dag_data(
-  cg,
-  n = 1000,
-  coef_range = c(0.2, 0.8),
-  error_sd = c(0.5, 1.5)
-)
-
-head(sim_data)
-attr(sim_data, "generating_model")
-
-# Simulate with custom equation for node C
-sim_data_custom <- generate_dag_data(
-  cg,
-  n = 1000,
-  C = A^2 + B + rnorm(n, sd = 0.7),
-  seed = 1405
-)
-head(sim_data_custom)
-attr(sim_data_custom, "generating_model")
-}
+\keyword{internal}

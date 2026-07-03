@@ -457,29 +457,13 @@ print.Disco <- function(x, ...) {
 #'
 #' `summary()` for `Disco` objects is deprecated. Use [print()] instead.
 #'
-#' @param object A `Disco` object.
-#' @param ... Additional arguments (not used).
-#' @returns Invisibly returns the `Disco` object.
-#' @examples
-#' data(tpc_example)
-#' kn <- knowledge(
-#'   tpc_example,
-#'   tier(
-#'     child ~ starts_with("child"),
-#'     youth ~ starts_with("youth"),
-#'     old ~ starts_with("old")
-#'   )
-#' )
-#' cd_tges <- tpc(engine = "causalDisco", test = "fisher_z")
-#' disco_cd_tges <- disco(data = tpc_example, method = cd_tges, knowledge = kn)
-#' print(disco_cd_tges)
-#'
+#' @keywords internal
 #' @exportS3Method summary Disco
 summary.Disco <- function(object, ...) {
   lifecycle::deprecate_warn(
     when = "1.2.0",
-    what = "summary.Disco()",
-    with = "print.Disco()"
+    what = "summary()",
+    with = "print()"
   )
   print(object, ...)
   invisible(object)

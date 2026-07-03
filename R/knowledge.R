@@ -637,33 +637,20 @@ print.Knowledge <- function(x, ...) {
   }
 }
 
-#' @title Summarize a Knowledge Object
+#' @title Summarize a Disco Object
 #'
 #' @description
 #' `r lifecycle::badge("deprecated")`
 #'
-#' `summary()` for `Knowledge` objects is deprecated. Use [print()] instead.
+#' `summary()` for `Disco` objects is deprecated. Use [print()] instead.
 #'
-#' @param object A `Knowledge` object.
-#' @param ... Additional arguments (not used).
-#' @returns Invisibly returns the `Knowledge` object.
-#' @examples
-#' kn <- knowledge(
-#'   tpc_example,
-#'   tier(
-#'     child ~ starts_with("child"),
-#'     youth ~ starts_with("youth"),
-#'     old ~ starts_with("old")
-#'   )
-#' )
-#' print(kn)
-#'
-#' @exportS3Method summary Knowledge
+#' @keywords internal
+#' @exportS3Method summary Disco
 summary.Knowledge <- function(object, ...) {
   lifecycle::deprecate_warn(
     when = "1.2.0",
-    what = "summary.Knowledge()",
-    with = "print.Knowledge()"
+    what = "summary()",
+    with = "print()"
   )
   print(object, ...)
   invisible(object)
