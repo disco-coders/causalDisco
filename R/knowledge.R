@@ -611,11 +611,12 @@ print.Knowledge <- function(x, ...) {
   if (n_required > 0L || n_forbidden > 0L) {
     n_shown <- 0L
     for (status in c("required", "forbidden")) {
-      op <- if (status == "required") "%-->%" else "%!-->%"
+      op <- if (status == "required") "-->" else "!-->"
       grp <- x$edges[x$edges$status == status, , drop = FALSE]
       if (nrow(grp) == 0L) {
         next
       }
+      cat(sprintf("  %s:\n", status))
       by_from <- split(grp$to, grp$from)
       for (from_var in names(by_from)) {
         if (n_shown >= max_edge_groups) {
@@ -629,7 +630,7 @@ print.Knowledge <- function(x, ...) {
         }
         to_vars <- by_from[[from_var]]
         rhs <- paste(to_vars, collapse = " + ")
-        cat(sprintf("  %s %s %s\n", from_var, op, rhs))
+        cat(sprintf("    %s%s%s\n", from_var, op, rhs))
         n_shown <- n_shown + 1L
       }
     }
