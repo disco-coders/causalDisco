@@ -211,3 +211,29 @@
 #' @seealso [num_data]
 #' @concept dataset
 "num_data_latent"
+
+#' US National Longitudinal Survey of Youth 1997
+#'
+#' A subset of data from the US National Longitudinal Survey of Youth 1997 (NLSY97).
+#' Several ordinal variables were dichotomized for analysis purposes, and all survey-specific missing value codes were
+#' recoded to NA.
+#'
+#' See source code on GitHub in data-raw/ for the raw data, the corresponding RNUM, and code showing how it has been
+#' cleaned.
+#'
+#' @format
+#' A tibble with 8,974 rows and 9 columns:
+#' \describe{
+#'   \item{r1_hhchildren}{Number of household members younger than 18. Measured in Round 1, 1997.}
+#'   \item{r1_mcollege}{Did biological mother attend college? Binary factor (levels: No, Yes). Measured in Round 1, 1997.}
+#'   \item{r1_rural_urban}{Residence in an urban or a rural area. Binary factor (levels: Rural, Urban). Measured in Round 1, 1997.}
+#'   \item{r6_depressed}{Depressive feelings during the last month. Binary factor derived from 4-point scale (levels: Any = 1–3, None = 4). Measured in Round 6, 2002.}
+#'   \item{r6_docvisits}{Number of doctor’s visits during the last year. Measured in Round 6, 2002.}
+#'   \item{r6_exercise}{Days with 30+ minutes exercise / week. Measured in Round 6, 2002.}
+#'   \item{r12_depressed}{Depressive feelings during the last month. Binary factor derived from 4-point scale (levels: Any = 1–3, None = 4). Measured in Round 12, 2008.}
+#'   \item{r12_docvisits}{Number of doctor’s visits during the last year. Measured in Round 12, 2008.}
+#'   \item{r12_health}{Perception of own health. Binary factor derived from 5-point scale (levels: Good = 1–3, Poor = 4–5). Measured in Round 12, 2008.}
+#' }
+#' @source <https://www.nlsinfo.org/investigator/pages/search?s=NLSY97>
+#'@concept dataset
+"nlsy97"
