@@ -83,6 +83,8 @@ See \code{\link[micd:gaussCItwd]{micd::gaussCItwd()}}.
 \item \code{"fisher_z_mi"} - Fisher Z test for Gaussian data with multiple imputation.
 See \code{\link[micd:gaussCItestMI]{micd::gaussCItestMI()}}.
 
+\item \code{"reg"} - Regression test for discrete or binary data.
+See \code{\link[=reg_test]{reg_test()}}.
 \item \code{"g_square"} - G square test for discrete data.
 See \code{\link[pcalg:binCItest]{pcalg::binCItest()}} and \code{\link[pcalg:disCItest]{pcalg::disCItest()}}.
 \item \code{"g_square_twd"} - G square test for discrete data with test-wise deletion.
