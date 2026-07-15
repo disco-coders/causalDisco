@@ -34,3 +34,10 @@ The model is fitted in both directions (interchanging the roles
 of \code{x} and \code{y}). The final p-value is the maximum of the two
 obtained p-values.
 }
+\examples{
+# Use via disco() and method functions (recommended):
+data(tpc_example)
+my_tpc <- tpc(engine = "causalDisco", test = "reg", alpha = 0.05)
+result <- disco(data = tpc_example, method = my_tpc)
+
+}

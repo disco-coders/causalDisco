@@ -39,6 +39,13 @@ cor_test <- function(x, y, conditioning_set, suff_stat) {
 #' @inheritParams cor_test
 #'
 #' @return A numeric, which is the p-value of the test.
+#'
+#' @examples
+#' # Use via disco() and method functions (recommended):
+#' data(tpc_example)
+#' my_tpc <- tpc(engine = "causalDisco", test = "reg", alpha = 0.05)
+#' result <- disco(data = tpc_example, method = my_tpc)
+#'
 #' @export
 reg_test <- function(x, y, conditioning_set, suff_stat) {
   p1 <- reg_test_each_dir(x, y, conditioning_set, suff_stat)
