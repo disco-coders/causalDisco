@@ -234,3 +234,127 @@ test_that("order_restrict_amat_cpdag returns input matrix when all tier ranks ar
   out <- order_restrict_amat_cpdag(amat, kn)
   expect_equal(out, amat)
 })
+
+test_that(".infer_tiers_from_forbidden places untiered vars into existing tiers", {
+  data(tpc_example)
+
+  # forbidding oldage -> child pins child to the latest consistent position,
+  # which is alongside youth in tier 2
+  kn <- knowledge(
+    tpc_example,
+    starts_with("oldage") %!-->% starts_with("child"),
+    starts_with("oldage") %!-->% starts_with("youth"),
+    tier(
+      2 ~ starts_with("youth"),
+      3 ~ starts_with("oldage")
+    )
+  )
+  kn_equiv <- knowledge(
+    tpc_example,
+    tier(
+      2 ~ starts_with("youth") + starts_with("child"),
+      3 ~ starts_with("oldage")
+    )
+  )
+  expect_message(
+    kn_inferred <- .infer_tiers_from_forbidden(kn),
+    "place 2 untiered variable"
+  )
+  expect_identical(
+    kn_inferred$vars[order(kn_inferred$vars$var), ],
+    kn_equiv$vars[order(kn_equiv$vars$var), ]
+  )
+  # the placed edges are dropped; the tier-implied oldage -> youth edges
+  # remain for the downstream pcalg conversion to resolve
+  expect_true(all(
+    kn_inferred$edges$to %in% c("youth_x3", "youth_x4")
+  ))
+})
+
+test_that(".infer_tiers_from_forbidden creates a new tier when needed", {
+  data(tpc_example)
+
+  # child is forbidden from both youth and oldage, so it must sit in a new
+  # tier strictly before tier 2
+  kn <- knowledge(
+    tpc_example,
+    starts_with("youth") %!-->% starts_with("child"),
+    starts_with("oldage") %!-->% starts_with("child"),
+    starts_with("oldage") %!-->% starts_with("youth"),
+    tier(
+      2 ~ starts_with("youth"),
+      3 ~ starts_with("oldage")
+    )
+  )
+  kn_equiv <- knowledge(
+    tpc_example,
+    tier(
+      1 ~ starts_with("child"),
+      2 ~ starts_with("youth"),
+      3 ~ starts_with("oldage")
+    )
+  )
+  expect_message(
+    kn_inferred <- .infer_tiers_from_forbidden(kn),
+    "place 2 untiered variable"
+  )
+  expect_identical(kn_inferred$tiers, kn_equiv$tiers)
+  expect_identical(
+    kn_inferred$vars[order(kn_inferred$vars$var), ],
+    kn_equiv$vars[order(kn_equiv$vars$var), ]
+  )
+  # after inference both encode the same forbidden set
+  norm_forb <- function(x) {
+    e <- convert_tiers_to_forbidden(x)$edges
+    e <- e[e$status == "forbidden", c("from", "to")]
+    e[order(e$from, e$to), ]
+  }
+  expect_identical(norm_forb(kn_inferred), norm_forb(kn_equiv))
+})
+
+test_that(".infer_tiers_from_forbidden leaves non-tier-shaped knowledge alone", {
+  data(tpc_example)
+
+  # only one oldage variable is forbidden into child: no tier placement
+  # reproduces exactly that constraint
+  kn_partial <- knowledge(
+    tpc_example,
+    oldage_x5 %!-->% child_x1,
+    tier(
+      2 ~ starts_with("youth"),
+      3 ~ starts_with("oldage")
+    )
+  )
+  expect_identical(.infer_tiers_from_forbidden(kn_partial), kn_partial)
+
+  # two candidate tiers with no stated relation to child: ambiguous
+  kn_ambiguous <- knowledge(
+    tpc_example,
+    starts_with("oldage") %!-->% starts_with("child"),
+    tier(
+      1 ~ youth_x3,
+      2 ~ youth_x4,
+      3 ~ starts_with("oldage")
+    )
+  )
+  expect_identical(.infer_tiers_from_forbidden(kn_ambiguous), kn_ambiguous)
+
+  # symmetric forbidden pairs are gap constraints and survive placement
+  kn_gap <- knowledge(
+    tpc_example,
+    starts_with("oldage") %!-->% starts_with("child"),
+    starts_with("oldage") %!-->% starts_with("youth"),
+    child_x1 %!-->% youth_x3,
+    youth_x3 %!-->% child_x1,
+    tier(
+      2 ~ starts_with("youth"),
+      3 ~ starts_with("oldage")
+    )
+  )
+  expect_message(
+    kn_gap_inferred <- .infer_tiers_from_forbidden(kn_gap),
+    "place 2 untiered variable"
+  )
+  gap <- kn_gap_inferred$edges[kn_gap_inferred$edges$to == "child_x1", ]
+  expect_identical(gap$from, "youth_x3")
+})
