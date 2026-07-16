@@ -30,10 +30,10 @@
 #'   \code{"twd"} (test-wise deletion).
 #' @param orientation_method Conflict-handling method when orienting edges.
 #'   Currently only the conservative method is available.
-#' @param directed_as_undirected Logical; if \code{TRUE}, treat any directed
-#'   edges in \code{knowledge} as undirected during skeleton learning. This
-#'   is due to the fact that \pkg{pcalg} does not allow directed edges in
-#'   \code{fixedEdges} or \code{fixedGaps}. Default is \code{FALSE}.
+#' @param directed_as_undirected `r lifecycle::badge("deprecated")` This
+#'   argument no longer has any effect and will be removed in a future
+#'   release. Directed forbidden edges are now resolved using tier
+#'   information, or must be specified in both directions.
 #' @param varnames Character vector of variable names. Only needed when
 #'   \code{data} is not supplied and all information is passed via
 #'   \code{suff_stat}.
@@ -71,11 +71,22 @@ tpc_run <- function(
   method = "stable.fast",
   na_method = "none",
   orientation_method = "conservative",
-  directed_as_undirected = FALSE,
+  directed_as_undirected = lifecycle::deprecated(),
   varnames = NULL,
   num_cores = 1,
   ...
 ) {
+  if (lifecycle::is_present(directed_as_undirected)) {
+    lifecycle::deprecate_warn(
+      when = "1.2.0",
+      what = "tpc_run(directed_as_undirected)",
+      details = paste0(
+        "The argument is ignored. Directed forbidden edges are now resolved ",
+        "using tier information, or must be specified in both directions."
+      )
+    )
+  }
+
   prep <- constraint_based_prepare_inputs(
     data = data,
     knowledge = knowledge,
@@ -83,7 +94,6 @@ tpc_run <- function(
     na_method = na_method,
     test = test,
     suff_stat = suff_stat,
-    directed_as_undirected = directed_as_undirected,
     function_name = "tpc"
   )
 
@@ -93,9 +103,9 @@ tpc_run <- function(
   vnames <- prep$vnames
   suff_stat <- prep$suff_stat
   na_method <- prep$na_method
-  directed_as_undirected <- prep$directed_as_undirected
   test <- prep$internal_test # Ensure we use the internal test with camelCase so it works downstream with pcalg
 
+  knowledge <- .infer_tiers_from_forbidden(knowledge)
   knowledge <- prepare_knowledge(knowledge) # Precompute variable ranks for efficient access
 
   # check orientation method
@@ -111,8 +121,7 @@ tpc_run <- function(
   # pcalg background constraints (forbidden/required) from knowledge
   constraints <- .pcalg_constraints_from_knowledge(
     knowledge,
-    labels = vnames,
-    directed_as_undirected = directed_as_undirected
+    labels = vnames
   )
 
   # learn skeleton
@@ -285,6 +294,82 @@ find_adjacencies <- function(amatrix, index) {
   )
 }
 
+#' Infer tiers from tier-shaped forbidden knowledge
+#'
+#' @description
+#' If a `Knowledge` object has no tiers but its directed forbidden edges are
+#' exactly the set a tier ordering would generate (e.g. the output of
+#' [convert_tiers_to_forbidden()]), reconstruct that ordering: fill in the
+#' tiers and drop the tier-implied forbidden edges. Under a tier ordering,
+#' the set of variables each variable is forbidden to point at is exactly
+#' the union of all earlier tiers, which identifies the tiers uniquely.
+#' Symmetric forbidden pairs are gap constraints, not order statements, and
+#' are left untouched. If the forbidden edges are not tier-shaped, the input
+#' is returned unchanged.
+#'
+#' @param kn A `Knowledge` object.
+#'
+#' @return A `Knowledge` object.
+#' @keywords internal
+#' @noRd
+.infer_tiers_from_forbidden <- function(kn) {
+  if (!all(is.na(kn$vars$tier))) {
+    return(kn)
+  }
+  forb_idx <- which(kn$edges$status == "forbidden")
+  forb <- kn$edges[forb_idx, , drop = FALSE]
+  if (!nrow(forb)) {
+    return(kn)
+  }
+
+  sym <- paste(forb$from, forb$to) %in% paste(forb$to, forb$from)
+  dir_forb <- forb[!sym, , drop = FALSE]
+  if (!nrow(dir_forb)) {
+    return(kn)
+  }
+
+  participants <- sort(unique(c(dir_forb$from, dir_forb$to)))
+  earlier <- lapply(
+    participants,
+    function(v) unique(dir_forb$to[dir_forb$from == v])
+  )
+  names(earlier) <- participants
+
+  sig <- vapply(
+    earlier,
+    function(x) paste(sort(x), collapse = "\r"),
+    FUN.VALUE = ""
+  )
+  groups <- split(participants, sig)
+  groups <- groups[
+    order(vapply(groups, function(g) length(earlier[[g[[1]]]]), integer(1)))
+  ]
+
+  # tier-shaped iff each group's earlier-set is exactly the union of all
+  # preceding groups
+  seen <- character(0)
+  for (g in groups) {
+    if (!setequal(earlier[[g[[1]]]], seen)) {
+      return(kn)
+    }
+    seen <- c(seen, g)
+  }
+
+  message(
+    "The directed forbidden edges in `knowledge` encode a temporal order; ",
+    "treating them as ",
+    length(groups),
+    " tiers."
+  )
+
+  labels <- as.character(seq_along(groups))
+  tier_of <- stats::setNames(rep(labels, lengths(groups)), unlist(groups))
+  kn$tiers <- tibble::tibble(label = labels)
+  kn$vars$tier <- unname(tier_of[kn$vars$var])
+  kn$edges <- kn$edges[-forb_idx[!sym], , drop = FALSE]
+  kn
+}
+
 #' Compute tier indices for variables
 #'
 #' @description
@@ -368,8 +453,12 @@ dir_test <- function(test, vnames, knowledge) {
 #' @description
 #' Turn directed forbidden/required edges into undirected \code{fixedGaps} and
 #' \code{fixedEdges} matrices in the supplied \code{labels} order. Tier
-#' annotations are ignored here; use \code{order_restrict_amat_cpdag()} for
-#' tier-based pruning.
+#' membership is used to resolve directed forbidden edges: an edge forbidden
+#' from a later tier into an earlier one is already enforced during
+#' orientation and yields no skeleton constraint, while a forbidden edge
+#' whose reverse direction is ruled out by the tier ordering amounts to a
+#' full gap and is mirrored. Any remaining asymmetric edge is an error, as
+#' in [as_pcalg_constraints()].
 #'
 #' @param kn A `Knowledge` object.
 #' @param labels Character vector of variable names in the desired order.
@@ -379,17 +468,37 @@ dir_test <- function(test, vnames, knowledge) {
 #' @return A list with logical matrices \code{fixedGaps} and \code{fixedEdges}.
 #' @keywords internal
 #' @noRd
-.pcalg_constraints_from_knowledge <- function(
-  kn,
-  labels,
-  directed_as_undirected
-) {
+.pcalg_constraints_from_knowledge <- function(kn, labels) {
+  edges <- kn$edges
+  ranks <- .tier_index(kn, labels)
+  from_rank <- unname(ranks[edges$from])
+  to_rank <- unname(ranks[edges$to])
+  cross_tier <- edges$status == "forbidden" &
+    !is.na(from_rank) &
+    !is.na(to_rank) &
+    from_rank != to_rank
+
+  # later -> earlier is already forbidden by the tier ordering (enforced
+  # during orientation), so it adds no skeleton constraint
+  drop <- cross_tier & from_rank > to_rank
+  # earlier -> later: the reverse direction is tier-forbidden, so forbidding
+  # this direction too amounts to a full gap between the pair
+  mirror <- cross_tier & from_rank < to_rank
+
+  mirrored <- edges[mirror, , drop = FALSE]
+  if (nrow(mirrored)) {
+    tmp <- mirrored$from
+    mirrored$from <- mirrored$to
+    mirrored$to <- tmp
+  }
+
   kn_undirected <- kn
+  kn_undirected$edges <- rbind(edges[!drop, , drop = FALSE], mirrored)
   kn_undirected$vars$tier <- NA_character_
   as_pcalg_constraints(
     kn_undirected,
     labels = labels,
-    directed_as_undirected = TRUE
+    directed_as_undirected = FALSE
   )
 }
 

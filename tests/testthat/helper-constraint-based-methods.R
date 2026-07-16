@@ -8,11 +8,7 @@ method_registry_constraint <- list(
 )
 
 method_args <- function(method_name, engine) {
-  args <- list(test = "fisher_z", alpha = 0.05)
-  if (engine == "pcalg") {
-    args$directed_as_undirected_knowledge <- TRUE
-  }
-  args
+  list(test = "fisher_z", alpha = 0.05)
 }
 
 toy_knowledge <- function(df) {

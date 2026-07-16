@@ -19,7 +19,6 @@ constraint_based_prepare_inputs <- function(
   na_method = "none",
   test = reg_test,
   suff_stat = NULL,
-  directed_as_undirected = FALSE,
   function_name
 ) {
   # check required packages

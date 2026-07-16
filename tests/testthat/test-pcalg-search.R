@@ -265,21 +265,17 @@ test_that("set_knowledge defers building constraints and validates input", {
   s <- PcalgSearch$new()
   kn <- knowledge(
     my_df,
-    A %-->% B,
-    B %!-->% C
+    B %!-->% C,
+    C %!-->% B
   )
 
-  s$set_knowledge(kn, directed_as_undirected = TRUE)
+  s$set_knowledge(kn)
   # knowledge_function is deferred; becomes a concrete list during run_search()
   s$set_params(list(alpha = 0.05))
   s$set_test("fisher_z")
   s$set_alg("pc")
 
-  expect_warning(
-    out <- s$run_search(my_df),
-    "Engine pcalg does not use required edges; ignoring them.",
-    fixed = TRUE
-  )
+  out <- s$run_search(my_df)
   expect_s3_class(out, "Disco")
 })
 
@@ -297,7 +293,7 @@ test_that("knowledge builder errors if data missing", {
   )
 })
 
-test_that("set_knowledge defers building constraints and validates input", {
+test_that("set_knowledge with deprecated directed_as_undirected still mirrors", {
   s_bad <- PcalgSearch$new()
   expect_error(
     s_bad$set_knowledge(knowledge_obj = 123),
@@ -311,7 +307,9 @@ test_that("set_knowledge defers building constraints and validates input", {
     A %-->% B,
     B %!-->% C
   )
-  s$set_knowledge(kn, directed_as_undirected = TRUE)
+  lifecycle::expect_deprecated(
+    s$set_knowledge(kn, directed_as_undirected = TRUE)
+  )
   s$set_test("fisher_z")
   s$set_data(my_df, set_suff_stat = TRUE)
   s$set_alg("pc")
@@ -383,7 +381,9 @@ test_that("run_search without score_function (pc) works; with score_function (ge
   s_ges2 <- PcalgSearch$new()
   s_ges2$set_alg("ges")
   s_ges2$set_score("sem_bic")
-  s_ges2$set_knowledge(kn_req, directed_as_undirected = TRUE)
+  lifecycle::expect_deprecated(
+    s_ges2$set_knowledge(kn_req, directed_as_undirected = TRUE)
+  )
   expect_warning(
     s_ges2$run_search(my_df),
     "Engine pcalg does not use required edges; ignoring them.",

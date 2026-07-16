@@ -11,7 +11,6 @@ kn <- knowledge(
 
 pc_cons <- .pcalg_constraints_from_knowledge(
   kn,
-  labels = names(tpc_example),
-  directed_as_undirected = TRUE
+  labels = names(tpc_example)
 )
 pc_cons

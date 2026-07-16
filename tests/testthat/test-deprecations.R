@@ -13,3 +13,47 @@ test_that("summary Disco deprecated", {
   fit <- disco(tpc_example, pc_pcalg)
   lifecycle::expect_deprecated(summary(fit))
 })
+
+test_that("directed_as_undirected deprecated in tpc_run and tfci_run", {
+  data(tpc_example)
+  kn <- knowledge(
+    tpc_example,
+    tier(
+      child ~ starts_with("child"),
+      youth ~ starts_with("youth"),
+      oldage ~ starts_with("old")
+    )
+  )
+  lifecycle::expect_deprecated(
+    tpc_run(
+      tpc_example,
+      knowledge = kn,
+      test = cor_test,
+      directed_as_undirected = TRUE
+    )
+  )
+  lifecycle::expect_deprecated(
+    tfci_run(
+      tpc_example,
+      knowledge = kn,
+      test = cor_test,
+      directed_as_undirected = TRUE
+    )
+  )
+})
+
+test_that("directed_as_undirected deprecated in CausalDiscoSearch$set_knowledge", {
+  kn <- knowledge(A %-->% B)
+  s <- CausalDiscoSearch$new()
+  lifecycle::expect_deprecated(
+    s$set_knowledge(kn, directed_as_undirected = TRUE)
+  )
+})
+
+test_that("directed_as_undirected deprecated in PcalgSearch$set_knowledge", {
+  kn <- knowledge(A %-->% B)
+  s <- PcalgSearch$new()
+  lifecycle::expect_deprecated(
+    s$set_knowledge(kn, directed_as_undirected = TRUE)
+  )
+})

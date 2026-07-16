@@ -42,7 +42,7 @@ s_tpc <- CausalDiscoSearch$new()
 s_tpc$set_params(list(verbose = FALSE))
 s_tpc$set_test("fisher_z", alpha = 0.2)
 s_tpc$set_alg("tpc")
-s_tpc$set_knowledge(kn, directed_as_undirected = TRUE)
+s_tpc$set_knowledge(kn)
 s_tpc$set_data(tpc_example)
 res_tpc <- s_tpc$run_search()
 print(res_tpc)
@@ -365,19 +365,20 @@ Only needed if \code{method} is a user-defined function with an
   Sets the background knowledge for the search with a \code{Knowledge} object.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{CausalDiscoSearch$set_knowledge(kn, directed_as_undirected = FALSE)}
+    \preformatted{CausalDiscoSearch$set_knowledge(
+  kn,
+  directed_as_undirected = lifecycle::deprecated()
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{kn}}{A \code{Knowledge} object.}
-      \item{\code{directed_as_undirected}}{Logical; whether to treat directed edges in
-the knowledge as undirected. Default is \code{FALSE}. This is due to the
-nature of how \pkg{pcalg} handles background knowledge when using
-\code{\link[pcalg:skeleton]{pcalg::skeleton()}} under the hood in
-\code{\link[=tpc]{tpc()}} and
-\code{\link[=tfci]{tfci()}}.}
+      \item{\code{directed_as_undirected}}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} This
+argument no longer has any effect and will be removed in a future
+release. Directed forbidden edges are now resolved using tier
+information, or must be specified in both directions.}
     }
     \if{html}{\out{</div>}}
   }

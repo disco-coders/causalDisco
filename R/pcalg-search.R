@@ -344,8 +344,26 @@ PcalgSearch <- R6::R6Class(
     #' done when data is provided.
     #'
     #' @param knowledge_obj A `Knowledge` object that contains the fixed constraints.
-    #' @param directed_as_undirected Logical; whether to treat directed edges as undirected.
-    set_knowledge = function(knowledge_obj, directed_as_undirected = FALSE) {
+    #' @param directed_as_undirected `r lifecycle::badge("deprecated")`
+    #' Logical; if \code{TRUE}, directed knowledge edges are mirrored into
+    #' symmetric constraints. Deprecated: specify directed edges in both
+    #' directions in [knowledge()] instead.
+    set_knowledge = function(
+      knowledge_obj,
+      directed_as_undirected = lifecycle::deprecated()
+    ) {
+      if (lifecycle::is_present(directed_as_undirected)) {
+        lifecycle::deprecate_warn(
+          when = "1.2.0",
+          what = "PcalgSearch$set_knowledge(directed_as_undirected)",
+          details = paste0(
+            "Specify directed edges in both directions in knowledge() ",
+            "instead."
+          )
+        )
+      } else {
+        directed_as_undirected <- FALSE
+      }
       is_knowledge(knowledge_obj)
 
       private$knowledge_function <- function() {

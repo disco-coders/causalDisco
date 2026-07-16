@@ -38,16 +38,14 @@ test_that("make_runner dispatches to a registered engine's make_runner_fn", {
       test = NULL,
       alpha = NULL,
       score = NULL,
-      ...,
-      directed_as_undirected_knowledge = FALSE
+      ...
     ) {
       captured <<- list(
         alg = alg,
         test = test,
         alpha = alpha,
         score = score,
-        dots = list(...),
-        directed_as_undirected_knowledge = directed_as_undirected_knowledge
+        dots = list(...)
       )
       list(
         set_knowledge = function(knowledge) NULL,
@@ -62,15 +60,13 @@ test_that("make_runner dispatches to a registered engine's make_runner_fn", {
     alg = "my_alg",
     test = "my_test",
     alpha = 0.01,
-    extra_arg = "value",
-    directed_as_undirected_knowledge = TRUE
+    extra_arg = "value"
   )
 
   expect_identical(captured$alg, "my_alg")
   expect_identical(captured$test, "my_test")
   expect_identical(captured$alpha, 0.01)
   expect_identical(captured$dots, list(extra_arg = "value"))
-  expect_true(captured$directed_as_undirected_knowledge)
   expect_identical(runner$run(data.frame()), "ran")
 })
 

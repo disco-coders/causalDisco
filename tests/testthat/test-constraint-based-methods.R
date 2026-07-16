@@ -46,11 +46,8 @@ test_that("set_knowledge returns a new method and injects knowledge (all engines
       m2 <- set_knowledge(m, kn)
       expect_s3_class(m2, c(method_name, "disco_method", "function"))
       if (engine == "pcalg") {
-        expect_warning(
-          m2(num_data),
-          "Engine pcalg does not use required edges; ignoring them.",
-          fixed = TRUE
-        )
+        # pcalg requires directed knowledge in both directions
+        expect_error(m2(num_data), "asymmetric edges")
       } else {
         expect_s3_class(m2(num_data), "Disco")
       }
@@ -80,11 +77,12 @@ test_that("disco() injects knowledge and validates method type (pc + fci)", {
       m <- do.call(reg$fn, c(list(engine = engine), args))
 
       if (engine == "pcalg") {
-        expect_warning(
+        # pcalg requires directed knowledge in both directions
+        expect_error(
           disco(num_data, method = m, knowledge = kn),
-          "Engine pcalg does not use required edges; ignoring them.",
-          fixed = TRUE
+          "asymmetric edges"
         )
+        next
       } else {
         if (engine == "tetrad" && method_name == "pc") {
           expect_warning(

@@ -4,15 +4,7 @@
 \alias{make_runner}
 \title{Create a Custom Runner for a Causal Discovery Algorithm}
 \usage{
-make_runner(
-  engine,
-  alg,
-  test = NULL,
-  alpha = NULL,
-  score = NULL,
-  ...,
-  directed_as_undirected_knowledge = FALSE
-)
+make_runner(engine, alg, test = NULL, alpha = NULL, score = NULL, ...)
 }
 \arguments{
 \item{engine}{Character. The engine to use. Options include \code{"causalDisco"},
@@ -28,8 +20,6 @@ make_runner(
 \item{score}{Optional. A scoring function for score-based methods.}
 
 \item{...}{Additional arguments passed to the engine-specific runner.}
-
-\item{directed_as_undirected_knowledge}{Logical. Used internally for \pkg{pcalg}.}
 }
 \value{
 An object representing a configured runner for the chosen engine.
