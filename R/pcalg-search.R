@@ -344,10 +344,10 @@ PcalgSearch <- R6::R6Class(
     #' done when data is provided.
     #'
     #' @param knowledge_obj A `Knowledge` object that contains the fixed constraints.
-    #' @param directed_as_undirected `r lifecycle::badge("deprecated")`
-    #' Logical; if \code{TRUE}, directed knowledge edges are mirrored into
-    #' symmetric constraints. Deprecated: specify directed edges in both
-    #' directions in [knowledge()] instead.
+    #' @param directed_as_undirected `r lifecycle::badge("deprecated")` This
+    #' argument no longer has any effect and will be removed in a future
+    #' release. Specify directed edges in both directions in [knowledge()]
+    #' instead.
     set_knowledge = function(
       knowledge_obj,
       directed_as_undirected = lifecycle::deprecated()
@@ -357,12 +357,10 @@ PcalgSearch <- R6::R6Class(
           when = "1.2.0",
           what = "PcalgSearch$set_knowledge(directed_as_undirected)",
           details = paste0(
-            "Specify directed edges in both directions in knowledge() ",
-            "instead."
+            "The argument is ignored. Specify directed edges in both ",
+            "directions in knowledge() instead."
           )
         )
-      } else {
-        directed_as_undirected <- FALSE
       }
       is_knowledge(knowledge_obj)
 
@@ -371,11 +369,7 @@ PcalgSearch <- R6::R6Class(
           stop("Data must be set before knowledge.", call. = FALSE)
         }
         labels <- colnames(self$data)
-        constraints <- as_pcalg_constraints(
-          knowledge_obj,
-          labels,
-          directed_as_undirected = directed_as_undirected
-        )
+        constraints <- as_pcalg_constraints(knowledge_obj, labels)
         if (any(constraints$fixed_edges)) {
           warning(
             "Engine pcalg does not use required edges; ignoring them.",

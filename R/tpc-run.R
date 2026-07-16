@@ -495,11 +495,7 @@ dir_test <- function(test, vnames, knowledge) {
   kn_undirected <- kn
   kn_undirected$edges <- rbind(edges[!drop, , drop = FALSE], mirrored)
   kn_undirected$vars$tier <- NA_character_
-  as_pcalg_constraints(
-    kn_undirected,
-    labels = labels,
-    directed_as_undirected = FALSE
-  )
+  as_pcalg_constraints(kn_undirected, labels = labels)
 }
 
 #' Remove disallowed backward edges across tiers

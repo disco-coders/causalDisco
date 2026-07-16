@@ -311,10 +311,10 @@ done when data is provided.
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{knowledge_obj}}{A \code{Knowledge} object that contains the fixed constraints.}
-      \item{\code{directed_as_undirected}}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
-Logical; if \code{TRUE}, directed knowledge edges are mirrored into
-symmetric constraints. Deprecated: specify directed edges in both
-directions in \code{\link[=knowledge]{knowledge()}} instead.}
+      \item{\code{directed_as_undirected}}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} This
+argument no longer has any effect and will be removed in a future
+release. Specify directed edges in both directions in \code{\link[=knowledge]{knowledge()}}
+instead.}
     }
     \if{html}{\out{</div>}}
   }

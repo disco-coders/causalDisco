@@ -7,7 +7,7 @@ kn <- knowledge(
   youth_x3 %!-->% child_x1
 )
 
-pc_constraints <- as_pcalg_constraints(kn, directed_as_undirected = FALSE)
+pc_constraints <- as_pcalg_constraints(kn)
 print(pc_constraints)
 
 # error paths
