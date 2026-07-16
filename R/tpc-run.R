@@ -132,7 +132,6 @@ tpc_run <- function(
     labels = vnames,
     method = method,
     fixedGaps = constraints$fixed_gaps,
-    fixedEdges = constraints$fixed_edges,
     numCores = num_cores,
     ...
   )
@@ -451,8 +450,8 @@ dir_test <- function(test, vnames, knowledge) {
 #' Convert knowledge to \pkg{pcalg} constraints
 #'
 #' @description
-#' Turn directed forbidden/required edges into undirected \code{fixedGaps} and
-#' \code{fixedEdges} matrices in the supplied \code{labels} order. Tier
+#' Turn directed forbidden edges into an undirected \code{fixedGaps} matrix
+#' in the supplied \code{labels} order. Tier
 #' membership is used to resolve directed forbidden edges: an edge forbidden
 #' from a later tier into an earlier one is already enforced during
 #' orientation and yields no skeleton constraint, while a forbidden edge
@@ -465,7 +464,8 @@ dir_test <- function(test, vnames, knowledge) {
 #'
 #' @example inst/roxygen-examples/dot-pcalg_constraints_from_knowledge-example.R
 #'
-#' @return A list with logical matrices \code{fixedGaps} and \code{fixedEdges}.
+#' @return A list with the logical matrix \code{fixed_gaps}. Required edges
+#'   are dropped with a warning by [as_pcalg_constraints()].
 #' @keywords internal
 #' @noRd
 .pcalg_constraints_from_knowledge <- function(kn, labels) {

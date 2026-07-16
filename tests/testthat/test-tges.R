@@ -56,30 +56,6 @@ test_that("TGES causalDisco respects tier-based background knowledge", {
   )
 })
 
-test_that("TGES causalDisco respects required background knowledge", {
-  skip(
-    "TGES causalDisco does not yet support required edges from knowledge objects."
-  )
-  data(tpc_example)
-
-  kn <- knowledge(
-    tpc_example,
-    child_x1 %-->% youth_x3
-  )
-
-  # Run TGES with TemporalBIC
-  my_tges <- tges(engine = "causalDisco", score = "tbic")
-  out <- disco(data = tpc_example, method = my_tges, knowledge = kn)
-
-  edges <- out$caugi@edges
-
-  violations <- check_edge_constraints(edges, kn)
-  expect_true(
-    nrow(violations) == 0,
-    info = "Required edge not found in the output graph."
-  )
-})
-
 test_that("TGES causalDisco respects forbidden background knowledge", {
   data(tpc_example)
 

@@ -49,7 +49,7 @@ test_that("tpc causalDisco respects tier knowledge", {
   )
 })
 
-test_that("tpc causalDisco respects required background knowledge", {
+test_that("tpc causalDisco warns and ignores required background knowledge", {
   data(tpc_example)
 
   kn <- knowledge(
@@ -58,43 +58,16 @@ test_that("tpc causalDisco respects required background knowledge", {
   )
 
   my_tpc <- tpc(engine = "causalDisco", test = "fisher_z")
-  # a directed required edge has no symmetric pcalg counterpart, so it errors
-  expect_error(
+  # required edges cannot be represented as pcalg constraints; both disco()
+  # and the conversion warn, and the search runs without them
+  expect_warning(
     expect_warning(
-      disco(data = tpc_example, method = my_tpc, knowledge = kn),
+      out <- disco(data = tpc_example, method = my_tpc, knowledge = kn),
       "causalDisco engine does not support required edges in knowledge."
     ),
-    "asymmetric edges"
+    "cannot represent required edges"
   )
-  skip(
-    "tpc causalDisco does not yet support required edges from knowledge objects."
-  )
-  edges <- out$caugi@edges
-
-  violations <- check_edge_constraints(edges, kn)
-
-  expect_true(
-    nrow(violations) == 0,
-    info = "Required edge not found in the output graph."
-  )
-
-  kn <- knowledge(
-    tpc_example,
-    child_x1 %-->% youth_x3,
-    child_x2 %-->% child_x1
-  )
-
-  my_tpc <- tpc(engine = "causalDisco", test = "fisher_z")
-  out <- disco(data = tpc_example, method = my_tpc, knowledge = kn)
-
-  edges <- out$caugi@edges
-
-  violations <- check_edge_constraints(edges, kn)
-
-  expect_true(
-    nrow(violations) == 0,
-    info = "Required edge not found in the output graph."
-  )
+  expect_s3_class(out, "Disco")
 })
 
 test_that("tpc causalDisco respects forbidden background knowledge", {

@@ -65,12 +65,15 @@ as_tetrad_knowledge <- function(kn) {
 #' Convert Knowledge to pcalg Knowledge
 #'
 #' \pkg{pcalg} only supports _undirected_ (symmetric) background constraints:
-#' * **fixed_gaps**  - forbidding edges (zeros enforced)
-#' * **fixed_edges** - requiring edges (ones enforced)
+#' * **fixed_gaps** - forbidding edges (zeros enforced)
 #'
-#' This function takes a `Knowledge` object (with only forbidden/required
-#' edges, no tiers) and returns the two logical matrices in the exact
-#' variable order you supply.
+#' This function takes a `Knowledge` object (with only forbidden edges, no
+#' tiers) and returns the logical constraint matrix in the exact variable
+#' order you supply.
+#'
+#' Required edges in a `Knowledge` object are directed statements. \pkg{pcalg}
+#' constraints are adjacency-level only, so a required edge cannot be honored;
+#' any required edges are dropped with a warning.
 #'
 #' @param kn A `Knowledge` object.  Must have no tier information.
 #' @param labels Character vector of all variable names, in the exact order
@@ -81,12 +84,12 @@ as_tetrad_knowledge <- function(kn) {
 #'   release. Specify directed edges in both directions in [knowledge()]
 #'   instead.
 #'
-#' @returns A list with two elements, each an \code{n × n} logical matrix
-#' corresponding to \pkg{pcalg} `fixed_gaps` and `fixed_edges` arguments.
+#' @returns A list with one element, `fixed_gaps`: an \code{n × n} logical
+#' matrix corresponding to the \pkg{pcalg} `fixedGaps` argument.
 #'
 #' @section Errors:
 #' * If the `Knowledge` object contains tiered knowledge.
-#' * If any edge lacks its symmetrical counterpart.
+#' * If any forbidden edge lacks its symmetrical counterpart.
 #'
 #' @example inst/roxygen-examples/as_pcalg_constraints-example.R
 #'
@@ -167,8 +170,18 @@ as_pcalg_constraints <- function(
 
   p <- length(labels)
   fixed_gaps <- matrix(FALSE, p, p, dimnames = list(labels, labels))
-  fixed_edges <- matrix(FALSE, p, p, dimnames = list(labels, labels))
   idx <- rlang::set_names(seq_along(labels), labels)
+
+  # pcalg constraints are adjacency-level only; a directed required edge
+  # cannot be honored, so drop required edges with a warning
+  req <- kn$edges$status == "required"
+  if (any(req)) {
+    warning(
+      "pcalg constraints cannot represent required edges; ignoring them.",
+      call. = FALSE
+    )
+    kn$edges <- kn$edges[!req, , drop = FALSE]
+  }
 
   bad <- kn$edges |>
     dplyr::anti_join(kn$edges, by = c("from" = "to", "to" = "from")) |>
@@ -195,19 +208,7 @@ as_pcalg_constraints <- function(
     fixed_gaps[i, j] <- TRUE
   }
 
-  # fill required
-  req <- dplyr::filter(kn$edges, .data$status == "required")
-  for (k in seq_len(nrow(req))) {
-    i <- match(req$from[k], labels, nomatch = NA_integer_)
-    j <- match(req$to[k], labels, nomatch = NA_integer_)
-    # extra security measure
-    if (is.na(i) || is.na(j)) {
-      stop("Required edge refers to unknown variable(s).", call. = FALSE)
-    }
-    fixed_edges[i, j] <- TRUE
-  }
-
-  list(fixed_gaps = fixed_gaps, fixed_edges = fixed_edges)
+  list(fixed_gaps = fixed_gaps)
 }
 
 #' Convert Knowledge to bnlearn Knowledge

@@ -24,6 +24,5 @@ skel <- pcalg::skeleton(
   alpha = 0.05,
   labels = vnames,
   method = "stable.fast",
-  fixedGaps = pc_cons$fixedGaps,
-  fixedEdges = pc_cons$fixedEdges
+  fixedGaps = pc_cons$fixed_gaps
 )

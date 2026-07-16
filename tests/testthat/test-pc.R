@@ -167,7 +167,7 @@ test_that("pc pcalg disco errors on tier knowledge", {
   )
 })
 
-test_that("pc pcalg disco errors on required background knowledge", {
+test_that("pc pcalg disco warns and ignores required background knowledge", {
   # See ?as_pcalg_constraints - only forbidden edges are supported
   data(tpc_example)
 
@@ -177,10 +177,11 @@ test_that("pc pcalg disco errors on required background knowledge", {
   )
 
   pcalg_pc <- pc(engine = "pcalg", test = "conditional_gaussian", alpha = 0.05)
-  expect_error(
-    disco(data = tpc_example, method = pcalg_pc, knowledge = kn),
-    regexp = "pcalg does not support asymmetric edges."
+  expect_warning(
+    out <- disco(data = tpc_example, method = pcalg_pc, knowledge = kn),
+    regexp = "cannot represent required edges"
   )
+  expect_s3_class(out, "Disco")
 })
 
 test_that("pc pcalg disco respects forbidden background knowledge", {

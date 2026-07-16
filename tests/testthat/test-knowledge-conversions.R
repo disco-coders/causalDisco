@@ -111,32 +111,51 @@ test_that("errors on asymmetric edges", {
 })
 
 test_that("directed_as_undirected is deprecated and ignored", {
-  kn <- knowledge(
-    data.frame(X1 = 1, X2 = 2, Y = 3),
+  kn_sym <- knowledge(
+    data.frame(X1 = 1, X2 = 2),
     X1 %!-->% X2,
-    Y %-->% X1
+    X2 %!-->% X1
   )
   lifecycle::expect_deprecated(
-    try(
-      as_pcalg_constraints(
-        kn,
-        labels = c("X1", "X2", "Y"),
-        directed_as_undirected = TRUE
-      ),
-      silent = TRUE
+    as_pcalg_constraints(
+      kn_sym,
+      labels = c("X1", "X2"),
+      directed_as_undirected = TRUE
     )
   )
   # the flag no longer mirrors, so asymmetric edges still error
+  kn_asym <- knowledge(
+    data.frame(X1 = 1, X2 = 2),
+    X1 %!-->% X2
+  )
   expect_error(
     suppressWarnings(
       as_pcalg_constraints(
-        kn,
-        labels = c("X1", "X2", "Y"),
+        kn_asym,
+        labels = c("X1", "X2"),
         directed_as_undirected = TRUE
       )
     ),
     "no symmetrical counterpart"
   )
+})
+
+test_that("required edges are dropped with a warning", {
+  kn <- knowledge(
+    data.frame(A = 1, B = 2, C = 3),
+    A %-->% B,
+    B %!-->% C,
+    C %!-->% B
+  )
+  expect_warning(
+    cons <- as_pcalg_constraints(kn, labels = c("A", "B", "C")),
+    "cannot represent required edges"
+  )
+  expect_named(cons, "fixed_gaps")
+  expect_true(cons$fixed_gaps["B", "C"])
+  expect_true(cons$fixed_gaps["C", "B"])
+  # the required edge leaves no trace in the constraints
+  expect_false(any(cons$fixed_gaps["A", ]) || any(cons$fixed_gaps[, "A"]))
 })
 
 test_that("works when forbidden edges are fully symmetric via DSL", {
@@ -157,8 +176,8 @@ test_that("works when forbidden edges are fully symmetric via DSL", {
   # no other forbidden pairs
   expect_equal(sum(cons$fixed_gaps), 2)
 
-  # fixed_edges should be entirely FALSE
-  expect_false(any(cons$fixed_edges))
+  # fixed_gaps is the only constraint returned
+  expect_named(cons, "fixed_gaps")
 })
 
 test_that("result has correct dimnames and dimensions", {
@@ -173,8 +192,6 @@ test_that("result has correct dimnames and dimensions", {
   cons <- as_pcalg_constraints(kn, labels = labels)
   expect_equal(dim(cons$fixed_gaps), c(4L, 4L))
   expect_equal(dimnames(cons$fixed_gaps), list(labels, labels))
-  expect_equal(dim(cons$fixed_edges), c(4L, 4L))
-  expect_equal(dimnames(cons$fixed_edges), list(labels, labels))
 })
 test_that("create pcalg cons without providing labels", {
   kn <- knowledge(
@@ -233,23 +250,6 @@ test_that("as_pcalg_constraints() detects edges that reference unknown vars", {
   expect_error(
     as_pcalg_constraints(kn_forb, labels = c("A", "B")),
     "Forbidden edge refers to unknown variable",
-    fixed = FALSE
-  )
-
-  # knowledge() cannot express a symmetric required pair, so flip statuses
-  # on a forbidden pair to exercise the required-edge guard
-  kn_req <- knowledge(
-    tibble::tibble(A = 1, B = 2),
-    A %!-->% B,
-    B %!-->% A
-  )
-  kn_req$edges$status <- "required"
-  kn_req$edges$to[1] <- "Y"
-  kn_req$edges$from[2] <- "Y"
-
-  expect_error(
-    as_pcalg_constraints(kn_req, labels = c("A", "B")),
-    "Required edge refers to unknown variable",
     fixed = FALSE
   )
 })

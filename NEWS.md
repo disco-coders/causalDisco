@@ -33,7 +33,12 @@
 
 - The internal-only `directed_as_undirected_knowledge` argument of
   `make_runner()` has been removed, and the `directed_as_undirected` argument of
-  `PcalgSearch$set_knowledge()` is deprecated.
+  `PcalgSearch$set_knowledge()` and `as_pcalg_constraints()` is deprecated and
+  ignored.
+
+- `as_pcalg_constraints()` no longer returns a `fixed_edges` matrix. pcalg's
+  `fixedEdges` argument only protects an undirected adjacency in the skeleton,
+  so a directed required edge (`A %-->% B`) cannot be honored through it.
 
 ## Bug fixes
 

@@ -105,7 +105,6 @@ tfci_run <- function(
     labels = vnames,
     method = method,
     fixedGaps = constraints$fixed_gaps,
-    fixedEdges = constraints$fixed_edges,
     numCores = num_cores,
     ...
   )

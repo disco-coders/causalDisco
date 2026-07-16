@@ -23,26 +23,29 @@ release. Specify directed edges in both directions in \code{\link[=knowledge]{kn
 instead.}
 }
 \value{
-A list with two elements, each an \code{n × n} logical matrix
-corresponding to \pkg{pcalg} \code{fixed_gaps} and \code{fixed_edges} arguments.
+A list with one element, \code{fixed_gaps}: an \code{n × n} logical
+matrix corresponding to the \pkg{pcalg} \code{fixedGaps} argument.
 }
 \description{
 \pkg{pcalg} only supports \emph{undirected} (symmetric) background constraints:
 \itemize{
-\item \strong{fixed_gaps}  - forbidding edges (zeros enforced)
-\item \strong{fixed_edges} - requiring edges (ones enforced)
+\item \strong{fixed_gaps} - forbidding edges (zeros enforced)
 }
 }
 \details{
-This function takes a \code{Knowledge} object (with only forbidden/required
-edges, no tiers) and returns the two logical matrices in the exact
-variable order you supply.
+This function takes a \code{Knowledge} object (with only forbidden edges, no
+tiers) and returns the logical constraint matrix in the exact variable
+order you supply.
+
+Required edges in a \code{Knowledge} object are directed statements. \pkg{pcalg}
+constraints are adjacency-level only, so a required edge cannot be honored;
+any required edges are dropped with a warning.
 }
 \section{Errors}{
 
 \itemize{
 \item If the \code{Knowledge} object contains tiered knowledge.
-\item If any edge lacks its symmetrical counterpart.
+\item If any forbidden edge lacks its symmetrical counterpart.
 }
 }
 

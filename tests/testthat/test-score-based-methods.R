@@ -42,8 +42,8 @@ test_that("ges(): set_knowledge returns a new method and injects knowledge", {
     expect_s3_class(m2, c("ges", "disco_method", "function"))
 
     if (engine == "pcalg") {
-      # pcalg requires directed knowledge in both directions
-      expect_error(m2(num_data), "asymmetric edges")
+      # pcalg can't use directed knowledge
+      expect_warning(m2(num_data), "required edges")
     } else {
       expect_s3_class(m2(num_data), "Disco")
     }
@@ -70,10 +70,10 @@ test_that("ges(): disco() injects knowledge and validates method type", {
     )
 
     if (engine == "pcalg") {
-      # pcalg requires directed knowledge in both directions
-      expect_error(
+      # pcalg can't use directed knowledge
+      expect_warning(
         disco(num_data, method = m, knowledge = kn),
-        "asymmetric edges"
+        "required edges"
       )
     } else {
       res <- disco(num_data, method = m, knowledge = kn)

@@ -60,30 +60,6 @@ test_that("tfci causalDisco respects tier knowledge", {
   )
 })
 
-test_that("tfci causalDisco respects required background knowledge", {
-  skip(
-    "tfci causalDisco does not yet support required edges from knowledge objects."
-  )
-  data(tpc_example)
-
-  kn <- knowledge(
-    tpc_example,
-    child_x1 %-->% youth_x3
-  )
-
-  my_tfci <- tfci(engine = "causalDisco", test = "fisher_z")
-  out <- disco(data = tpc_example, method = my_tfci, knowledge = kn)
-
-  edges <- out$caugi@edges
-
-  violations <- check_edge_constraints(edges, kn)
-
-  expect_true(
-    nrow(violations) == 0,
-    info = "Required edge not found in the output graph."
-  )
-})
-
 test_that("tfci causalDisco respects forbidden background knowledge", {
   data(tpc_example)
 

@@ -35,8 +35,7 @@ skel <- pcalg::skeleton(
   alpha = 0.05,
   labels = vnames,
   method = "stable.fast",
-  fixedGaps = cons$fixed_gaps,
-  fixedEdges = cons$fixed_edges
+  fixedGaps = cons$fixed_gaps
 )
 
 fci_skel <- pcalg::pdsep(

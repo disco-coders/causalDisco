@@ -314,9 +314,10 @@ test_that("set_knowledge deprecates and ignores directed_as_undirected", {
   s$set_data(my_df, set_suff_stat = TRUE)
   s$set_alg("pc")
 
-  # the flag no longer mirrors, so the asymmetric edges error at run time
+  # the flag no longer mirrors, so the asymmetric forbidden edge errors at
+  # run time (the required edge is dropped first, with a warning)
   expect_error(
-    s$run_search(),
+    suppressWarnings(s$run_search()),
     "no symmetrical counterpart"
   )
 })
@@ -355,7 +356,7 @@ test_that("run_search errors in correct order and messages", {
   )
 })
 
-test_that("run_search without score_function (pc) works; with score_function (ges) warns on fixedEdges", {
+test_that("run_search without score_function (pc) works; with score_function (ges) warns on required edges", {
   set.seed(1405)
   my_df <- matrix(rnorm(100), ncol = 5) |> as.data.frame()
   colnames(my_df) <- LETTERS[1:5]
@@ -375,16 +376,16 @@ test_that("run_search without score_function (pc) works; with score_function (ge
   res_ges <- s_ges$run_search(my_df)
   expect_s3_class(res_ges, "Disco")
 
-  # GES with knowledge warns on fixedEdges;
-  kn_req <- knowledge(my_df, A %!-->% B, B %!-->% A)
-  kn_req$edges$status <- "required"
+  # GES with required edges in knowledge warns and drops them
+  kn_req <- knowledge(my_df, A %-->% B)
   s_ges2 <- PcalgSearch$new()
   s_ges2$set_alg("ges")
   s_ges2$set_score("sem_bic")
   s_ges2$set_knowledge(kn_req)
   expect_warning(
-    s_ges2$run_search(my_df),
-    "Engine pcalg does not use required edges; ignoring them.",
+    res_ges2 <- s_ges2$run_search(my_df),
+    "pcalg constraints cannot represent required edges; ignoring them.",
     fixed = TRUE
   )
+  expect_s3_class(res_ges2, "Disco")
 })

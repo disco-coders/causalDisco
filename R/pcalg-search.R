@@ -369,14 +369,7 @@ PcalgSearch <- R6::R6Class(
           stop("Data must be set before knowledge.", call. = FALSE)
         }
         labels <- colnames(self$data)
-        constraints <- as_pcalg_constraints(knowledge_obj, labels)
-        if (any(constraints$fixed_edges)) {
-          warning(
-            "Engine pcalg does not use required edges; ignoring them.",
-            call. = FALSE
-          )
-        }
-        constraints
+        as_pcalg_constraints(knowledge_obj, labels)
       }
     },
 
@@ -424,8 +417,7 @@ PcalgSearch <- R6::R6Class(
           result <- self$alg(
             suffStat = self$suff_stat,
             labels = labels,
-            fixedGaps = self$knowledge$fixed_gaps,
-            fixedEdges = self$knowledge$fixed_edges
+            fixedGaps = self$knowledge$fixed_gaps
           )
         } else {
           if (inherits(self$data, "mids")) {
@@ -447,7 +439,7 @@ PcalgSearch <- R6::R6Class(
           self$score <- private$score_function()
           result <- self$alg(
             self$score,
-            fixedGaps = self$knowledge$fixedGaps
+            fixedGaps = self$knowledge$fixed_gaps
           )
         } else {
           self$score <- private$score_function()
