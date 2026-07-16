@@ -49,7 +49,7 @@ test_that("tpc causalDisco respects tier knowledge", {
   )
 })
 
-test_that("tpc causalDisco warns and ignores required background knowledge", {
+test_that("tpc causalDisco errors on required background knowledge", {
   data(tpc_example)
 
   kn <- knowledge(
@@ -58,16 +58,10 @@ test_that("tpc causalDisco warns and ignores required background knowledge", {
   )
 
   my_tpc <- tpc(engine = "causalDisco", test = "fisher_z")
-  # required edges cannot be represented as pcalg constraints; both disco()
-  # and the conversion warn, and the search runs without them
-  expect_warning(
-    expect_warning(
-      out <- disco(data = tpc_example, method = my_tpc, knowledge = kn),
-      "causalDisco engine does not support required edges in knowledge."
-    ),
-    "cannot represent required edges"
+  expect_error(
+    disco(data = tpc_example, method = my_tpc, knowledge = kn),
+    "causalDisco engine does not support required edges in knowledge."
   )
-  expect_s3_class(out, "Disco")
 })
 
 test_that("tpc causalDisco respects forbidden background knowledge", {

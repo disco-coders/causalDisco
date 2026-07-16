@@ -72,9 +72,8 @@ disco <- function(data, method, knowledge = NULL) {
   check_method_knowledge_bug(method, knowledge)
 
   if (engine == "causalDisco" && any(knowledge$edges$status == "required")) {
-    warning(
-      "causalDisco engine does not support required edges in knowledge. ",
-      "These will be ignored.",
+    stop(
+      "causalDisco engine does not support required edges in knowledge.",
       call. = FALSE
     )
   }
