@@ -61,6 +61,24 @@ s_tges$set_knowledge(kn)
 res_tges <- s_tges$run_search()
 print(res_tges)
 
+# --- Custom (user-defined) algorithm: constraint-based -----------------------
+my_alg <- function(data, knowledge, suff_stat) {
+  tpc_run(
+    data = data,
+    knowledge = knowledge,
+    suff_stat = suff_stat,
+    test = reg_test
+  )
+}
+
+s_custom <- CausalDiscoSearch$new()
+s_custom$set_test("reg")
+s_custom$set_knowledge(kn)
+s_custom$set_alg(my_alg) # type = "constraint" by default
+s_custom$set_data(tpc_example)
+res_custom <- s_custom$run_search()
+print(res_custom)
+
 # --- Intentional error demonstrations ----------------------------------------
 
 # run_search() without setting an algorithm
@@ -137,7 +155,8 @@ See \code{\link[=tfci]{tfci()}}.
 See \code{\link[=tges]{tges()}}.
 \item \code{"tpc"}  - TPC algorithm.
 See \code{\link[=tpc]{tpc()}}.
-}}
+}
+Can also be a user-defined function; see \code{$set_alg()} for details.}
 
     \item{\code{params}}{A list of parameters for the test and algorithm.
 Can be set with \code{$set_params()}.
@@ -299,13 +318,41 @@ Only needed if \code{method} is a user-defined function with an \code{args} para
   Sets the algorithm for the search.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{CausalDiscoSearch$set_alg(method)}
+    \preformatted{CausalDiscoSearch$set_alg(method, type = c("constraint", "score"), args = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{method}}{A string specifying the type of algorithm to use.}
+      \item{\code{method}}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
+A string specifying the type of algorithm to use.
+
+Can also be a user-defined function implementing a full search
+algorithm. Its required signature depends on \code{type}:
+\itemize{
+\item \code{type = "constraint"} (default) - signature
+\code{function(data, knowledge, suff_stat, ...)}, analogous to
+\code{\link[=tpc_run]{tpc_run()}} and \code{\link[=tfci_run]{tfci_run()}}.
+\item \code{type = "score"} - signature \code{function(score, ...)},
+analogous to \code{\link[=tges_run]{tges_run()}}.
+}
+Optionally, the function's signature can also include an \code{args}
+parameter, which is a list of additional arguments to pass to the
+algorithm function. If \code{args} is provided, the function should have
+the signature \code{function(data, knowledge, suff_stat, args)} (or
+\code{function(score, args)} for \code{type = "score"}), and the
+\code{args} parameter will be passed to the algorithm function.
+
+EXPERIMENTAL: user-defined algorithm syntax is subject to change.}
+      \item{\code{type}}{Only used if \code{method} is a user-defined function.
+One of \code{"constraint"} (default) or \code{"score"}, specifying
+whether the algorithm is constraint-based (called with
+\code{data}/\code{knowledge}/\code{suff_stat}) or score-based (called
+with \code{score}).}
+      \item{\code{args}}{A list of additional arguments to pass to the algorithm.
+Only needed if \code{method} is a user-defined function with an
+\code{args} parameter in its signature.}
     }
     \if{html}{\out{</div>}}
   }

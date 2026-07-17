@@ -45,6 +45,8 @@ PcalgSearch <- R6::R6Class(
     #'    \item \code{"fisher_z_mi"} - Fisher Z test for Gaussian data with multiple imputation.
     #'    See [micd::gaussCItestMI()].
     #'
+    #'    \item \code{"reg"} - Regression test for discrete or binary data.
+    #'    See [reg_test()].
     #'    \item \code{"g_square"} - G square test for discrete data.
     #'    See [pcalg::binCItest()] and [pcalg::disCItest()].
     #'    \item \code{"g_square_twd"} - G square test for discrete data with test-wise deletion.

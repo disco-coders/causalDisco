@@ -4,14 +4,10 @@
 \alias{print.Disco}
 \title{Print a Disco Object}
 \usage{
-\method{print}{Disco}(x, compact = FALSE, wide_vars = FALSE, ...)
+\method{print}{Disco}(x, ...)
 }
 \arguments{
 \item{x}{A \code{Disco} object.}
-
-\item{compact}{Logical. If \code{TRUE}, prints a more compact summary.}
-
-\item{wide_vars}{Logical. If \code{TRUE}, prints the variables in a wide format.}
 
 \item{...}{Additional arguments (not used).}
 }
@@ -34,7 +30,5 @@ kn <- knowledge(
 cd_tges <- tpc(engine = "causalDisco", test = "fisher_z")
 disco_cd_tges <- disco(data = tpc_example, method = cd_tges, knowledge = kn)
 print(disco_cd_tges)
-print(disco_cd_tges, wide_vars = TRUE)
-print(disco_cd_tges, compact = TRUE)
 
 }

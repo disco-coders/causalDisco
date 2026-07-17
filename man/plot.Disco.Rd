@@ -86,7 +86,7 @@ kn <- knowledge(
     youth ~ starts_with("youth"),
     old ~ starts_with("old")
   ),
-  child_x1 \%-->\% c(child_x2, youth_x4) # required edges
+  child_x1 \%-->\% child_x2 + youth_x4 # required edges
 )
 bnlearn_pc <- pc(engine = "bnlearn", test = "fisher_z")
 disco_bnlearn_pc <- disco(data = tpc_example, method = bnlearn_pc, knowledge = kn)
@@ -109,7 +109,7 @@ plot(
 data(num_data)
 kn_untiered <- knowledge(
   num_data,
-  X1 \%-->\% c(X2, X3),
+  X1 \%-->\% X2 + X3,
   Z \%!-->\% Y
 )
 

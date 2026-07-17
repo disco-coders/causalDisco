@@ -8,6 +8,7 @@ Bjerre
 Bui
 CMD
 CPDAG
+CPDAGs
 Camchong
 Caugi
 Chickering
@@ -42,6 +43,8 @@ Kristensen
 Kummerfeld
 Kun
 MCAR
+MPDAG
+MPDAGs
 Maathuis
 Margaritis
 NML
@@ -94,7 +97,6 @@ aje
 al
 alg
 amat
-arxiv
 bdeu
 bic
 bidirected
@@ -111,7 +113,6 @@ factorised
 fci
 fges
 honouring
-https
 independencies
 initializations
 interventional
@@ -143,7 +144,6 @@ tamat
 tbic
 tetrad
 th
-thorugh
 tibble
 tidyselect
 tikzpicture

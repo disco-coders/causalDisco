@@ -65,6 +65,22 @@ kn <- knowledge(
   oldage_x6 %!-->% child_x1
 )
 
+# Both sides of an edge operator accept tidyselect helpers, so a set of edges
+# can be specified at once. Here every "child" variable is forbidden from
+# pointing to every "youth" variable.
+kn <- knowledge(
+  tpc_example,
+  starts_with("child") %!-->% starts_with("youth")
+)
+
+# tidyselect set operations such as `!` (negation) and `&` (intersection)
+# also work. Forbid edges from child_x1 to every variable that is not a
+# "child" variable.
+kn <- knowledge(
+  tpc_example,
+  child_x1 %!-->% !starts_with("child")
+)
+
 # You can also add exogenous variables
 kn <- knowledge(
   tpc_example,

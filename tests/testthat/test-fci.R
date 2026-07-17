@@ -142,7 +142,7 @@ test_that("fci Tetrad disco respects forbidden background knowledge", {
   # Verify it actually changes the output when forbidding an edge present above
   kn <- knowledge(
     tpc_example,
-    child_x2 %!-->% c(child_x1, oldage_x5)
+    child_x2 %!-->% child_x1 + oldage_x5
   )
 
   tetrad_fci <- fci(

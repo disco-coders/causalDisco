@@ -37,8 +37,8 @@ simple `Knowledge` object and visualizing it with `plot()`.
 data(num_data)
 kn <- knowledge(
   num_data,
-  X1 %-->% c(X2, X3), # Require edge from X1 to X2, and X1 to X3
-  X2 %!-->% c(X3, Y), # Forbid edge from X2 to X3, and X2 to Y
+  X1 %-->% X2 + X3, # Require edge from X1 to X2, and X1 to X3
+  X2 %!-->% X3 + Y, # Forbid edge from X2 to X3, and X2 to Y
   Y %!-->% Z # Forbid edge from Y to Z
 )
 
@@ -175,7 +175,7 @@ data(num_data)
 kn <- knowledge(
   num_data,
   X1 %-->% X2,
-  X2 %!-->% c(X3, Y),
+  X2 %!-->% X3 + Y,
   Y %!-->% Z
 )
 
@@ -239,7 +239,7 @@ data(num_data)
 kn <- knowledge(
   num_data,
   X1 %-->% X2,
-  X2 %!-->% c(X3, Y),
+  X2 %!-->% X3 + Y,
   Y %!-->% Z
 )
 

@@ -155,7 +155,7 @@ Recognised values are:
 
 \strong{Mixed Discrete/Gaussian}
 \itemize{
-\item \code{"mi_cg"} – mutual information (conditional Gaussian)
+\item \code{"mi_cg"} / \code{"conditional_gaussian"} – mutual information (conditional Gaussian)
 }
 
 For Monte Carlo tests, set the number of permutations using the \code{B} argument.}

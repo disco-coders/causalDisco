@@ -65,7 +65,8 @@ test_that("bnlearn test argument works (mixed)", {
   }
 
   tests <- c(
-    "mi_cg"
+    "mi_cg",
+    "conditional_gaussian"
   )
 
   lapply(tests, function(t) suppressWarnings(run_pc_test(mix_data, t)))

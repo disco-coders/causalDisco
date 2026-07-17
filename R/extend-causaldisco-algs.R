@@ -89,3 +89,89 @@ reset_tetrad_alg_registry <- function() {
   )
   invisible(NULL)
 }
+
+engine_registry_env <- new.env(parent = emptyenv())
+
+#' Register a New Engine
+#'
+#' The built-in engines ("bnlearn", "causalDisco", "pcalg", "tetrad") are
+#' backed by R6 search classes ([BnlearnSearch], [CausalDiscoSearch],
+#' [PcalgSearch], [TetradSearch]) that [make_runner()] knows how to build and
+#' configure. `register_engine()` lets you plug in a backend for a package
+#' that isn't one of the built-ins, so that it can be selected by name from
+#' [make_runner()] the same way as a built-in engine.
+#'
+#' `make_runner_fn` must accept `alg` and `...`, and return a runner: a list
+#' with two elements,
+#' \itemize{
+#'   \item `set_knowledge`, a function that takes a single `Knowledge`
+#'   object and configures background knowledge on the underlying search, and
+#'   \item `run`, a function that takes a single data frame, runs the search,
+#'   and returns the algorithm's result using [as_disco()].
+#' }
+#' [make_runner()] calls `make_runner_fn` with `alg`, `test`, `alpha`,
+#' `score`, and any additional arguments it was itself called with. Pick up
+#' whichever of these your engine needs by naming them explicitly, and let
+#' `...` absorb the rest.
+#'
+#' @param name Engine name (string). Cannot be one of the built-in engine
+#' names ("bnlearn", "causalDisco", "pcalg", "tetrad").
+#' @param make_runner_fn A function implementing the engine. See Details.
+#' @param pkgs Character vector of package names required by the engine.
+#' Checked, with an informative error if missing, before `make_runner_fn` is
+#' called.
+#'
+#' @family Extending causalDisco
+#' @concept extending_causalDisco
+#' @export
+register_engine <- function(name, make_runner_fn, pkgs = character(0)) {
+  checkmate::assert_string(name)
+  checkmate::assert_character(pkgs, any.missing = FALSE)
+  if (!is.function(make_runner_fn)) {
+    stop("`make_runner_fn` must be a function", call. = FALSE)
+  }
+  if (name %in% .engines) {
+    stop(
+      "'",
+      name,
+      "' is a built-in engine name and cannot be overridden. ",
+      "Built-in engines are: ",
+      paste(.engines, collapse = ", "),
+      call. = FALSE
+    )
+  }
+  engine_registry_env[[name]] <- list(
+    make_runner_fn = make_runner_fn,
+    pkgs = pkgs
+  )
+  invisible(NULL)
+}
+
+#' List Registered Engines
+#'
+#' Returns the names of all custom engines registered via
+#' [register_engine()] (in addition to the built-in engines "bnlearn",
+#' "causalDisco", "pcalg", and "tetrad", which are always available).
+#'
+#' @return Character vector of engine names.
+#' @family Extending causalDisco
+#' @concept extending_causalDisco
+#' @export
+list_registered_engines <- function() {
+  sort(ls(envir = engine_registry_env))
+}
+
+#' Reset the Engine Registry
+#'
+#' Clears all custom registered engines.
+#'
+#' @family Extending causalDisco
+#' @concept extending_causalDisco
+#' @export
+reset_engine_registry <- function() {
+  rm(
+    list = ls(engine_registry_env, all.names = TRUE),
+    envir = engine_registry_env
+  )
+  invisible(NULL)
+}

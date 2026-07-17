@@ -50,6 +50,24 @@ s_tges$set_knowledge(kn)
 res_tges <- s_tges$run_search()
 print(res_tges)
 
+# --- Custom (user-defined) algorithm: constraint-based -----------------------
+my_alg <- function(data, knowledge, suff_stat) {
+  tpc_run(
+    data = data,
+    knowledge = knowledge,
+    suff_stat = suff_stat,
+    test = reg_test
+  )
+}
+
+s_custom <- CausalDiscoSearch$new()
+s_custom$set_test("reg")
+s_custom$set_knowledge(kn)
+s_custom$set_alg(my_alg) # type = "constraint" by default
+s_custom$set_data(tpc_example)
+res_custom <- s_custom$run_search()
+print(res_custom)
+
 # --- Intentional error demonstrations ----------------------------------------
 
 # run_search() without setting an algorithm

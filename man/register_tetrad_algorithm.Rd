@@ -19,11 +19,15 @@ This allows you to extend the set of Tetrad algorithms that can be used with cau
 }
 \seealso{
 Other Extending causalDisco:
+\code{\link[=as_disco]{as_disco()}},
 \code{\link[=distribute_engine_args]{distribute_engine_args()}},
+\code{\link[=list_registered_engines]{list_registered_engines()}},
 \code{\link[=list_registered_tetrad_algorithms]{list_registered_tetrad_algorithms()}},
 \code{\link[=make_method]{make_method()}},
 \code{\link[=make_runner]{make_runner()}},
 \code{\link[=new_disco_method]{new_disco_method()}},
+\code{\link[=register_engine]{register_engine()}},
+\code{\link[=reset_engine_registry]{reset_engine_registry()}},
 \code{\link[=reset_tetrad_alg_registry]{reset_tetrad_alg_registry()}}
 }
 \concept{Extending causalDisco}

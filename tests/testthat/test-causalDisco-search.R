@@ -452,3 +452,96 @@ test_that("run_search(data=...) takes score-based path and skips suff_stat", {
   expect_null(s$suff_stat)
   expect_s3_class(out, "Disco")
 })
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Custom (user-defined) algorithms
+# ──────────────────────────────────────────────────────────────────────────────
+
+test_that("set_alg accepts a custom constraint-based algorithm", {
+  my_df <- data.frame(
+    p1_x = rnorm(100),
+    p1_y = rnorm(100),
+    p2_z = rnorm(100)
+  )
+  kn <- knowledge(
+    my_df,
+    tier(
+      p1 ~ tidyselect::starts_with("p1"),
+      p2 ~ tidyselect::starts_with("p2")
+    )
+  )
+
+  my_alg <- function(data, knowledge, suff_stat) {
+    tpc_run(
+      data = data,
+      knowledge = knowledge,
+      suff_stat = suff_stat,
+      test = reg_test
+    )
+  }
+
+  s <- CausalDiscoSearch$new()
+  s$set_test("reg")
+  s$set_knowledge(kn)
+  s$set_alg(my_alg)
+  s$set_data(my_df, set_suff_stat = TRUE)
+
+  out <- s$run_search()
+  expect_s3_class(out, "Disco")
+})
+
+test_that("set_alg accepts a custom score-based algorithm", {
+  gdf <- matrix(rnorm(100), ncol = 4) |> as.data.frame()
+  colnames(gdf) <- paste0("p1_X", 1:4)
+  kn <- knowledge(gdf, tier(p1 ~ tidyselect::starts_with("p1")))
+
+  my_alg <- function(score) {
+    tges_run(score = score)
+  }
+
+  s <- CausalDiscoSearch$new()
+  s$set_data(gdf, set_suff_stat = FALSE)
+  s$set_knowledge(kn)
+  s$set_score("tbic")
+  s$set_alg(my_alg, type = "score")
+
+  out <- s$run_search()
+  expect_s3_class(out, "Disco")
+})
+
+test_that("set_alg forwards args to a custom algorithm", {
+  my_df <- data.frame(
+    p1_x = rnorm(100),
+    p1_y = rnorm(100),
+    p2_z = rnorm(100)
+  )
+  kn <- knowledge(
+    my_df,
+    tier(
+      p1 ~ tidyselect::starts_with("p1"),
+      p2 ~ tidyselect::starts_with("p2")
+    )
+  )
+
+  seen_alpha <- NULL
+  my_alg <- function(data, knowledge, suff_stat, args) {
+    seen_alpha <<- args$alpha
+    tpc_run(
+      data = data,
+      knowledge = knowledge,
+      suff_stat = suff_stat,
+      test = reg_test,
+      alpha = args$alpha
+    )
+  }
+
+  s <- CausalDiscoSearch$new()
+  s$set_test("reg")
+  s$set_knowledge(kn)
+  s$set_alg(my_alg, args = list(alpha = 0.2))
+  s$set_data(my_df, set_suff_stat = TRUE)
+
+  out <- s$run_search()
+  expect_identical(seen_alpha, 0.2)
+  expect_s3_class(out, "Disco")
+})

@@ -4,7 +4,7 @@ data(num_data)
 kn <- knowledge(
   num_data,
   X1 %-->% X2,
-  X2 %!-->% c(X3, Y),
+  X2 %!-->% X3 + Y,
   Y %!-->% Z
 )
 
@@ -55,7 +55,7 @@ data(num_data)
 kn <- knowledge(
   num_data,
   X1 %-->% X2,
-  X2 %!-->% c(X3, Y),
+  X2 %!-->% X3 + Y,
   Y %!-->% Z
 )
 

@@ -228,7 +228,6 @@ tpc_run <- function(
 #' @keywords internal
 #' @noRd
 v_orient_temporal <- function(amat, sepsets) {
-  vnames <- rownames(amat) # TODO: not used
   nvar <- nrow(amat)
 
   for (i in 1:nvar) {

@@ -113,3 +113,62 @@ test_that("register_tetrad_algorithm errors if not a function", {
     "must be a function"
   )
 })
+
+# ──────────────────────────────────────────────────────────────────────────────
+# register_engine
+# ──────────────────────────────────────────────────────────────────────────────
+
+test_that("register_engine registers a new engine, visible via list_registered_engines", {
+  reset_engine_registry()
+  on.exit(reset_engine_registry())
+
+  expect_identical(list_registered_engines(), character(0))
+
+  runner_fn <- function(alg, ...) NULL
+  register_engine("my_engine", runner_fn, pkgs = "stats")
+
+  expect_identical(list_registered_engines(), "my_engine")
+  expect_identical(
+    engine_registry_env[["my_engine"]],
+    list(make_runner_fn = runner_fn, pkgs = "stats")
+  )
+})
+
+test_that("register_engine defaults pkgs to an empty character vector", {
+  reset_engine_registry()
+  on.exit(reset_engine_registry())
+
+  register_engine("my_engine", function(alg, ...) NULL)
+
+  expect_identical(engine_registry_env[["my_engine"]]$pkgs, character(0))
+})
+
+test_that("register_engine errors if make_runner_fn is not a function", {
+  reset_engine_registry()
+  on.exit(reset_engine_registry())
+
+  expect_error(
+    register_engine("my_engine", "not a function"),
+    "must be a function"
+  )
+})
+
+test_that("register_engine errors if name is a built-in engine name", {
+  reset_engine_registry()
+  on.exit(reset_engine_registry())
+
+  expect_error(
+    register_engine("bnlearn", function(alg, ...) NULL),
+    "'bnlearn' is a built-in engine name and cannot be overridden"
+  )
+})
+
+test_that("reset_engine_registry clears all registered engines", {
+  reset_engine_registry()
+
+  register_engine("my_engine", function(alg, ...) NULL)
+  expect_identical(list_registered_engines(), "my_engine")
+
+  reset_engine_registry()
+  expect_identical(list_registered_engines(), character(0))
+})

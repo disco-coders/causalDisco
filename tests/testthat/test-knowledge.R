@@ -43,7 +43,8 @@ test_that("Knowledge object is created correctly using mini-DSL", {
 
 test_that("infix edges before tier() do not drop variables from tier() (no data frame)", {
   kn <- knowledge(
-    A %-->% C, C %!-->% D,
+    A %-->% C,
+    C %!-->% D,
     tier(
       1 ~ A + B,
       2 ~ C + D
@@ -1289,7 +1290,7 @@ test_that("print and summary method for knowledge", {
   print(kn, wide = TRUE)
   print(kn, compact = TRUE)
   print(kn, wide = TRUE, compact = TRUE)
-  summary(kn)
+  lifecycle::expect_deprecated(summary(kn))
   expect_true(TRUE)
 })
 
@@ -1299,7 +1300,7 @@ test_that("print and summary method for empty knowledge works", {
   print(kn, wide = TRUE)
   print(kn, compact = TRUE)
   print(kn, wide = TRUE, compact = TRUE)
-  summary(kn)
+  lifecycle::expect_deprecated(summary(kn))
   expect_true(TRUE)
 })
 
@@ -1309,6 +1310,135 @@ test_that("print and summary method for no tier knowledge works", {
   print(kn, wide = TRUE)
   print(kn, compact = TRUE)
   print(kn, wide = TRUE, compact = TRUE)
-  summary(kn)
+  lifecycle::expect_deprecated(summary(kn))
   expect_true(TRUE)
+})
+
+# ──────────────────────────────────────────────────────────────────────────────
+# + syntax for infix edge operators
+# ──────────────────────────────────────────────────────────────────────────────
+
+test_that("+ on RHS of %-->% is equivalent to c()", {
+  kn_plus <- knowledge(V1 %-->% V2 + V3)
+  kn_c <- knowledge(V1 %-->% c(V2, V3))
+  expect_equal(kn_plus$edges, kn_c$edges)
+})
+
+test_that("+ on RHS of %!-->% is equivalent to c()", {
+  kn_plus <- knowledge(V1 %!-->% V2 + V3)
+  kn_c <- knowledge(V1 %!-->% c(V2, V3))
+  expect_equal(kn_plus$edges, kn_c$edges)
+})
+
+test_that("+ on LHS of %-->% is equivalent to c()", {
+  kn_plus <- knowledge(V1 + V2 %-->% V3)
+  kn_c <- knowledge(c(V1, V2) %-->% V3)
+  expect_equal(kn_plus$edges, kn_c$edges)
+})
+
+test_that("+ on LHS of %!-->% is equivalent to c()", {
+  kn_plus <- knowledge(V1 + V2 %!-->% V3)
+  kn_c <- knowledge(c(V1, V2) %!-->% V3)
+  expect_equal(kn_plus$edges, kn_c$edges)
+})
+
+test_that("+ on both sides of %-->% is equivalent to c()", {
+  kn_plus <- knowledge(V1 + V2 %-->% V3 + V4)
+  kn_c <- knowledge(c(V1, V2) %-->% c(V3, V4))
+  expect_equal(kn_plus$edges, kn_c$edges)
+})
+
+test_that("+ on both sides of %!-->% is equivalent to c()", {
+  kn_plus <- knowledge(V1 + V2 %!-->% V3 + V4)
+  kn_c <- knowledge(c(V1, V2) %!-->% c(V3, V4))
+  expect_equal(kn_plus$edges, kn_c$edges)
+})
+
+test_that("+ syntax with data and multiple edge lines matches c() syntax", {
+  kn_plus <- knowledge(
+    tpc_example,
+    child_x1 + youth_x4 %-->% child_x2 + youth_x3,
+    child_x2 %!-->% youth_x3 + oldage_x5
+  )
+  kn_c <- knowledge(
+    tpc_example,
+    c(child_x1, youth_x4) %-->% c(child_x2, youth_x3),
+    child_x2 %!-->% c(youth_x3, oldage_x5)
+  )
+  expect_equal(kn_plus$edges, kn_c$edges)
+})
+
+# ──────────────────────────────────────────────────────────────────────────────
+# tidyselect helpers in edge operators
+# ──────────────────────────────────────────────────────────────────────────────
+
+test_that("tidyselect helpers select on both sides of edge operators", {
+  df <- data.frame(child_x1 = 1, child_x2 = 2, youth_x3 = 3, youth_x4 = 4)
+
+  kn_sel <- knowledge(df, starts_with("child") %!-->% starts_with("youth"))
+  kn_expl <- knowledge(
+    df,
+    child_x1 + child_x2 %!-->% youth_x3 + youth_x4
+  )
+  expect_equal(kn_sel$edges, kn_expl$edges)
+})
+
+test_that("tidyselect helpers mix with bare names and + in edge operators", {
+  df <- data.frame(child_x1 = 1, child_x2 = 2, youth_x3 = 3, old_x5 = 5)
+
+  kn_sel <- knowledge(df, starts_with("child") + old_x5 %-->% youth_x3)
+  kn_expl <- knowledge(df, child_x1 + child_x2 + old_x5 %-->% youth_x3)
+  expect_equal(kn_sel$edges, kn_expl$edges)
+})
+
+test_that("tidyselect set operations (! and &) work in edge operators", {
+  df <- data.frame(child_x1 = 1, child_x2 = 2, youth_x3 = 3, youth_x4 = 4)
+
+  # Negation: child_x1 -> everything that is not a "child" variable.
+  kn_neg <- knowledge(df, child_x1 %-->% !starts_with("child"))
+  kn_neg_expl <- knowledge(df, child_x1 %-->% youth_x3 + youth_x4)
+  expect_equal(kn_neg$edges, kn_neg_expl$edges)
+
+  # Intersection: only youth_x3 matches both selectors.
+  kn_and <- knowledge(
+    df,
+    child_x1 %-->% (starts_with("youth") & ends_with("x3"))
+  )
+  kn_and_expl <- knowledge(df, child_x1 %-->% youth_x3)
+  expect_equal(kn_and$edges, kn_and_expl$edges)
+})
+
+test_that("edge operator errors when a tidyselect helper matches nothing", {
+  df <- data.frame(child_x1 = 1, youth_x3 = 3)
+  expect_error(
+    knowledge(df, child_x1 %-->% starts_with("nope")),
+    "no variables matched"
+  )
+})
+
+test_that("required edges that form a directed cycle are rejected", {
+  df <- data.frame(A = 1, B = 1, C = 1)
+  expect_error(
+    knowledge(df, A %-->% B, B %-->% A),
+    "required in both directions"
+  )
+  # 3-cycle
+  expect_error(
+    knowledge(df, A %-->% B, B %-->% C, C %-->% A),
+    "directed cycle"
+  )
+  # longer cycle
+  df2 <- data.frame(A = 1, B = 1, C = 1, D = 1)
+  expect_error(
+    knowledge(df2, A %-->% B, B %-->% C, C %-->% D, D %-->% A),
+    "directed cycle"
+  )
+})
+
+test_that("acyclic required edges and forbidden cycles are accepted", {
+  df <- data.frame(A = 1, B = 1, C = 1)
+  # an acyclic chain of required edges is fine
+  expect_no_error(knowledge(df, A %-->% B, B %-->% C))
+  # forbidden edges impose no orientation, so a "cycle" of forbidden edges is fine
+  expect_no_error(knowledge(df, A %!-->% B, B %!-->% C, C %!-->% A))
 })

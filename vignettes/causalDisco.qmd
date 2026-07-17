@@ -181,13 +181,12 @@ For more details on customizing plots and generating TikZ code for LaTeX
 documents, see the [visualization vignette](visualization.html).
 
 Instead of using `plot()`, another way to view and analyze the results is to use
-the `print()` or `summary()` functions:
+print the object:
 
 ```{r}
 #| label: view-results
 
 print(pc_result_bnlearn)
-summary(pc_result_bnlearn)
 ```
 
 # Incorporating knowledge

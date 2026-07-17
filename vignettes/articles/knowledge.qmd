@@ -18,9 +18,9 @@ prior knowledge into causal discovery algorithms. The different supported
 knowledge types are explained below, along with examples of how to create
 `Knowledge` objects and use them with causal discovery methods. All knowledge
 types can be freely combined. Multiple calls or operators are additive: each
-call adds new edges to the `Knowledge` object. For example if we require an edge
-from `A` to `B` and then require an edge from A to C, the resulting `Knowledge`
-object will require both edges from `A` to `B` and from `A` to `C`.
+call adds new edges to the `Knowledge` object. For example, if we require an
+edge from `A` to `B` and then require an edge from A to C, the resulting
+`Knowledge` object will require both edges from `A` to `B` and from `A` to `C`.
 
 At a conceptual level, all knowledge is represented as constraints on edges,
 specifying which edges are required and forbidden. Some knowledge types provide
@@ -51,7 +51,7 @@ from B to C:
 #| label: required-and-forbidden-knowledge
 
 kn_1 <- knowledge(
-  A %-->% c(B, C), # Require edges from A to B and A to C
+  A %-->% B + C, # Require edges from A to B and A to C
   B %!-->% C # Forbid edge from B to C
 )
 ```
@@ -68,7 +68,7 @@ The blue edge represents the required edge from A to B, while the red edge
 represents the forbidden edge from B to C.
 
 If one wishes to remove some edges (either required or forbidden) knowledge from
-an existing `Knowledge` object, the `remove_edge()` function can be used. For
+existing `Knowledge` objects, the `remove_edge()` function can be used. For
 example, to remove the required edge from A to B:
 
 ```{r}
@@ -143,6 +143,19 @@ can have edges to any variables starting with "youth". We can visualize this:
 #| label: plot-required-and-forbidden-knowledge-with-tidyselect
 
 plot(kn_3)
+```
+
+The tidyselect set operations `!` (negation), `&` (intersection), and `|`
+(union) are also supported. For example, to forbid an edge from `child_x1` to
+every variable that is *not* a "child" variable:
+
+```{r}
+#| label: required-and-forbidden-knowledge-with-tidyselect-set-ops
+
+kn_4 <- knowledge(
+  tpc_example,
+  child_x1 %!-->% !starts_with("child")
+)
 ```
 
 For a list of all available tidyselect helpers we refer to the [tidyselect

@@ -85,6 +85,87 @@ rather than `test` and `alpha`. A **hybrid** algorithm would accept `test`,
 To implement an algorithm from pcalg rather than bnlearn, we would follow the
 same structure but change all instances of `"bnlearn"` to `"pcalg"`.
 
+# A fully custom algorithm implemented in R
+
+Here we show how to use a plain R function you wrote yourself as an algorithm,
+instead of from a package. The `causalDisco` engine's
+`CausalDiscoSearch$set_alg()` accepts such a function directly, so you can reuse
+its data/knowledge/test handling while swapping out only the search procedure.
+
+A **constraint-based** custom algorithm has the signature
+`function(data, knowledge, suff_stat)`, mirroring `tpc_run()`/`tfci_run()`. A
+**score-based** custom algorithm instead has the signature `function(score)`,
+mirroring `tges_run()`; pass `type = "score"` to `set_alg()` for these. Here we
+implement a (trivial) constraint-based algorithm that just calls `tpc_run()`
+with whatever test the search object was configured with.
+
+To wire this into `disco()`, with the same knowledge injection and return type
+as the built-in algorithms, wrap a `CausalDiscoSearch` object in
+`make_method()`, exactly as we did for `hpc()` above. One thing to watch out
+for: `search$set_test()` doesn't just resolve the test to a function (afterwards
+available as `search$test`), it also computes the sufficient statistic that
+`run_search()` passes into your algorithm's `suff_stat` argument. So your custom
+algorithm should read the test off `search$test` rather than hardcoding one, to
+keep the two in sync.
+
+```{r}
+#| label: my-alg-method
+
+my_alg <- function(test = "fisher_z", alpha = 0.05, ...) {
+  make_method(
+    method_name = "my_alg",
+    engine = "causalDisco",
+    engine_fns = list(
+      causalDisco = function(test, alpha, ...) {
+        search <- CausalDiscoSearch$new()
+        search$set_test(test, alpha)
+
+        my_search_alg <- function(data, knowledge, suff_stat) {
+          tpc_run(
+            data = data,
+            knowledge = knowledge,
+            suff_stat = suff_stat,
+            test = search$test
+          )
+        }
+        search$set_alg(my_search_alg)
+
+        list(
+          set_knowledge = function(knowledge) search$set_knowledge(knowledge),
+          run = function(data) search$run_search(data)
+        )
+      }
+    ),
+    test = test,
+    alpha = alpha,
+    graph_class = "PDAG",
+    ...
+  )
+}
+```
+
+`my_alg()` can now be used exactly like any built-in method:
+
+```{r}
+#| label: my-alg-example
+
+data(tpc_example)
+kn <- knowledge(
+  tpc_example,
+  tier(
+    child ~ tidyselect::starts_with("child"),
+    youth ~ tidyselect::starts_with("youth"),
+    oldage ~ tidyselect::starts_with("oldage")
+  )
+)
+result <- disco(
+  data = tpc_example,
+  method = my_alg(test = "fisher_z"),
+  knowledge = kn
+)
+plot(result)
+```
+
 # Tetrad
 
 We will illustrate how to make a custom version (which actually does the same as
@@ -206,10 +287,91 @@ Finally, we clean up the custom registered Tetrad algorithm
 reset_tetrad_alg_registry()
 ```
 
+# A brand-new engine
+
+Everything above adds a new *algorithm* to one of the built-in engines
+(`"bnlearn"`, `"causalDisco"`, `"pcalg"`, `"tetrad"`). This section shows how to
+add a new *engine* to causalDisco.
+
+`register_engine()` takes an engine name, a `make_runner_fn`, and the packages
+it depends on. `make_runner_fn` must accept `alg` and `...`, and must return a
+*runner*: a list with a `set_knowledge()` function and a `run()` function. This
+is the same runner shape returned by `make_runner()` itself, and by the
+`engine_fns` we wrote by hand in the "fully custom algorithm" example above.
+`run()` should return its graph wrapped with `as_disco()`, which is what
+`disco()`, `print()`, and `plot()` expect.
+
+Here we register a (trivial) `"always_empty"` engine that ignores its input and
+always returns the empty graph over the columns of the input data, to show the
+registration mechanics.
+
+```{r}
+#| label: register-engine
+
+always_empty_runner <- function(alg, ...) {
+  kn <- knowledge()
+  list(
+    set_knowledge = function(knowledge) kn <<- knowledge,
+    run = function(data) {
+      cg <- caugi::caugi(
+        from = character(0),
+        edge = character(0),
+        to = character(0),
+        nodes = names(data),
+        class = "PDAG"
+      )
+      as_disco(cg, kn)
+    }
+  )
+}
+
+register_engine("always_empty", always_empty_runner)
+```
+
+With the engine registered, we can wire up a method for it with `make_method()`
+and `make_runner()`, just like `hpc()` and `my_boss_variant()` above:
+
+```{r}
+#| label: empty-alg-function
+
+empty_alg <- function(engine = "always_empty", ...) {
+  engine <- match.arg(engine)
+
+  make_method(
+    method_name = "empty_alg",
+    engine = engine,
+    engine_fns = list(
+      always_empty = function(...) {
+        make_runner(engine = "always_empty", alg = "empty_alg", ...)
+      }
+    ),
+    graph_class = "PDAG",
+    ...
+  )
+}
+```
+
+```{r}
+#| label: empty-alg-example
+
+disco(tpc_example, empty_alg())
+```
+
+You can view all registered engines with `list_registered_engines()`, and clear
+them with `reset_engine_registry()`:
+
+```{r}
+#| label: cleanup-engine
+
+list_registered_engines()
+reset_engine_registry()
+```
+
 # Conclusion
 
 In this article, we have illustrated how to add new algorithms to causalDisco,
-both from the R packages pcalg and bnlearn and from Tetrad.
+both from the R packages pcalg and bnlearn and from Tetrad, as well as how to
+register an entirely new engine backend.
 
 If you have any feedback or suggestions for improvement on the API and
 functionality for extending causalDisco, please let us know by opening an issue

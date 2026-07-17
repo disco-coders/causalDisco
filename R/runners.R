@@ -67,7 +67,8 @@ make_method <- function(
 #' engine and algorithm. This allows users to support new algorithms.
 #'
 #' @param engine Character. The engine to use. Options include `"causalDisco"`,
-#'   `"pcalg"`, `"bnlearn"`, `"tetrad"`.
+#'   `"pcalg"`, `"bnlearn"`, `"tetrad"`, or the name of any engine added via
+#'   [register_engine()].
 #' @param alg Character. The algorithm name.
 #' @param test Optional. A test statistic to pass to the engine.
 #' @param alpha Optional. Significance level to pass to the engine.
@@ -89,12 +90,45 @@ make_runner <- function(
   ...,
   directed_as_undirected_knowledge = FALSE
 ) {
+  if (exists(engine, envir = engine_registry_env, inherits = FALSE)) {
+    custom_engine <- engine_registry_env[[engine]]
+    if (length(custom_engine$pkgs) > 0) {
+      .check_if_pkgs_are_installed(
+        pkgs = custom_engine$pkgs,
+        function_name = paste0(alg, "_", engine, "_runner")
+      )
+    }
+    return(custom_engine$make_runner_fn(
+      alg = alg,
+      test = test,
+      alpha = alpha,
+      score = score,
+      ...,
+      directed_as_undirected_knowledge = directed_as_undirected_knowledge
+    ))
+  }
+
   engine_map <- list(
     causalDisco = list(class = CausalDiscoSearch, pkgs = "causalDisco"),
     pcalg = list(class = PcalgSearch, pkgs = "pcalg"),
     bnlearn = list(class = BnlearnSearch, pkgs = "bnlearn"),
     tetrad = list(class = TetradSearch, pkgs = "rJava")
   )
+
+  if (!engine %in% names(engine_map)) {
+    stop(
+      "Unknown engine: '",
+      engine,
+      "'. Supported engines are: ",
+      paste(
+        c(names(engine_map), list_registered_engines()),
+        collapse = ", "
+      ),
+      ". Use register_engine() to add support for a new engine.",
+      call. = FALSE
+    )
+  }
+
   required_pkgs <- engine_map[[engine]]$pkgs
   .check_if_pkgs_are_installed(
     pkgs = required_pkgs,

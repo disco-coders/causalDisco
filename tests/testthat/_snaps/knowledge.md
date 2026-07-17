@@ -1,12 +1,8 @@
 # print.Knowledge() snapshot
 
-      [1mtier[22m 
-      <chr>
-    1 1    
-    2 2    
-      [1mvar[22m   [1mtier[22m 
-      <chr> <chr>
-    1 V1    1    
-    2 V2    2    
-     x  V1 > V2
+    <Knowledge: 2 tiers | 2 vars | 1 forbidden>
+      tier(1): V1
+      tier(2): V2
+      forbidden:
+        V1!-->V2
 

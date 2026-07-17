@@ -95,8 +95,8 @@ kn <- knowledge(
     youth ~ starts_with("youth"),
     old ~ starts_with("old")
   ),
-  child_x1 \%-->\% c(child_x2, youth_x4), # required edges
-  youth_x4 \%!-->\% c(youth_x3, oldage_x5)  # forbidden edges
+  child_x1 \%-->\% child_x2 + youth_x4, # required edges
+  youth_x4 \%!-->\% youth_x3 + oldage_x5  # forbidden edges
 )
 
 # Edge from child_x1 to child_x2 will be orange, but edge from child_x1 to youth_x4
@@ -122,7 +122,7 @@ plot(
 # Define a `Knowledge` object without tiers
 kn_untiered <- knowledge(
   tpc_example,
-  child_x1 \%-->\% c(child_x2, youth_x3),
+  child_x1 \%-->\% child_x2 + youth_x3,
   youth_x4 \%!-->\% oldage_x5
 )
 # Plot with default layout

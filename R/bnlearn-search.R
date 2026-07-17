@@ -110,7 +110,7 @@ BnlearnSearch <- R6::R6Class(
     #'
     #'   **Mixed Discrete/Gaussian**
     #'   \itemize{
-    #'     \item \code{"mi_cg"} – mutual information (conditional Gaussian)
+    #'     \item \code{"mi_cg"} / \code{"conditional_gaussian"} – mutual information (conditional Gaussian)
     #'   }
     #'
     #'   For Monte Carlo tests, set the number of permutations using the `B` argument.
@@ -271,7 +271,8 @@ BnlearnSearch <- R6::R6Class(
         "mi-g-sh", # mutual information for Gaussian variables with shrinkage
 
         # Conditional Gaussian
-        "mi-cg" # mutual information for conditional Gaussian variables
+        "mi-cg", # mutual information for conditional Gaussian variables
+        "conditional-gaussian" # alias for mi-cg
       )
 
       if (!(method %in% allowed_tests)) {
@@ -279,6 +280,9 @@ BnlearnSearch <- R6::R6Class(
       }
       if (method == "fisher-z") {
         method <- "zf" # alias
+      }
+      if (method == "conditional-gaussian") {
+        method <- "mi-cg" # alias
       }
 
       self$params$alpha <- alpha

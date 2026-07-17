@@ -192,7 +192,53 @@
 
   # validate again for safety
   .validate_forbidden_required(kn$edges)
+  # required edges must not form a directed cycle: no DAG could satisfy them
+  .validate_no_required_cycle(kn$edges)
   kn
+}
+
+#' @title Reject Required Edges That Form a Directed Cycle
+#'
+#' @description
+#' Required edges are directed constraints, so a directed cycle among them
+#' (e.g. `A %-->% B`, `B %-->% C`, `C %-->% A`) cannot be satisfied by any DAG.
+#' This helper detects such cycles and errors. Forbidden edges impose no
+#' orientation and are ignored.
+#'
+#' @param edges The `edges` tibble of a `Knowledge` object.
+#' @returns Invisibly `NULL`; called for its side effect of erroring on a cycle.
+#' @keywords internal
+#' @noRd
+.validate_no_required_cycle <- function(edges) {
+  req <- edges[
+    !is.na(edges$status) & edges$status == "required",
+    ,
+    drop = FALSE
+  ]
+  if (nrow(req) == 0L) {
+    return(invisible(NULL))
+  }
+
+  acyclic <- tryCatch(
+    caugi::is_acyclic(
+      caugi::caugi(
+        from = req$from,
+        edge = rep("-->", nrow(req)),
+        to = req$to,
+        class = "UNKNOWN"
+      )
+    ),
+    error = function(e) FALSE
+  )
+
+  if (!isTRUE(acyclic)) {
+    stop(
+      "Required edges form a directed cycle, so no DAG can satisfy them. ",
+      "Remove or redirect the conflicting required edge(s).",
+      call. = FALSE
+    )
+  }
+  invisible(NULL)
 }
 
 #' @title Handle forbid_edge() / require_edge() calls
@@ -332,18 +378,20 @@
     return(character(0))
   }
 
-  # character vector --> wrap in all_of()
+  # character vector --> wrap in all_of() so external names match strictly.
+  # Any other expression is a tidy-select expression that eval_select() can
+  # evaluate directly, which preserves set operations such as `!`, `&`, `|`,
+  # and `-`.
   if (is.character(spec)) {
-    q <- rlang::quo(dplyr::all_of(spec))
+    q <- rlang::quo(dplyr::all_of(!!spec))
   } else {
-    # 5) otherwise, a tidy-select expression → leave it as a quosure
     q <- rlang::as_quosure(spec, env = parent.frame())
   }
 
   # fall back to tidyselect
   vars <- tryCatch(
     names(tidyselect::eval_select(
-      rlang::expr(dplyr::all_of(!!q)), # !!q unquotes the symbol/variable
+      q,
       rlang::set_names(seq_along(kn$vars$var), kn$vars$var)
     )),
     error = function(e) character(0)

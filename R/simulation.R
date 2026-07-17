@@ -41,7 +41,7 @@
 #' cg <- caugi::caugi(A %-->% B, B %-->% C, A %-->% C, class = "DAG")
 #'
 #' # Simulate 1000 observations
-#' sim_data <- generate_dag_data(
+#' sim_data <- sim_data(
 #'   cg,
 #'   n = 1000,
 #'   coef_range = c(0.2, 0.8),
@@ -52,7 +52,7 @@
 #' attr(sim_data, "generating_model")
 #'
 #' # Simulate with custom equation for node C
-#' sim_data_custom <- generate_dag_data(
+#' sim_data_custom <- sim_data(
 #'   cg,
 #'   n = 1000,
 #'   C = A^2 + B + rnorm(n, sd = 0.7),
@@ -61,7 +61,7 @@
 #' head(sim_data_custom)
 #' attr(sim_data_custom, "generating_model")
 #' @export
-generate_dag_data <- function(
+sim_data <- function(
   cg,
   n,
   ...,
@@ -190,6 +190,40 @@ generate_dag_data <- function(
 
   attr(out, "generating_model") <- model
   out
+}
+
+#' Generate Synthetic Data from a Linear Gaussian DAG
+#'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
+#' This function has been renamed to [sim_data()] instead.
+#' @keywords internal
+#' @export
+generate_dag_data <- function(
+  cg,
+  n,
+  ...,
+  standardize = TRUE,
+  coef_range = c(0.1, 0.9),
+  error_sd = c(0.3, 2),
+  seed = NULL
+) {
+  lifecycle::deprecate_warn(
+    when = "1.2.0",
+    what = "generate_dag_data()",
+    with = "sim_data()"
+  )
+
+  sim_data(
+    cg = cg,
+    n = n,
+    ...,
+    standardize = standardize,
+    coef_range = coef_range,
+    error_sd = error_sd,
+    seed = seed
+  )
 }
 
 #' Simulate a Random DAG

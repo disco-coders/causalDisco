@@ -73,7 +73,7 @@
 #'     youth ~ starts_with("youth"),
 #'     old ~ starts_with("old")
 #'   ),
-#'   child_x1 %-->% c(child_x2, youth_x4) # required edges
+#'   child_x1 %-->% child_x2 + youth_x4 # required edges
 #' )
 #' bnlearn_pc <- pc(engine = "bnlearn", test = "fisher_z")
 #' disco_bnlearn_pc <- disco(data = tpc_example, method = bnlearn_pc, knowledge = kn)
@@ -96,7 +96,7 @@
 #' data(num_data)
 #' kn_untiered <- knowledge(
 #'   num_data,
-#'   X1 %-->% c(X2, X3),
+#'   X1 %-->% X2 + X3,
 #'   Z %!-->% Y
 #' )
 #'
@@ -232,8 +232,8 @@ plot.Disco <- function(
 #'     youth ~ starts_with("youth"),
 #'     old ~ starts_with("old")
 #'   ),
-#'   child_x1 %-->% c(child_x2, youth_x4), # required edges
-#'   youth_x4 %!-->% c(youth_x3, oldage_x5)  # forbidden edges
+#'   child_x1 %-->% child_x2 + youth_x4, # required edges
+#'   youth_x4 %!-->% youth_x3 + oldage_x5  # forbidden edges
 #' )
 #'
 #' # Edge from child_x1 to child_x2 will be orange, but edge from child_x1 to youth_x4
@@ -259,7 +259,7 @@ plot.Disco <- function(
 #' # Define a `Knowledge` object without tiers
 #' kn_untiered <- knowledge(
 #'   tpc_example,
-#'   child_x1 %-->% c(child_x2, youth_x3),
+#'   child_x1 %-->% child_x2 + youth_x3,
 #'   youth_x4 %!-->% oldage_x5
 #' )
 #' # Plot with default layout

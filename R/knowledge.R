@@ -20,10 +20,14 @@
 #'
 #' @details
 #' The first argument can be a data frame, which will be used to populate the
-#' `Knowledge` object with variable names. If you later add variables with
+#' `Knowledge` object with variable names. Supplying a data frame also gives
+#' \pkg{tidyselect} helpers (e.g. [tidyselect::starts_with()]), a set of column
+#' names to resolve against, so they can be used throughout the mini-DSL, for example
+#' `tier(1 ~ starts_with("V"))` or `everything() %-->% Y`. If you later add
+#' variables with
 #' `add_*` verbs, this will throw a warning, since the `Knowledge` object will
 #' be *frozen*. You can unfreeze a `Knowledge` object by using the function
-#' `unfreeze(knowledge)`.
+#' [unfreeze()].
 #'
 #' If no data frame is provided, the object is initially empty. Variables can
 #' then be added via `tier()`, `forbidden()`, `required()`, infix operators, or `add_vars()`.
@@ -362,6 +366,75 @@ knowledge <- function(...) {
       fun <- as.character(expr[[1]])
     }
 
+    # Handle expressions like A + B %-->% C + D where + mixes with edge ops.
+    # R parses %any% before +, so A + B %-->% C + D becomes A + (B %-->% C) + D.
+    # Flatten the whole + chain into terms, find
+    # the single edge-op term, then attach left/right node-terms to its LHS/RHS.
+    if (is.call(expr) && identical(expr[[1]], as.name("+"))) {
+      .split_terms <- function(e) {
+        if (is.call(e) && identical(e[[1L]], as.name("+"))) {
+          c(.split_terms(e[[2L]]), .split_terms(e[[3L]]))
+        } else {
+          list(e)
+        }
+      }
+      .join_plus <- function(ts) Reduce(function(a, b) call("+", a, b), ts)
+
+      terms <- .split_terms(expr)
+      is_edge_term <- vapply(
+        terms,
+        function(t) {
+          is.call(t) && as.character(t[[1L]]) %in% c("%-->%", "%!-->%")
+        },
+        logical(1L)
+      )
+
+      if (any(is_edge_term)) {
+        if (sum(is_edge_term) > 1L) {
+          stop(
+            "Only one edge operator per + expression is supported.\n",
+            "Expression: ",
+            deparse(expr),
+            call. = FALSE
+          )
+        }
+        i <- which(is_edge_term)
+        edge_term <- terms[[i]]
+        left_terms <- terms[seq_len(i - 1L)]
+        right_terms <- if (i < length(terms)) {
+          terms[seq(i + 1L, length(terms))]
+        } else {
+          list()
+        }
+
+        natural_lhs <- edge_term[[2L]]
+        natural_rhs <- edge_term[[3L]]
+
+        new_lhs <- if (length(left_terms)) {
+          call("+", .join_plus(left_terms), natural_lhs)
+        } else {
+          natural_lhs
+        }
+        new_rhs <- if (length(right_terms)) {
+          call("+", natural_rhs, .join_plus(right_terms))
+        } else {
+          natural_rhs
+        }
+
+        new_edge <- edge_term
+        new_edge[[2L]] <- new_lhs
+        new_edge[[3L]] <- new_rhs
+
+        status <- if (identical(edge_term[[1L]], as.name("%-->%"))) {
+          "required"
+        } else {
+          "forbidden"
+        }
+        add_edge_infix(new_edge, status)
+        next
+      }
+    }
+
     # Infix required
     if (is.call(expr) && identical(expr[[1]], as.name("%-->%"))) {
       add_edge_infix(expr, "required")
@@ -455,8 +528,6 @@ knowledge <- function(...) {
 #' @title Print a Knowledge Object
 #'
 #' @param x A `Knowledge` object.
-#' @param compact Logical. If `TRUE`, prints a more compact summary.
-#' @param wide_vars Logical. If `TRUE`, prints the variables in a wide format.
 #' @param ... Additional arguments (not used).
 #' @returns Invisibly returns the `Knowledge` object.
 #' @examples
@@ -469,170 +540,119 @@ knowledge <- function(...) {
 #'   )
 #' )
 #' print(kn)
-#' print(kn, wide_vars = TRUE)
-#' print(kn, compact = TRUE)
 #'
 #' @exportS3Method print Knowledge
-print.Knowledge <- function(x, compact = FALSE, wide_vars = FALSE, ...) {
+print.Knowledge <- function(x, ...) {
   .check_if_pkgs_are_installed(
-    pkgs = c("cli", "tibble"),
+    pkgs = c("cli"),
     function_name = "print.Knowledge"
   )
 
-  cli::cli_h1("Knowledge object")
+  n_tiers <- if (!is.null(x$tiers)) nrow(x$tiers) else 0L
+  n_vars <- if (!is.null(x$vars)) nrow(x$vars) else 0L
+  n_required <- sum(x$edges$status == "required", na.rm = TRUE)
+  n_forbidden <- sum(x$edges$status == "forbidden", na.rm = TRUE)
 
-  # ---- If knowledge is empty, return silently ----
-  if (
-    (is.null(x$tiers) || length(x$tiers) == 0) &&
-      (is.null(x$vars) || nrow(x$vars) == 0) &&
-      (is.null(x$edges) || nrow(x$edges) == 0)
-  ) {
+  if (n_tiers == 0L && n_vars == 0L && n_required == 0L && n_forbidden == 0L) {
+    cat("<Knowledge: empty>\n")
     return(invisible(x))
   }
 
-  # ---- Print tiers ----
-  tier_vec <- if (is.data.frame(x$tiers) || tibble::is_tibble(x$tiers)) {
-    x$tiers[[1]]
-  } else {
-    x$tiers
+  parts <- character(0)
+  if (n_tiers > 0L) {
+    parts <- c(parts, paste0(n_tiers, " tier", if (n_tiers != 1L) "s"))
   }
-
-  if (length(tier_vec) > 0) {
-    print_section(
-      "Tiers",
-      tibble::tibble(tier = tier_vec),
-      header_fmt = function(hdr) {
-        sub("(\\s*)tier(.*)", "\\1\u001b[1mtier\u001b[22m\\2", hdr)
-      },
-      n_max = if (compact) 5 else 20
-    )
+  if (n_vars > 0L) {
+    parts <- c(parts, paste0(n_vars, " var", if (n_vars != 1L) "s"))
   }
-
-  # ---- Print variables ----
-  if (nrow(x$vars) > 0) {
-    if (wide_vars) {
-      # Preserve NA tiers
-      tiers_vec <- x$vars$tier
-      tiers_vec[is.na(tiers_vec)] <- "<NA>"
-
-      vars_by_tier <- split(x$vars$var, tiers_vec)
-      if (length(vars_by_tier) > 0) {
-        n_max_cols <- max(lengths(vars_by_tier))
-
-        # Pad each tier with NA
-        vars_padded <- lapply(vars_by_tier, function(v) {
-          length(v) <- n_max_cols
-          v
-        })
-
-        vars_wide <- do.call(rbind, vars_padded)
-        colnames(vars_wide) <- paste0("var", seq_len(ncol(vars_wide)))
-        vars_wide <- tibble::as_tibble(vars_wide)
-
-        tier_names <- names(vars_by_tier)
-        tier_names[tier_names == "<NA>"] <- NA
-        vars_wide <- tibble::add_column(
-          vars_wide,
-          tier = tier_names,
-          .before = 1
-        )
-        na_idx <- is.na(vars_wide$tier)
-        vars_wide <- rbind(
-          vars_wide[!na_idx, , drop = FALSE],
-          vars_wide[na_idx, , drop = FALSE]
-        )
-
-        print_section(
-          "Variables",
-          vars_wide,
-          header_fmt = function(hdr) {
-            sub("(\\s*)tier(.*)", "\\1\u001b[1mtier\u001b[22m\\2", hdr)
-          },
-          n_max = if (compact) 5 else 20
-        )
-      }
-    } else {
-      print_section(
-        "Variables",
-        x$vars,
-        header_fmt = function(hdr) {
-          sub(
-            "(\\s*)var(.*)tier(\\s*)",
-            "\\1\u001b[1mvar\u001b[22m\\2\u001b[1mtier\u001b[22m\\3",
-            hdr
-          )
-        },
-        n_max = if (compact) 5 else 20
-      )
-    }
+  if (n_required > 0L) {
+    parts <- c(parts, paste0(n_required, " required"))
   }
-
-  # ---- Print edges ----
-  if (nrow(x$edges) > 0) {
-    cli::cli_h2("Edges")
-
-    sym_arrow <- cli::symbol$arrow_right
-    bullets <- c(
-      forbidden = cli::col_red(cli::symbol$cross),
-      required = cli::col_green(cli::symbol$tick)
-    )
-
-    rows <- if (compact && nrow(x$edges) > 20) 1:20 else seq_len(nrow(x$edges))
-
-    for (i in rows) {
-      edge <- x$edges[i, ]
-      bullet <- bullets[[edge$status]] %||% cli::symbol$bullet
-      cli::cat_line(" ", bullet, "  ", edge$from, " ", sym_arrow, " ", edge$to)
-    }
-
-    if (compact && nrow(x$edges) > 20) {
-      cli::cli_text("... and {nrow(x$edges) - 20} more edges")
-    }
+  if (n_forbidden > 0L) {
+    parts <- c(parts, paste0(n_forbidden, " forbidden"))
   }
+  cat(sprintf("<Knowledge: %s>\n", paste(parts, collapse = " | ")))
 
+  .print_knowledge_body(x)
   invisible(x)
 }
 
-#' @title Summarize a Knowledge Object
-#' @param object A `Knowledge` object.
-#' @param ... Additional arguments (not used).
-#' @returns Invisibly returns the `Knowledge` object.
-#' @examples
-#' kn <- knowledge(
-#'   tpc_example,
-#'   tier(
-#'     child ~ starts_with("child"),
-#'     youth ~ starts_with("youth"),
-#'     old ~ starts_with("old")
-#'   )
-#' )
-#' summary(kn)
-#'
-#' @exportS3Method summary Knowledge
-summary.Knowledge <- function(object, ...) {
-  cli::cli_h2("Knowledge summary")
+.print_knowledge_body <- function(x, max_tiers = 5L, max_edge_groups = 8L) {
+  n_tiers <- if (!is.null(x$tiers)) nrow(x$tiers) else 0L
+  n_vars <- if (!is.null(x$vars)) nrow(x$vars) else 0L
+  n_required <- sum(x$edges$status == "required", na.rm = TRUE)
+  n_forbidden <- sum(x$edges$status == "forbidden", na.rm = TRUE)
 
-  n_tiers <- if (!is.null(object$tiers)) nrow(object$tiers) else 0
-  n_vars <- if (!is.null(object$vars)) nrow(object$vars) else 0
-
-  n_required <- sum(object$edges$status == "required", na.rm = TRUE)
-  n_forbidden <- sum(object$edges$status == "forbidden", na.rm = TRUE)
-
-  cli::cli_text("Tiers: {.strong {n_tiers}}")
-  cli::cli_text("Variables: {.strong {n_vars}}")
-  cli::cli_text("Required edges: {.strong {n_required}}")
-  cli::cli_text("Forbidden edges: {.strong {n_forbidden}}")
-
-  if (!is.null(object$tiers) && !is.null(object$vars)) {
-    cli::cli_h3("Variables per Tier")
-    tier_counts <- table(object$vars$tier)
-    for (tier_name in names(tier_counts)) {
-      cli::cli_text(
-        "{tier_name}: {.strong {tier_counts[[tier_name]]}} variables"
-      )
+  # ---- Tiers ----
+  if (n_tiers > 0L) {
+    show <- min(n_tiers, max_tiers)
+    for (lbl in x$tiers$label[seq_len(show)]) {
+      tier_vars <- x$vars$var[!is.na(x$vars$tier) & x$vars$tier == lbl]
+      .print_item_line(paste0("tier(", lbl, ")"), tier_vars)
+    }
+    if (n_tiers > max_tiers) {
+      cat(sprintf(
+        "  ... and %d more tier%s\n",
+        n_tiers - max_tiers,
+        if (n_tiers - max_tiers != 1L) "s" else ""
+      ))
     }
   }
 
+  # ---- Untiered vars ----
+  if (n_vars > 0L) {
+    untiered <- x$vars$var[is.na(x$vars$tier)]
+    if (length(untiered) > 0L) {
+      .print_item_line("vars", untiered)
+    }
+  }
+
+  # ---- Edges ----
+  if (n_required > 0L || n_forbidden > 0L) {
+    n_shown <- 0L
+    for (status in c("required", "forbidden")) {
+      op <- if (status == "required") "-->" else "!-->"
+      grp <- x$edges[x$edges$status == status, , drop = FALSE]
+      if (nrow(grp) == 0L) {
+        next
+      }
+      cat(sprintf("  %s:\n", status))
+      by_from <- split(grp$to, grp$from)
+      for (from_var in names(by_from)) {
+        if (n_shown >= max_edge_groups) {
+          n_total_groups <- length(unique(x$edges$from))
+          cat(sprintf(
+            "  ... and %d more edge group%s\n",
+            n_total_groups - n_shown,
+            if (n_total_groups - n_shown != 1L) "s" else ""
+          ))
+          return(invisible())
+        }
+        to_vars <- by_from[[from_var]]
+        rhs <- paste(to_vars, collapse = " + ")
+        cat(sprintf("    %s%s%s\n", from_var, op, rhs))
+        n_shown <- n_shown + 1L
+      }
+    }
+  }
+}
+
+#' @title Summarize a Disco Object
+#'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
+#' `summary()` for `Disco` objects is deprecated. Use [print()] instead.
+#'
+#' @keywords internal
+#' @exportS3Method summary Disco
+summary.Knowledge <- function(object, ...) {
+  lifecycle::deprecate_warn(
+    when = "1.2.0",
+    what = "summary()",
+    with = "print()"
+  )
+  print(object, ...)
   invisible(object)
 }
 

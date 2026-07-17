@@ -16,7 +16,8 @@ make_runner(
 }
 \arguments{
 \item{engine}{Character. The engine to use. Options include \code{"causalDisco"},
-\code{"pcalg"}, \code{"bnlearn"}, \code{"tetrad"}.}
+\code{"pcalg"}, \code{"bnlearn"}, \code{"tetrad"}, or the name of any engine added via
+\code{\link[=register_engine]{register_engine()}}.}
 
 \item{alg}{Character. The algorithm name.}
 
@@ -42,11 +43,15 @@ engine and algorithm. This allows users to support new algorithms.
 }
 \seealso{
 Other Extending causalDisco:
+\code{\link[=as_disco]{as_disco()}},
 \code{\link[=distribute_engine_args]{distribute_engine_args()}},
+\code{\link[=list_registered_engines]{list_registered_engines()}},
 \code{\link[=list_registered_tetrad_algorithms]{list_registered_tetrad_algorithms()}},
 \code{\link[=make_method]{make_method()}},
 \code{\link[=new_disco_method]{new_disco_method()}},
+\code{\link[=register_engine]{register_engine()}},
 \code{\link[=register_tetrad_algorithm]{register_tetrad_algorithm()}},
+\code{\link[=reset_engine_registry]{reset_engine_registry()}},
 \code{\link[=reset_tetrad_alg_registry]{reset_tetrad_alg_registry()}}
 }
 \concept{Extending causalDisco}

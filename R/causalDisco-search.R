@@ -74,6 +74,7 @@ CausalDiscoSearch <- R6::R6Class(
     #'   \item \code{"tpc"}  - TPC algorithm.
     #'   See [tpc()].
     #' }
+    #' Can also be a user-defined function; see \code{$set_alg()} for details.
     alg = NULL,
 
     #' @field params A list of parameters for the test and algorithm.
@@ -315,8 +316,58 @@ CausalDiscoSearch <- R6::R6Class(
     #' @description
     #' Sets the algorithm for the search.
     #'
-    #' @param method A string specifying the type of algorithm to use.
-    set_alg = function(method) {
+    #' @param method `r lifecycle::badge("experimental")`
+    #'
+    #' A string specifying the type of algorithm to use.
+    #'
+    #' Can also be a user-defined function implementing a full search
+    #' algorithm. Its required signature depends on \code{type}:
+    #' \itemize{
+    #'   \item \code{type = "constraint"} (default) - signature
+    #'   \code{function(data, knowledge, suff_stat, ...)}, analogous to
+    #'   [tpc_run()] and [tfci_run()].
+    #'   \item \code{type = "score"} - signature \code{function(score, ...)},
+    #'   analogous to [tges_run()].
+    #' }
+    #' Optionally, the function's signature can also include an \code{args}
+    #' parameter, which is a list of additional arguments to pass to the
+    #' algorithm function. If \code{args} is provided, the function should have
+    #' the signature \code{function(data, knowledge, suff_stat, args)} (or
+    #' \code{function(score, args)} for \code{type = "score"}), and the
+    #' \code{args} parameter will be passed to the algorithm function.
+    #'
+    #' EXPERIMENTAL: user-defined algorithm syntax is subject to change.
+    #' @param type Only used if \code{method} is a user-defined function.
+    #' One of \code{"constraint"} (default) or \code{"score"}, specifying
+    #' whether the algorithm is constraint-based (called with
+    #' \code{data}/\code{knowledge}/\code{suff_stat}) or score-based (called
+    #' with \code{score}).
+    #' @param args A list of additional arguments to pass to the algorithm.
+    #' Only needed if \code{method} is a user-defined function with an
+    #' \code{args} parameter in its signature.
+    set_alg = function(method, type = c("constraint", "score"), args = NULL) {
+      if (is.function(method)) {
+        type <- match.arg(type)
+
+        if (!is.null(args)) {
+          self$alg <- if (identical(type, "constraint")) {
+            function(data, knowledge, suff_stat) {
+              method(data, knowledge, suff_stat, args = args)
+            }
+          } else {
+            function(score) {
+              method(score, args = args)
+            }
+          }
+        } else {
+          self$alg <- method
+        }
+
+        private$alg_method <- "custom-alg"
+        private$alg_family <- type
+        return(invisible(self))
+      }
+
       method <- tolower(method)
       private$alg_method <- method
 
@@ -331,6 +382,7 @@ CausalDiscoSearch <- R6::R6Class(
             test = self$test,
             !!!self$params
           )
+          private$alg_family <- "constraint"
         },
         "tfci" = {
           if (is.null(self$test)) {
@@ -341,12 +393,14 @@ CausalDiscoSearch <- R6::R6Class(
             test = self$test,
             !!!self$params
           )
+          private$alg_family <- "constraint"
         },
         "tges" = {
           self$alg <- purrr::partial(
             tges_run,
             verbose = isTRUE(self$params$verbose)
           )
+          private$alg_family <- "score"
         },
         stop(
           "Unknown method type using causalDisco engine: ",
@@ -402,7 +456,7 @@ CausalDiscoSearch <- R6::R6Class(
       }
 
       # constraint-based path
-      if (!identical(private$alg_method, "tges")) {
+      if (!identical(private$alg_family, "score")) {
         if (is.null(self$suff_stat) && set_suff_stat) {
           stop(
             "No sufficient statistic is set. Use set_data() first.",
@@ -422,21 +476,16 @@ CausalDiscoSearch <- R6::R6Class(
         }
         self$score <- private$score_function()
 
-        if (!is.null(self$knowledge)) {
-          res <- self$alg(
-            score = self$score
-          )
-        } else {
-          res <- self$alg(
-            score = self$score
-          )
-        }
+        res <- self$alg(
+          score = self$score
+        )
         res
       }
     }
   ),
   private = list(
-    alg_method = NULL, # "tpc", "tfci", or "tges"
+    alg_method = NULL, # "tpc", "tfci", "tges", or "custom-alg"
+    alg_family = NULL, # "constraint" or "score"
     test_key = NULL,
     directed_as_undirected = FALSE,
     score_method = NULL,
