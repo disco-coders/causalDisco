@@ -308,7 +308,7 @@ find_adjacencies <- function(amatrix, index) {
 #'
 #' When the object already has tiers, directed forbidden edges involving
 #' untiered variables are instead resolved by
-#' [.assign_untiered_from_forbidden()], which places those variables into
+#' `.assign_untiered_from_forbidden()`, which places those variables into
 #' the existing tier ordering when the edges pin down a unique position.
 #'
 #' @param kn A `Knowledge` object.
