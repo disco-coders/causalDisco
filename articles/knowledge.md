@@ -18,7 +18,7 @@ algorithms. The different supported knowledge types are explained below,
 along with examples of how to create `Knowledge` objects and use them
 with causal discovery methods. All knowledge types can be freely
 combined. Multiple calls or operators are additive: each call adds new
-edges to the `Knowledge` object. For example if we require an edge from
+edges to the `Knowledge` object. For example, if we require an edge from
 `A` to `B` and then require an edge from A to C, the resulting
 `Knowledge` object will require both edges from `A` to `B` and from `A`
 to `C`.
@@ -53,7 +53,7 @@ an edge from B to C:
 ``` r
 
 kn_1 <- knowledge(
-  A %-->% c(B, C), # Require edges from A to B and A to C
+  A %-->% B + C, # Require edges from A to B and A to C
   B %!-->% C # Forbid edge from B to C
 )
 ```
@@ -71,7 +71,7 @@ The blue edge represents the required edge from A to B, while the red
 edge represents the forbidden edge from B to C.
 
 If one wishes to remove some edges (either required or forbidden)
-knowledge from an existing `Knowledge` object, the
+knowledge from existing `Knowledge` objects, the
 [`remove_edge()`](https://disco-coders.github.io/causalDisco/reference/remove_edge.md)
 function can be used. For example, to remove the required edge from A to
 B:
@@ -158,6 +158,18 @@ plot(kn_3)
 ```
 
 ![](knowledge_files/figure-html/plot-required-and-forbidden-knowledge-with-tidyselect-1.png)
+
+The tidyselect set operations `!` (negation), `&` (intersection), and
+`|` (union) are also supported. For example, to forbid an edge from
+`child_x1` to every variable that is *not* a “child” variable:
+
+``` r
+
+kn_4 <- knowledge(
+  tpc_example,
+  child_x1 %!-->% !starts_with("child")
+)
+```
 
 For a list of all available tidyselect helpers we refer to the
 [tidyselect reference
@@ -259,32 +271,13 @@ forbidden edges using
 
 kn_converted <- convert_tiers_to_forbidden(kn)
 print(kn_converted)
-#> 
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Variables ──
-#> 
-#>   [1mvar[22m   [1mtier[22m 
-#>   <chr> <chr>
-#> 1 A1    <NA> 
-#> 2 A2    <NA> 
-#> 3 B1    <NA> 
-#> 4 B2    <NA> 
-#> 5 C1    <NA> 
-#> 6 C2    <NA>
-#> ── Edges ──
-#>  ✖  B1 → A1
-#>  ✖  B1 → A2
-#>  ✖  B2 → A1
-#>  ✖  B2 → A2
-#>  ✖  C1 → A1
-#>  ✖  C1 → A2
-#>  ✖  C1 → B1
-#>  ✖  C1 → B2
-#>  ✖  C2 → A1
-#>  ✖  C2 → A2
-#>  ✖  C2 → B1
-#>  ✖  C2 → B2
+#> <Knowledge: 6 vars | 12 forbidden>
+#>   vars: A1, A2, B1, B2, C1, C2
+#>   forbidden:
+#>     B1!-->A1 + A2
+#>     B2!-->A1 + A2
+#>     C1!-->A1 + A2 + B1 + B2
+#>     C2!-->A1 + A2 + B1 + B2
 plot(kn_converted)
 ```
 

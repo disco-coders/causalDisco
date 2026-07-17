@@ -85,6 +85,8 @@ algorithm.
   - `"tpc"` - TPC algorithm. See
     [`tpc()`](https://disco-coders.github.io/causalDisco/reference/tpc.md).
 
+  Can also be a user-defined function; see `$set_alg()` for details.
+
 - `params`:
 
   A list of parameters for the test and algorithm. Can be set with
@@ -263,13 +265,49 @@ Sets the algorithm for the search.
 
 #### Usage
 
-    CausalDiscoSearch$set_alg(method)
+    CausalDiscoSearch$set_alg(method, type = c("constraint", "score"), args = NULL)
 
 #### Arguments
 
 - `method`:
 
+  **\[experimental\]**
+
   A string specifying the type of algorithm to use.
+
+  Can also be a user-defined function implementing a full search
+  algorithm. Its required signature depends on `type`:
+
+  - `type = "constraint"` (default) - signature
+    `function(data, knowledge, suff_stat, ...)`, analogous to
+    [`tpc_run()`](https://disco-coders.github.io/causalDisco/reference/tpc_run.md)
+    and
+    [`tfci_run()`](https://disco-coders.github.io/causalDisco/reference/tfci_run.md).
+
+  - `type = "score"` - signature `function(score, ...)`, analogous to
+    [`tges_run()`](https://disco-coders.github.io/causalDisco/reference/tges_run.md).
+
+  Optionally, the function's signature can also include an `args`
+  parameter, which is a list of additional arguments to pass to the
+  algorithm function. If `args` is provided, the function should have
+  the signature `function(data, knowledge, suff_stat, args)` (or
+  `function(score, args)` for `type = "score"`), and the `args`
+  parameter will be passed to the algorithm function.
+
+  EXPERIMENTAL: user-defined algorithm syntax is subject to change.
+
+- `type`:
+
+  Only used if `method` is a user-defined function. One of
+  `"constraint"` (default) or `"score"`, specifying whether the
+  algorithm is constraint-based (called with
+  `data`/`knowledge`/`suff_stat`) or score-based (called with `score`).
+
+- `args`:
+
+  A list of additional arguments to pass to the algorithm. Only needed
+  if `method` is a user-defined function with an `args` parameter in its
+  signature.
 
 ------------------------------------------------------------------------
 
@@ -376,96 +414,29 @@ s_tpc$set_knowledge(kn, directed_as_undirected = TRUE)
 s_tpc$set_data(tpc_example)
 res_tpc <- s_tpc$run_search()
 print(res_tpc)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x1  ---   child_x2 
-#> 2 child_x2  -->   oldage_x5
-#> 3 child_x2  -->   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  -->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Tiers ──
-#> 
-#>   tier 
-#>   <chr>
-#> 1 child
-#> 2 youth
-#> 3 old  
-#> ── Variables ──
-#> 
-#>   var       tier 
-#>   <chr>     <chr>
-#> 1 child_x1  child
-#> 2 child_x2  child
-#> 3 youth_x3  youth
-#> 4 youth_x4  youth
-#> 5 oldage_x5 old  
-#> 6 oldage_x6 old  
+#> <Disco UNKNOWN: 6 nodes | 6 edges | Knowledge: 3 tiers>
+#> Learned graph:
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2-->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+#> Knowledge:
+#>   tier(child): child_x1, child_x2
+#>   tier(youth): youth_x3, youth_x4
+#>   tier(old): oldage_x5, oldage_x6
 
 # Switch to TFCI on the same object (reuses suff_stat/test)
 s_tpc$set_alg("tfci")
 res_tfci <- s_tpc$run_search()
 print(res_tfci)
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  o-o   child_x1 
-#> 2 child_x2  o->   oldage_x5
-#> 3 child_x2  o->   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  o->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Tiers ──
-#> 
-#>   tier 
-#>   <chr>
-#> 1 child
-#> 2 youth
-#> 3 old  
-#> ── Variables ──
-#> 
-#>   var       tier 
-#>   <chr>     <chr>
-#> 1 child_x1  child
-#> 2 child_x2  child
-#> 3 youth_x3  youth
-#> 4 youth_x4  youth
-#> 5 oldage_x5 old  
-#> 6 oldage_x6 old  
+#> <Disco UNKNOWN: 6 nodes | 6 edges | Knowledge: 3 tiers>
+#> Learned graph:
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
+#> Knowledge:
+#>   tier(child): child_x1, child_x2
+#>   tier(youth): youth_x3, youth_x4
+#>   tier(old): oldage_x5, oldage_x6
 
 # --- Score-based: TGES --------------------------------------------------------
 s_tges <- CausalDiscoSearch$new()
@@ -475,30 +446,37 @@ s_tges$set_data(tpc_example, set_suff_stat = FALSE) # suff stat not used for TGE
 s_tges$set_knowledge(kn)
 res_tges <- s_tges$run_search()
 print(res_tges)
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x1  ---   child_x2 
-#> 2 child_x2  -->   oldage_x5
-#> 3 child_x2  -->   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  -->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco PDAG: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2-->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+
+# --- Custom (user-defined) algorithm: constraint-based -----------------------
+my_alg <- function(data, knowledge, suff_stat) {
+  tpc_run(
+    data = data,
+    knowledge = knowledge,
+    suff_stat = suff_stat,
+    test = reg_test
+  )
+}
+
+s_custom <- CausalDiscoSearch$new()
+s_custom$set_test("reg")
+s_custom$set_knowledge(kn)
+s_custom$set_alg(my_alg) # type = "constraint" by default
+s_custom$set_data(tpc_example)
+res_custom <- s_custom$run_search()
+print(res_custom)
+#> <Disco UNKNOWN: 6 nodes | 6 edges | Knowledge: 3 tiers>
+#> Learned graph:
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2-->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+#> Knowledge:
+#>   tier(child): child_x1, child_x2
+#>   tier(youth): youth_x3, youth_x4
+#>   tier(old): oldage_x5, oldage_x6
 
 # --- Intentional error demonstrations ----------------------------------------
 

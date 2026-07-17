@@ -65,6 +65,8 @@ data_linear <- generate_dag_data(
   coef_range = c(0.1, 0.9),
   error_sd = c(0.3, 2)
 )
+#> Warning: `generate_dag_data()` was deprecated in causalDisco 1.2.0.
+#> ℹ Please use `sim_data()` instead.
 head(data_linear)
 #> # A tibble: 6 × 5
 #>        Z      X3     X1      X2       Y
@@ -257,6 +259,7 @@ pc_result_unobserved <- disco(
   data = data_unobserved,
   method = pc_pcalg_unobserved
 )
+#> The learned graph is not a valid CPDAG because of conflicting edge orientations, which can happen due to statistical errors in finite samples, violations of faithfulness, or latent confounding; it is reported as PDAG instead.
 plot(pc_result_unobserved, layout = layout, main = "PC (pcalg)")
 ```
 

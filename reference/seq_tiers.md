@@ -70,23 +70,8 @@ kn <- knowledge(
   tier(seq_tiers(1:2, matches("^child_x{i}$")))
 )
 print(kn)
-#> 
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Tiers ──
-#> 
-#>   tier 
-#>   <chr>
-#> 1 1    
-#> 2 2    
-#> ── Variables ──
-#> 
-#>   var       tier 
-#>   <chr>     <chr>
-#> 1 child_x1  1    
-#> 2 child_x2  2    
-#> 3 oldage_x5 NA   
-#> 4 oldage_x6 NA   
-#> 5 youth_x3  NA   
-#> 6 youth_x4  NA   
+#> <Knowledge: 2 tiers | 6 vars>
+#>   tier(1): child_x1
+#>   tier(2): child_x2
+#>   vars: oldage_x5, oldage_x6, youth_x3, youth_x4
 ```

@@ -126,6 +126,7 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span>
 <span><span class="va">hpc_bnlearn</span> <span class="op">&lt;-</span> <span class="fu">hpc</span><span class="op">(</span>engine <span class="op">=</span> <span class="st">"bnlearn"</span>, test <span class="op">=</span> <span class="st">"fisher_z"</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="va">hpc_bnlearn_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/disco.html">disco</a></span><span class="op">(</span><span class="va">tpc_example</span>, <span class="va">hpc_bnlearn</span><span class="op">)</span></span>
+<span><span class="co">#&gt; The learned graph is not a valid CPDAG because of conflicting edge orientations, which can happen due to statistical errors in finite samples, violations of faithfulness, or latent confounding; it is reported as PDAG instead.</span></span>
 <span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">hpc_bnlearn_result</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -136,6 +137,70 @@
 </div>
 <p>To implement a <strong>score-based</strong> algorithm instead, the structure would remain the same. The main difference is that the method would accept a <code>score</code> argument rather than <code>test</code> and <code>alpha</code>. A <strong>hybrid</strong> algorithm would accept <code>test</code>, <code>alpha</code>, and <code>score</code> arguments.</p>
 <p>To implement an algorithm from pcalg rather than bnlearn, we would follow the same structure but change all instances of <code>"bnlearn"</code> to <code>"pcalg"</code>.</p>
+</section><section class="section level2"><h2 id="a-fully-custom-algorithm-implemented-in-r">A fully custom algorithm implemented in R<a class="anchor" aria-label="anchor" href="#a-fully-custom-algorithm-implemented-in-r"></a>
+</h2>
+<p>Here we show how to use a plain R function you wrote yourself as an algorithm, instead of from a package. The <code>causalDisco</code> engine’s <code>CausalDiscoSearch$set_alg()</code> accepts such a function directly, so you can reuse its data/knowledge/test handling while swapping out only the search procedure.</p>
+<p>A <strong>constraint-based</strong> custom algorithm has the signature <code>function(data, knowledge, suff_stat)</code>, mirroring <code><a href="../reference/tpc_run.html">tpc_run()</a></code>/<code><a href="../reference/tfci_run.html">tfci_run()</a></code>. A <strong>score-based</strong> custom algorithm instead has the signature <code>function(score)</code>, mirroring <code><a href="../reference/tges_run.html">tges_run()</a></code>; pass <code>type = "score"</code> to <code>set_alg()</code> for these. Here we implement a (trivial) constraint-based algorithm that just calls <code><a href="../reference/tpc_run.html">tpc_run()</a></code> with whatever test the search object was configured with.</p>
+<p>To wire this into <code><a href="../reference/disco.html">disco()</a></code>, with the same knowledge injection and return type as the built-in algorithms, wrap a <code>CausalDiscoSearch</code> object in <code><a href="../reference/make_method.html">make_method()</a></code>, exactly as we did for <code>hpc()</code> above. One thing to watch out for: <code>search$set_test()</code> doesn’t just resolve the test to a function (afterwards available as <code>search$test</code>), it also computes the sufficient statistic that <code>run_search()</code> passes into your algorithm’s <code>suff_stat</code> argument. So your custom algorithm should read the test off <code>search$test</code> rather than hardcoding one, to keep the two in sync.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_alg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">test</span> <span class="op">=</span> <span class="st">"fisher_z"</span>, <span class="va">alpha</span> <span class="op">=</span> <span class="fl">0.05</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/make_method.html">make_method</a></span><span class="op">(</span></span>
+<span>    method_name <span class="op">=</span> <span class="st">"my_alg"</span>,</span>
+<span>    engine <span class="op">=</span> <span class="st">"causalDisco"</span>,</span>
+<span>    engine_fns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      causalDisco <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">test</span>, <span class="va">alpha</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">search</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/CausalDiscoSearch.html">CausalDiscoSearch</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span>        <span class="va">search</span><span class="op">$</span><span class="fu">set_test</span><span class="op">(</span><span class="va">test</span>, <span class="va">alpha</span><span class="op">)</span></span>
+<span></span>
+<span>        <span class="va">my_search_alg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">knowledge</span>, <span class="va">suff_stat</span><span class="op">)</span> <span class="op">{</span></span>
+<span>          <span class="fu"><a href="../reference/tpc_run.html">tpc_run</a></span><span class="op">(</span></span>
+<span>            data <span class="op">=</span> <span class="va">data</span>,</span>
+<span>            knowledge <span class="op">=</span> <span class="va">knowledge</span>,</span>
+<span>            suff_stat <span class="op">=</span> <span class="va">suff_stat</span>,</span>
+<span>            test <span class="op">=</span> <span class="va">search</span><span class="op">$</span><span class="va">test</span></span>
+<span>          <span class="op">)</span></span>
+<span>        <span class="op">}</span></span>
+<span>        <span class="va">search</span><span class="op">$</span><span class="fu">set_alg</span><span class="op">(</span><span class="va">my_search_alg</span><span class="op">)</span></span>
+<span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>          set_knowledge <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">knowledge</span><span class="op">)</span> <span class="va">search</span><span class="op">$</span><span class="fu">set_knowledge</span><span class="op">(</span><span class="va">knowledge</span><span class="op">)</span>,</span>
+<span>          run <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="va">search</span><span class="op">$</span><span class="fu">run_search</span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span>        <span class="op">)</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    test <span class="op">=</span> <span class="va">test</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="va">alpha</span>,</span>
+<span>    graph_class <span class="op">=</span> <span class="st">"PDAG"</span>,</span>
+<span>    <span class="va">...</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<p><code>my_alg()</code> can now be used exactly like any built-in method:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span>
+<span><span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/knowledge.html">knowledge</a></span><span class="op">(</span></span>
+<span>  <span class="va">tpc_example</span>,</span>
+<span>  <span class="fu">tier</span><span class="op">(</span></span>
+<span>    <span class="va">child</span> <span class="op">~</span> <span class="fu">tidyselect</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"child"</span><span class="op">)</span>,</span>
+<span>    <span class="va">youth</span> <span class="op">~</span> <span class="fu">tidyselect</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"youth"</span><span class="op">)</span>,</span>
+<span>    <span class="va">oldage</span> <span class="op">~</span> <span class="fu">tidyselect</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"oldage"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/disco.html">disco</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">tpc_example</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu">my_alg</span><span class="op">(</span>test <span class="op">=</span> <span class="st">"fisher_z"</span><span class="op">)</span>,</span>
+<span>  knowledge <span class="op">=</span> <span class="va">kn</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot.html">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure><p><img src="new-algorithm_files/figure-html/my-alg-example-1.png" class="quarto-figure quarto-figure-center" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section><section class="section level2"><h2 id="tetrad">Tetrad<a class="anchor" aria-label="anchor" href="#tetrad"></a>
 </h2>
 <p>We will illustrate how to make a custom version (which actually does the same as our implementation, just with some defensive programming omitted) of the BOSS algorithm from Tetrad. Tetrad algorithms follow a slightly different integration pattern because Tetrad is a Java library rather than an R package.</p>
@@ -154,7 +219,7 @@
 <p>Be sure to browse the version corresponding to the installed Tetrad release. The relevant Java classes are located under:</p>
 <p>https://github.com/cmu-phil/tetrad/tree/development/tetrad-lib/src/main/java</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/register_tetrad_algorithm.html">register_tetrad_algorithm</a></span><span class="op">(</span></span>
 <span>  <span class="st">"my_boss_variant"</span>,</span>
 <span>  <span class="kw">function</span><span class="op">(</span></span>
@@ -182,7 +247,7 @@
 <p>You can view all the custom registered Tetrad algorithms using <code><a href="../reference/list_registered_tetrad_algorithms.html">list_registered_tetrad_algorithms()</a></code>, and reset it using <code><a href="../reference/reset_tetrad_alg_registry.html">reset_tetrad_alg_registry()</a></code>.</p>
 <p>The structure of the method function for a Tetrad algorithm is then the exact same as for bnlearn and pcalg, as seen below. BOSS is a <strong>score-based</strong> algorithm, so it accepts a <code>score</code> argument. The algorithm returns a PDAG, so we set the <code>graph_class</code> attribute to <code>"PDAG"</code>.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_boss_variant</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>  <span class="va">engine</span> <span class="op">=</span> <span class="st">"tetrad"</span>,</span>
 <span>  <span class="va">score</span>,</span>
@@ -206,7 +271,7 @@
 </div>
 <p>We can now run <code>my_boss_variant()</code> like any other method in causalDisco.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ensure Tetrad is installed and Java is working before running the algorithm</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="../reference/verify_tetrad.html">verify_tetrad</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">installed</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="../reference/verify_tetrad.html">verify_tetrad</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">java_ok</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">my_boss_variant_tetrad</span> <span class="op">&lt;-</span> <span class="fu">my_boss_variant</span><span class="op">(</span></span>
@@ -226,12 +291,70 @@
 <p>Once again, if using a hybrid or constraint-based algorithm rather than a score-based one, the structure would remain the same but the method would accept different arguments (e.g., <code>test</code> and <code>alpha</code> for a constraint-based algorithm).</p>
 <p>Finally, we clean up the custom registered Tetrad algorithm</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_tetrad_alg_registry.html">reset_tetrad_alg_registry</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+</section><section class="section level2"><h2 id="a-brand-new-engine">A brand-new engine<a class="anchor" aria-label="anchor" href="#a-brand-new-engine"></a>
+</h2>
+<p>Everything above adds a new <em>algorithm</em> to one of the built-in engines (<code>"bnlearn"</code>, <code>"causalDisco"</code>, <code>"pcalg"</code>, <code>"tetrad"</code>). This section shows how to add a new <em>engine</em> to causalDisco.</p>
+<p><code><a href="../reference/register_engine.html">register_engine()</a></code> takes an engine name, a <code>make_runner_fn</code>, and the packages it depends on. <code>make_runner_fn</code> must accept <code>alg</code> and <code>...</code>, and must return a <em>runner</em>: a list with a <code><a href="../reference/set_knowledge.html">set_knowledge()</a></code> function and a <code>run()</code> function. This is the same runner shape returned by <code><a href="../reference/make_runner.html">make_runner()</a></code> itself, and by the <code>engine_fns</code> we wrote by hand in the “fully custom algorithm” example above. <code>run()</code> should return its graph wrapped with <code><a href="../reference/as_disco.html">as_disco()</a></code>, which is what <code><a href="../reference/disco.html">disco()</a></code>, <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, and <code><a href="../reference/plot.html">plot()</a></code> expect.</p>
+<p>Here we register a (trivial) <code>"always_empty"</code> engine that ignores its input and always returns the empty graph over the columns of the input data, to show the registration mechanics.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">always_empty_runner</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">alg</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/knowledge.html">knowledge</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    set_knowledge <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">knowledge</span><span class="op">)</span> <span class="va">kn</span> <span class="op">&lt;&lt;-</span> <span class="va">knowledge</span>,</span>
+<span>    run <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">cg</span> <span class="op">&lt;-</span> <span class="fu">caugi</span><span class="fu">::</span><span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span></span>
+<span>        from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>        edge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>        to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>        nodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>,</span>
+<span>        class <span class="op">=</span> <span class="st">"PDAG"</span></span>
+<span>      <span class="op">)</span></span>
+<span>      <span class="fu"><a href="../reference/as_disco.html">as_disco</a></span><span class="op">(</span><span class="va">cg</span>, <span class="va">kn</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/register_engine.html">register_engine</a></span><span class="op">(</span><span class="st">"always_empty"</span>, <span class="va">always_empty_runner</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>With the engine registered, we can wire up a method for it with <code><a href="../reference/make_method.html">make_method()</a></code> and <code><a href="../reference/make_runner.html">make_runner()</a></code>, just like <code>hpc()</code> and <code>my_boss_variant()</code> above:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">empty_alg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">engine</span> <span class="op">=</span> <span class="st">"always_empty"</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">engine</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.arg.html" class="external-link">match.arg</a></span><span class="op">(</span><span class="va">engine</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="fu"><a href="../reference/make_method.html">make_method</a></span><span class="op">(</span></span>
+<span>    method_name <span class="op">=</span> <span class="st">"empty_alg"</span>,</span>
+<span>    engine <span class="op">=</span> <span class="va">engine</span>,</span>
+<span>    engine_fns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      always_empty <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="fu"><a href="../reference/make_runner.html">make_runner</a></span><span class="op">(</span>engine <span class="op">=</span> <span class="st">"always_empty"</span>, alg <span class="op">=</span> <span class="st">"empty_alg"</span>, <span class="va">...</span><span class="op">)</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    graph_class <span class="op">=</span> <span class="st">"PDAG"</span>,</span>
+<span>    <span class="va">...</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/disco.html">disco</a></span><span class="op">(</span><span class="va">tpc_example</span>, <span class="fu">empty_alg</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;Disco CPDAG: 6 nodes | 0 edges&gt;</span></span>
+<span><span class="co">#&gt;   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5</span></span></code></pre></div>
+</div>
+<p>You can view all registered engines with <code><a href="../reference/list_registered_engines.html">list_registered_engines()</a></code>, and clear them with <code><a href="../reference/reset_engine_registry.html">reset_engine_registry()</a></code>:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/list_registered_engines.html">list_registered_engines</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "always_empty"</span></span>
+<span><span class="fu"><a href="../reference/reset_engine_registry.html">reset_engine_registry</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </section><section class="section level2"><h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
 </h2>
-<p>In this article, we have illustrated how to add new algorithms to causalDisco, both from the R packages pcalg and bnlearn and from Tetrad.</p>
+<p>In this article, we have illustrated how to add new algorithms to causalDisco, both from the R packages pcalg and bnlearn and from Tetrad, as well as how to register an entirely new engine backend.</p>
 <p>If you have any feedback or suggestions for improvement on the API and functionality for extending causalDisco, please let us know by opening an issue on GitHub.</p>
 </section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -325,7 +448,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

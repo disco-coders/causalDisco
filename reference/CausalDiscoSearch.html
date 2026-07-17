@@ -108,7 +108,7 @@ See <code><a href="tfci.html">tfci()</a></code>.</p></li>
 See <code><a href="tges.html">tges()</a></code>.</p></li>
 <li><p><code>"tpc"</code>  - TPC algorithm.
 See <code><a href="tpc.html">tpc()</a></code>.</p></li>
-</ul></dd>
+</ul><p>Can also be a user-defined function; see <code>$set_alg()</code> for details.</p></dd>
 
 
     <dt><code>params</code></dt>
@@ -263,11 +263,37 @@ Only needed if <code>method</code> is a user-defined function with an <code>args
 <h3 id="causaldiscosearch-set-alg-"><code>CausalDiscoSearch$set_alg()</code><a class="anchor" aria-label="anchor" href="#causaldiscosearch-set-alg-"></a></h3>
 <p>Sets the algorithm for the search.</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CausalDiscoSearch</span><span class="op">$</span><span class="fu">set_alg</span><span class="op">(</span><span class="va">method</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CausalDiscoSearch</span><span class="op">$</span><span class="fu">set_alg</span><span class="op">(</span><span class="va">method</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"constraint"</span>, <span class="st">"score"</span><span class="op">)</span>, args <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>method</code></dt>
-<dd><p>A string specifying the type of algorithm to use.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a></p>
+<p>A string specifying the type of algorithm to use.</p>
+<p>Can also be a user-defined function implementing a full search
+algorithm. Its required signature depends on <code>type</code>:</p><ul><li><p><code>type = "constraint"</code> (default) - signature
+<code>function(data, knowledge, suff_stat, ...)</code>, analogous to
+<code><a href="tpc_run.html">tpc_run()</a></code> and <code><a href="tfci_run.html">tfci_run()</a></code>.</p></li>
+<li><p><code>type = "score"</code> - signature <code>function(score, ...)</code>,
+analogous to <code><a href="tges_run.html">tges_run()</a></code>.</p></li>
+</ul><p>Optionally, the function's signature can also include an <code>args</code>
+parameter, which is a list of additional arguments to pass to the
+algorithm function. If <code>args</code> is provided, the function should have
+the signature <code>function(data, knowledge, suff_stat, args)</code> (or
+<code>function(score, args)</code> for <code>type = "score"</code>), and the
+<code>args</code> parameter will be passed to the algorithm function.</p>
+<p>EXPERIMENTAL: user-defined algorithm syntax is subject to change.</p></dd>
+
+      <dt><code>type</code></dt>
+<dd><p>Only used if <code>method</code> is a user-defined function.
+One of <code>"constraint"</code> (default) or <code>"score"</code>, specifying
+whether the algorithm is constraint-based (called with
+<code>data</code>/<code>knowledge</code>/<code>suff_stat</code>) or score-based (called
+with <code>score</code>).</p></dd>
+
+      <dt><code>args</code></dt>
+<dd><p>A list of additional arguments to pass to the algorithm.
+Only needed if <code>method</code> is a user-defined function with an
+<code>args</code> parameter in its signature.</p></dd>
 
 
 </dl><p></p></div>
@@ -378,96 +404,29 @@ nature of how <span class="pkg">pcalg</span> handles background knowledge when u
 <span class="r-in"><span><span class="va">s_tpc</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res_tpc</span> <span class="op">&lt;-</span> <span class="va">s_tpc</span><span class="op">$</span><span class="fu">run_search</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">res_tpc</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">caugi graph</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────────────</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Graph class: <span style="font-weight: bold;">UNKNOWN</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Edges</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   from      edge  to       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child_x1  ---   child_x2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> child_x2  --&gt;   oldage_x5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> child_x2  --&gt;   youth_x4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> oldage_x5 --&gt;   oldage_x6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> youth_x3  --&gt;   oldage_x5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> youth_x4  --&gt;   oldage_x6</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Nodes</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   name     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child_x2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> child_x1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> youth_x4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> youth_x3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> oldage_x6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> oldage_x5</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Knowledge object</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Tiers</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="font-weight: bold;">tier</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> youth</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> old  </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Variables</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="font-weight: bold;">var</span>       <span style="font-weight: bold;">tier</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child_x1  child</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> child_x2  child</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> youth_x3  youth</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> youth_x4  youth</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> oldage_x5 old  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> oldage_x6 old  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;Disco UNKNOWN: 6 nodes | 6 edges | Knowledge: 3 tiers&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Learned graph:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   edges: child_x1---child_x2, child_x2--&gt;oldage_x5, child_x2--&gt;youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          oldage_x5--&gt;oldage_x6, youth_x3--&gt;oldage_x5, youth_x4--&gt;oldage_x6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Knowledge:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(child): child_x1, child_x2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(youth): youth_x3, youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(old): oldage_x5, oldage_x6</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Switch to TFCI on the same object (reuses suff_stat/test)</span></span></span>
 <span class="r-in"><span><span class="va">s_tpc</span><span class="op">$</span><span class="fu">set_alg</span><span class="op">(</span><span class="st">"tfci"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res_tfci</span> <span class="op">&lt;-</span> <span class="va">s_tpc</span><span class="op">$</span><span class="fu">run_search</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">res_tfci</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">caugi graph</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────────────</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Graph class: <span style="font-weight: bold;">UNKNOWN</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Edges</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   from      edge  to       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child_x2  o-o   child_x1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> child_x2  o-&gt;   oldage_x5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> child_x2  o-&gt;   youth_x4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> oldage_x5 --&gt;   oldage_x6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> youth_x3  o-&gt;   oldage_x5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> youth_x4  --&gt;   oldage_x6</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Nodes</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   name     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child_x2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> child_x1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> youth_x4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> youth_x3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> oldage_x6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> oldage_x5</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Knowledge object</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Tiers</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="font-weight: bold;">tier</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> youth</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> old  </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Variables</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="font-weight: bold;">var</span>       <span style="font-weight: bold;">tier</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child_x1  child</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> child_x2  child</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> youth_x3  youth</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> youth_x4  youth</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> oldage_x5 old  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> oldage_x6 old  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;Disco UNKNOWN: 6 nodes | 6 edges | Knowledge: 3 tiers&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Learned graph:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   edges: child_x2o-ochild_x1, child_x2o-&gt;oldage_x5, child_x2o-&gt;youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          oldage_x5--&gt;oldage_x6, youth_x3o-&gt;oldage_x5, youth_x4--&gt;oldage_x6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Knowledge:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(child): child_x1, child_x2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(youth): youth_x3, youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(old): oldage_x5, oldage_x6</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Score-based: TGES --------------------------------------------------------</span></span></span>
 <span class="r-in"><span><span class="va">s_tges</span> <span class="op">&lt;-</span> <span class="va">CausalDiscoSearch</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
@@ -477,30 +436,37 @@ nature of how <span class="pkg">pcalg</span> handles background knowledge when u
 <span class="r-in"><span><span class="va">s_tges</span><span class="op">$</span><span class="fu">set_knowledge</span><span class="op">(</span><span class="va">kn</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res_tges</span> <span class="op">&lt;-</span> <span class="va">s_tges</span><span class="op">$</span><span class="fu">run_search</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">res_tges</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">caugi graph</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────────────</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Graph class: <span style="font-weight: bold;">PDAG</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Edges</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   from      edge  to       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child_x1  ---   child_x2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> child_x2  --&gt;   oldage_x5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> child_x2  --&gt;   youth_x4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> oldage_x5 --&gt;   oldage_x6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> youth_x3  --&gt;   oldage_x5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> youth_x4  --&gt;   oldage_x6</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Nodes</span> ──</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   name     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> child_x2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> child_x1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> youth_x4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> youth_x3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> oldage_x6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> oldage_x5</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Knowledge object</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;Disco PDAG: 6 nodes | 6 edges&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   edges: child_x1---child_x2, child_x2--&gt;oldage_x5, child_x2--&gt;youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          oldage_x5--&gt;oldage_x6, youth_x3--&gt;oldage_x5, youth_x4--&gt;oldage_x6</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># --- Custom (user-defined) algorithm: constraint-based -----------------------</span></span></span>
+<span class="r-in"><span><span class="va">my_alg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">knowledge</span>, <span class="va">suff_stat</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="tpc_run.html">tpc_run</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">data</span>,</span></span>
+<span class="r-in"><span>    knowledge <span class="op">=</span> <span class="va">knowledge</span>,</span></span>
+<span class="r-in"><span>    suff_stat <span class="op">=</span> <span class="va">suff_stat</span>,</span></span>
+<span class="r-in"><span>    test <span class="op">=</span> <span class="va">reg_test</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">s_custom</span> <span class="op">&lt;-</span> <span class="va">CausalDiscoSearch</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">s_custom</span><span class="op">$</span><span class="fu">set_test</span><span class="op">(</span><span class="st">"reg"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">s_custom</span><span class="op">$</span><span class="fu">set_knowledge</span><span class="op">(</span><span class="va">kn</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">s_custom</span><span class="op">$</span><span class="fu">set_alg</span><span class="op">(</span><span class="va">my_alg</span><span class="op">)</span> <span class="co"># type = "constraint" by default</span></span></span>
+<span class="r-in"><span><span class="va">s_custom</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">res_custom</span> <span class="op">&lt;-</span> <span class="va">s_custom</span><span class="op">$</span><span class="fu">run_search</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">res_custom</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;Disco UNKNOWN: 6 nodes | 6 edges | Knowledge: 3 tiers&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Learned graph:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   edges: child_x1---child_x2, child_x2--&gt;oldage_x5, child_x2--&gt;youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          oldage_x5--&gt;oldage_x6, youth_x3--&gt;oldage_x5, youth_x4--&gt;oldage_x6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Knowledge:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(child): child_x1, child_x2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(youth): youth_x3, youth_x4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier(old): oldage_x5, oldage_x6</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># --- Intentional error demonstrations ----------------------------------------</span></span></span>
 <span class="r-in"><span></span></span>
@@ -538,7 +504,7 @@ nature of how <span class="pkg">pcalg</span> handles background knowledge when u
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

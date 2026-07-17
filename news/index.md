@@ -8,6 +8,37 @@
   [`rfci()`](https://disco-coders.github.io/causalDisco/reference/rfci.md),
   interfacing with implementations from pcalg and Tetrad.
 
+- The infix edge operators `%-->%` and `%!-->%` in
+  [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)
+  now accept `+` on both sides to specify multiple variables,
+  e.g. `A + B %-->% C + D` is equivalent to `c(A, B) %-->% c(C, D)`.
+
+- The infix edge operators `%-->%` and `%!-->%` in
+  [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)
+  now support tidyselect set operations such as `!`, `&`, and `|` on
+  either side, e.g. `child_x1 %!-->% !starts_with("child")`.
+
+- You can now plug a fully custom, user-written search algorithm into
+  the causalDisco engine and run it through
+  [`disco()`](https://disco-coders.github.io/causalDisco/reference/disco.md)
+  (via `CausalDiscoSearch$set_alg()` and
+  [`make_method()`](https://disco-coders.github.io/causalDisco/reference/make_method.md)).
+  See the “Extending causalDisco with new algorithms” article for a
+  worked example.
+
+- Added
+  [`register_engine()`](https://disco-coders.github.io/causalDisco/reference/register_engine.md),
+  which lets you plug in an entirely new engine backend (i.e. one not
+  built on bnlearn, causalDisco, pcalg, or Tetrad) so. See the
+  “Extending causalDisco with new algorithms” article for a worked
+  example.
+
+### Deprecated
+
+- The [`summary()`](https://rdrr.io/r/base/summary.html) methods for
+  `Knowledge` and `Disco` objects are deprecated; use
+  [`print()`](https://rdrr.io/r/base/print.html) instead.
+
 ### Bug fixes
 
 - Fixed
@@ -19,6 +50,18 @@
   [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md).
 
 ### Improvements
+
+- The [`print()`](https://rdrr.io/r/base/print.html) methods for
+  `Knowledge` and `Disco` objects now give a more concise and readable
+  summary.
+
+- `Disco` objects now store an attribute `graph_class` of the actual
+  learned graph class.
+
+- `Knowledge` objects generated from
+  [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)
+  now verifies the knowledge for requires edges doesn’t contain a
+  directed cycle.
 
 - Improved the documentation.
 

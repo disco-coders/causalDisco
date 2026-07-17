@@ -64,18 +64,6 @@ kn <- unfreeze(kn)
 kn <- add_vars(kn, "new_var")
 
 print(kn)
-#> 
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Variables ──
-#> 
-#>   var       tier 
-#>   <chr>     <chr>
-#> 1 child_x1  NA   
-#> 2 child_x2  NA   
-#> 3 oldage_x5 NA   
-#> 4 oldage_x6 NA   
-#> 5 youth_x3  NA   
-#> 6 youth_x4  NA   
-#> 7 new_var   NA   
+#> <Knowledge: 7 vars>
+#>   vars: child_x1, child_x2, oldage_x5, oldage_x6, youth_x3, youth_x4, new_var
 ```

@@ -96,59 +96,17 @@ data(tpc_example)
 # Recommended path using disco()
 ges_pcalg <- ges(engine = "pcalg", score = "sem_bic")
 disco(tpc_example, ges_pcalg)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x1  ---   child_x2 
-#> 2 child_x2  -->   oldage_x5
-#> 3 child_x2  ---   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  -->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco CPDAG: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2---youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
 
 # or using ges_pcalg directly
 ges_pcalg(tpc_example)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x1  ---   child_x2 
-#> 2 child_x2  -->   oldage_x5
-#> 3 child_x2  ---   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  -->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco PDAG: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2---youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
 
 # With all algorithm arguments specified
 ges_pcalg <- ges(
@@ -161,31 +119,10 @@ ges_pcalg <- ges(
   verbose = FALSE
 )
 disco(tpc_example, ges_pcalg)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x1  ---   child_x2 
-#> 2 child_x2  -->   oldage_x5
-#> 3 child_x2  ---   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  -->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco CPDAG: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x2-->oldage_x5, child_x2---youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
 
 
 #### Using tetrad engine with tier knowledge ####
@@ -208,31 +145,10 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
   ges_tetrad <- ges_tetrad |> set_knowledge(kn)
   ges_tetrad(tpc_example)
 }
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: UNKNOWN
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  ---   child_x1 
-#> 2 child_x2  -->   oldage_x5
-#> 3 child_x2  -->   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  -->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco UNKNOWN: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2---child_x1, child_x2-->oldage_x5, child_x2-->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
 
 # With all algorithm arguments specified
 if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
@@ -246,29 +162,8 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
   )
   disco(tpc_example, ges_tetrad)
 }
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x2  ---   child_x1 
-#> 2 child_x2  -->   oldage_x5
-#> 3 child_x2  ---   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  -->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco CPDAG: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2---child_x1, child_x2-->oldage_x5, child_x2---youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
 ```

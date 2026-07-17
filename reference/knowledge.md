@@ -43,10 +43,15 @@ Create a `Knowledge` object using a concise mini-DSL with `tier()`,
 `exogenous()` and infix edge operators `%-->%` and `%!-->%`.
 
 The first argument can be a data frame, which will be used to populate
-the `Knowledge` object with variable names. If you later add variables
-with `add_*` verbs, this will throw a warning, since the `Knowledge`
-object will be *frozen*. You can unfreeze a `Knowledge` object by using
-the function `unfreeze(knowledge)`.
+the `Knowledge` object with variable names. Supplying a data frame also
+gives tidyselect helpers (e.g.
+[`tidyselect::starts_with()`](https://tidyselect.r-lib.org/reference/starts_with.html)),
+a set of column names to resolve against, so they can be used throughout
+the mini-DSL, for example `tier(1 ~ starts_with("V"))` or
+`everything() %-->% Y`. If you later add variables with `add_*` verbs,
+this will throw a warning, since the `Knowledge` object will be
+*frozen*. You can unfreeze a `Knowledge` object by using the function
+[`unfreeze()`](https://disco-coders.github.io/causalDisco/reference/unfreeze.md).
 
 If no data frame is provided, the object is initially empty. Variables
 can then be added via `tier()`, `forbidden()`, `required()`, infix
@@ -171,6 +176,22 @@ kn <- knowledge(
   tpc_example,
   child_x1 %-->% youth_x3,
   oldage_x6 %!-->% child_x1
+)
+
+# Both sides of an edge operator accept tidyselect helpers, so a set of edges
+# can be specified at once. Here every "child" variable is forbidden from
+# pointing to every "youth" variable.
+kn <- knowledge(
+  tpc_example,
+  starts_with("child") %!-->% starts_with("youth")
+)
+
+# tidyselect set operations such as `!` (negation) and `&` (intersection)
+# also work. Forbid edges from child_x1 to every variable that is not a
+# "child" variable.
+kn <- knowledge(
+  tpc_example,
+  child_x1 %!-->% !starts_with("child")
 )
 
 # You can also add exogenous variables

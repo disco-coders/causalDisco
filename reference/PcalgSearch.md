@@ -39,6 +39,9 @@ pcalg documentation, which we link to in the respective sections below.
     imputation. See
     [`micd::gaussCItestMI()`](https://rdrr.io/pkg/micd/man/gaussMItest.html).
 
+  - `"reg"` - Regression test for discrete or binary data. See
+    [`reg_test()`](https://disco-coders.github.io/causalDisco/reference/reg_test.md).
+
   - `"g_square"` - G square test for discrete data. See
     [`pcalg::binCItest()`](https://rdrr.io/pkg/pcalg/man/binCItest.html)
     and
@@ -361,57 +364,15 @@ data(num_data)
 # Recommended:
 my_pc <- pc(engine = "pcalg", test = "fisher_z")
 my_pc(num_data)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from  edge  to   
-#>   <chr> <chr> <chr>
-#> 1 X1    -->   Y    
-#> 2 X1    ---   Z    
-#> 3 X2    ---   X3   
-#> 4 X2    -->   Y    
-#> 5 X3    -->   Y    
-#> 6 Z     -->   Y    
-#> ── Nodes ──
-#> 
-#>   name 
-#>   <chr>
-#> 1 X1   
-#> 2 X2   
-#> 3 X3   
-#> 4 Z    
-#> 5 Y    
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco PDAG: 5 nodes | 6 edges>
+#>   nodes: X1, X2, X3, Z, Y
+#>   edges: X1-->Y, X1---Z, X2---X3, X2-->Y, X3-->Y, Z-->Y
 
 # or
 disco(data = num_data, method = my_pc)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from  edge  to   
-#>   <chr> <chr> <chr>
-#> 1 X1    -->   Y    
-#> 2 X1    ---   Z    
-#> 3 X2    ---   X3   
-#> 4 X2    -->   Y    
-#> 5 X3    -->   Y    
-#> 6 Z     -->   Y    
-#> ── Nodes ──
-#> 
-#>   name 
-#>   <chr>
-#> 1 X1   
-#> 2 X2   
-#> 3 X3   
-#> 4 Z    
-#> 5 Y    
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco CPDAG: 5 nodes | 6 edges>
+#>   nodes: X1, X2, X3, Z, Y
+#>   edges: X1-->Y, X1---Z, X2---X3, X2-->Y, X3-->Y, Z-->Y
 
 # Example with detailed settings:
 my_pc2 <- pc(
@@ -423,29 +384,10 @@ my_pc2 <- pc(
 )
 
 disco(data = num_data, method = my_pc2)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from  edge  to   
-#>   <chr> <chr> <chr>
-#> 1 X1    -->   Y    
-#> 2 X2    ---   X3   
-#> 3 X2    -->   Y    
-#> 4 X3    -->   Y    
-#> 5 Z     -->   X1   
-#> ── Nodes ──
-#> 
-#>   name 
-#>   <chr>
-#> 1 X1   
-#> 2 X2   
-#> 3 X3   
-#> 4 Z    
-#> 5 Y    
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> The learned graph is not a valid CPDAG because of conflicting edge orientations, which can happen due to statistical errors in finite samples, violations of faithfulness, or latent confounding; it is reported as PDAG instead.
+#> <Disco PDAG: 5 nodes | 5 edges>
+#>   nodes: X1, X2, X3, Z, Y
+#>   edges: X1-->Y, X2---X3, X2-->Y, X3-->Y, Z-->X1
 
 # With knowledge
 
@@ -456,43 +398,15 @@ kn <- knowledge(
 )
 
 disco(data = num_data, method = my_pc2, knowledge = kn)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from  edge  to   
-#>   <chr> <chr> <chr>
-#> 1 X1    -->   Y    
-#> 2 X2    ---   X3   
-#> 3 X2    -->   Y    
-#> 4 X3    -->   Y    
-#> 5 Z     -->   X1   
-#> ── Nodes ──
-#> 
-#>   name 
-#>   <chr>
-#> 1 X1   
-#> 2 X2   
-#> 3 X3   
-#> 4 Z    
-#> 5 Y    
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Variables ──
-#> 
-#>   var   tier 
-#>   <chr> <chr>
-#> 1 X1    NA   
-#> 2 X2    NA   
-#> 3 X3    NA   
-#> 4 Y     NA   
-#> 5 Z     NA   
-#> ── Edges ──
-#> 
-#>  ✖  X1 → X2
-#>  ✖  X2 → X1
+#> <Disco MPDAG: 5 nodes | 5 edges | Knowledge: 2 forbidden>
+#> Learned graph:
+#>   nodes: X1, X2, X3, Z, Y
+#>   edges: X1-->Y, X2---X3, X2-->Y, X3-->Y, Z-->X1
+#> Knowledge:
+#>   vars: X1, X2, X3, Y, Z
+#>   forbidden:
+#>     X1!-->X2
+#>     X2!-->X1
 
 # Using R6 class:
 s <- PcalgSearch$new()
@@ -504,28 +418,8 @@ s$set_alg("pc")
 g <- s$run_search()
 
 print(g)
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x1  ---   child_x2 
-#> 2 child_x2  -->   oldage_x5
-#> 3 child_x2  ---   youth_x4 
-#> 4 oldage_x5 -->   oldage_x6
-#> 5 youth_x3  -->   oldage_x5
-#> 6 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco PDAG: 6 nodes | 6 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x2---child_x1, child_x2-->oldage_x5, child_x2---youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
 ```

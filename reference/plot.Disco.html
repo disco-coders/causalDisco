@@ -150,7 +150,7 @@ the default caugi layout is used. Edges marked as required are automatically col
 <span class="r-in"><span>    <span class="va">youth</span> <span class="op">~</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"youth"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="va">old</span> <span class="op">~</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"old"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span>,</span></span>
-<span class="r-in"><span>  <span class="va">child_x1</span> <span class="op">%--&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">child_x2</span>, <span class="va">youth_x4</span><span class="op">)</span> <span class="co"># required edges</span></span></span>
+<span class="r-in"><span>  <span class="va">child_x1</span> <span class="op">%--&gt;%</span> <span class="va">child_x2</span> <span class="op">+</span> <span class="va">youth_x4</span> <span class="co"># required edges</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bnlearn_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="pc.html">pc</a></span><span class="op">(</span>engine <span class="op">=</span> <span class="st">"bnlearn"</span>, test <span class="op">=</span> <span class="st">"fisher_z"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">disco_bnlearn_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="disco.html">disco</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">tpc_example</span>, method <span class="op">=</span> <span class="va">bnlearn_pc</span>, knowledge <span class="op">=</span> <span class="va">kn</span><span class="op">)</span></span></span>
@@ -174,12 +174,13 @@ the default caugi layout is used. Edges marked as required are automatically col
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">num_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">kn_untiered</span> <span class="op">&lt;-</span> <span class="fu"><a href="knowledge.html">knowledge</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">num_data</span>,</span></span>
-<span class="r-in"><span>  <span class="va">X1</span> <span class="op">%--&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">X2</span>, <span class="va">X3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">X1</span> <span class="op">%--&gt;%</span> <span class="va">X2</span> <span class="op">+</span> <span class="va">X3</span>,</span></span>
 <span class="r-in"><span>  <span class="va">Z</span> <span class="op">%!--&gt;%</span> <span class="va">Y</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">bnlearn_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="pc.html">pc</a></span><span class="op">(</span>engine <span class="op">=</span> <span class="st">"bnlearn"</span>, test <span class="op">=</span> <span class="st">"fisher_z"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res_untiered</span> <span class="op">&lt;-</span> <span class="fu"><a href="disco.html">disco</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">num_data</span>, method <span class="op">=</span> <span class="va">bnlearn_pc</span>, knowledge <span class="op">=</span> <span class="va">kn_untiered</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The learned graph is not a valid MPDAG because the background knowledge conflicts with the structure learned from the data; it is reported as PDAG instead.</span>
 <span class="r-in"><span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">res_untiered</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.Disco-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -203,7 +204,7 @@ the default caugi layout is used. Edges marked as required are automatically col
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

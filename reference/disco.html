@@ -91,7 +91,12 @@ for how to create a <code>Knowledge</code> object.</p></dd>
     <p>A <code>Disco</code> object (a list) containing the following components:</p><ul><li><p><code>knowledge</code> A <code>Knowledge</code> object with the background knowledge
 used in the causal discovery algorithm.</p></li>
 <li><p><code>caugi</code> A <a href="https://caugi.org/reference/caugi.html" class="external-link">caugi::caugi</a> object representing the learned causal graph from the causal discovery algorithm.</p></li>
-</ul></div>
+<li><p><code>graph_type</code> A string with the semantic class of the learned graph
+(e.g. <code>"CPDAG"</code>, <code>"MPDAG"</code>, or <code>"PAG"</code>).</p></li>
+</ul><p>Constraint-based algorithms may output graphs that are not valid CPDAGs/MPDAGs due to statistical errors in finite
+samples, violations of faithfulness, or latent confounding. In that case <code>disco()</code> emits a message and downgrades
+<code>graph_type</code>.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For specific details on the supported algorithms, scores, tests, and parameters for each engine, see:</p><ul><li><p><a href="BnlearnSearch.html">BnlearnSearch</a> for <span class="pkg">bnlearn</span>,</p></li>
@@ -142,7 +147,7 @@ used in the causal discovery algorithm.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

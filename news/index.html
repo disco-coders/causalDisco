@@ -44,7 +44,15 @@
 <h2 class="pkg-version" data-toc-text="development version" id="causaldisco-development-version">causalDisco (development version)<a class="anchor" aria-label="anchor" href="#causaldisco-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li>Added support for the RFCI algorithm via <code><a href="../reference/rfci.html">rfci()</a></code>, interfacing with implementations from pcalg and Tetrad.</li>
+<ul><li><p>Added support for the RFCI algorithm via <code><a href="../reference/rfci.html">rfci()</a></code>, interfacing with implementations from pcalg and Tetrad.</p></li>
+<li><p>The infix edge operators <code>%--&gt;%</code> and <code>%!--&gt;%</code> in <code><a href="../reference/knowledge.html">knowledge()</a></code> now accept <code>+</code> on both sides to specify multiple variables, e.g. <code>A + B %--&gt;% C + D</code> is equivalent to <code>c(A, B) %--&gt;% c(C, D)</code>.</p></li>
+<li><p>The infix edge operators <code>%--&gt;%</code> and <code>%!--&gt;%</code> in <code><a href="../reference/knowledge.html">knowledge()</a></code> now support tidyselect set operations such as <code>!</code>, <code>&amp;</code>, and <code>|</code> on either side, e.g. <code>child_x1 %!--&gt;% !starts_with("child")</code>.</p></li>
+<li><p>You can now plug a fully custom, user-written search algorithm into the causalDisco engine and run it through <code><a href="../reference/disco.html">disco()</a></code> (via <code>CausalDiscoSearch$set_alg()</code> and <code><a href="../reference/make_method.html">make_method()</a></code>). See the “Extending causalDisco with new algorithms” article for a worked example.</p></li>
+<li><p>Added <code><a href="../reference/register_engine.html">register_engine()</a></code>, which lets you plug in an entirely new engine backend (i.e. one not built on bnlearn, causalDisco, pcalg, or Tetrad) so. See the “Extending causalDisco with new algorithms” article for a worked example.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="deprecated-development-version">Deprecated<a class="anchor" aria-label="anchor" href="#deprecated-development-version"></a></h3>
+<ul><li>The <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> methods for <code>Knowledge</code> and <code>Disco</code> objects are deprecated; use <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> instead.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
@@ -52,7 +60,10 @@
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-development-version">Improvements<a class="anchor" aria-label="anchor" href="#improvements-development-version"></a></h3>
-<ul><li><p>Improved the documentation.</p></li>
+<ul><li><p>The <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> methods for <code>Knowledge</code> and <code>Disco</code> objects now give a more concise and readable summary.</p></li>
+<li><p><code>Disco</code> objects now store an attribute <code>graph_class</code> of the actual learned graph class.</p></li>
+<li><p><code>Knowledge</code> objects generated from <code><a href="../reference/knowledge.html">knowledge()</a></code> now verifies the knowledge for requires edges doesn’t contain a directed cycle.</p></li>
+<li><p>Improved the documentation.</p></li>
 <li><p>Reduced the number of package dependencies.</p></li>
 </ul></div>
 <div class="section level3">
@@ -114,7 +125,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

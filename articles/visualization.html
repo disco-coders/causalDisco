@@ -101,8 +101,8 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">num_data</span><span class="op">)</span></span>
 <span><span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/knowledge.html">knowledge</a></span><span class="op">(</span></span>
 <span>  <span class="va">num_data</span>,</span>
-<span>  <span class="va">X1</span> <span class="op">%--&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">X2</span>, <span class="va">X3</span><span class="op">)</span>, <span class="co"># Require edge from X1 to X2, and X1 to X3</span></span>
-<span>  <span class="va">X2</span> <span class="op">%!--&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">X3</span>, <span class="va">Y</span><span class="op">)</span>, <span class="co"># Forbid edge from X2 to X3, and X2 to Y</span></span>
+<span>  <span class="va">X1</span> <span class="op">%--&gt;%</span> <span class="va">X2</span> <span class="op">+</span> <span class="va">X3</span>, <span class="co"># Require edge from X1 to X2, and X1 to X3</span></span>
+<span>  <span class="va">X2</span> <span class="op">%!--&gt;%</span> <span class="va">X3</span> <span class="op">+</span> <span class="va">Y</span>, <span class="co"># Forbid edge from X2 to X3, and X2 to Y</span></span>
 <span>  <span class="va">Y</span> <span class="op">%!--&gt;%</span> <span class="va">Z</span> <span class="co"># Forbid edge from Y to Z</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -239,7 +239,7 @@
 <span><span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/knowledge.html">knowledge</a></span><span class="op">(</span></span>
 <span>  <span class="va">num_data</span>,</span>
 <span>  <span class="va">X1</span> <span class="op">%--&gt;%</span> <span class="va">X2</span>,</span>
-<span>  <span class="va">X2</span> <span class="op">%!--&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">X3</span>, <span class="va">Y</span><span class="op">)</span>,</span>
+<span>  <span class="va">X2</span> <span class="op">%!--&gt;%</span> <span class="va">X3</span> <span class="op">+</span> <span class="va">Y</span>,</span>
 <span>  <span class="va">Y</span> <span class="op">%!--&gt;%</span> <span class="va">Z</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -295,7 +295,7 @@
 <span><span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/knowledge.html">knowledge</a></span><span class="op">(</span></span>
 <span>  <span class="va">num_data</span>,</span>
 <span>  <span class="va">X1</span> <span class="op">%--&gt;%</span> <span class="va">X2</span>,</span>
-<span>  <span class="va">X2</span> <span class="op">%!--&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">X3</span>, <span class="va">Y</span><span class="op">)</span>,</span>
+<span>  <span class="va">X2</span> <span class="op">%!--&gt;%</span> <span class="va">X3</span> <span class="op">+</span> <span class="va">Y</span>,</span>
 <span>  <span class="va">Y</span> <span class="op">%!--&gt;%</span> <span class="va">Z</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -578,7 +578,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

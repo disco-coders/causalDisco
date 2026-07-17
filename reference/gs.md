@@ -102,82 +102,26 @@ gs_bnlearn <- gs(
   alpha = 0.05
 )
 disco(tpc_example, gs_bnlearn, knowledge = kn)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x1  ---   child_x2 
-#> 2 child_x1  -->   youth_x3 
-#> 3 child_x1  -->   youth_x4 
-#> 4 child_x2  -->   oldage_x5
-#> 5 child_x2  -->   youth_x3 
-#> 6 child_x2  -->   youth_x4 
-#> 7 oldage_x5 -->   oldage_x6
-#> 8 youth_x3  -->   oldage_x5
-#> 9 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
-#> 
-#> ── Variables ──
-#> 
-#>   var       tier 
-#>   <chr>     <chr>
-#> 1 child_x1  NA   
-#> 2 child_x2  NA   
-#> 3 oldage_x5 NA   
-#> 4 oldage_x6 NA   
-#> 5 youth_x3  NA   
-#> 6 youth_x4  NA   
-#> ── Edges ──
-#> 
-#>  ✔  child_x1 → youth_x3
-#>  ✔  child_x1 → youth_x4
-#>  ✔  child_x2 → youth_x3
-#>  ✔  child_x2 → youth_x4
+#> <Disco MPDAG: 6 nodes | 9 edges | Knowledge: 4 required>
+#> Learned graph:
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x1-->youth_x3, child_x1-->youth_x4
+#>          child_x2-->oldage_x5, child_x2-->youth_x3, child_x2-->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+#> Knowledge:
+#>   vars: child_x1, child_x2, oldage_x5, oldage_x6, youth_x3, youth_x4
+#>   required:
+#>     child_x1-->youth_x3 + youth_x4
+#>     child_x2-->youth_x3 + youth_x4
 
 # or using gs_bnlearn directly
 gs_bnlearn <- gs_bnlearn |> set_knowledge(kn)
 gs_bnlearn(tpc_example)
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x1  ---   child_x2 
-#> 2 child_x1  -->   youth_x3 
-#> 3 child_x1  -->   youth_x4 
-#> 4 child_x2  -->   oldage_x5
-#> 5 child_x2  -->   youth_x3 
-#> 6 child_x2  -->   youth_x4 
-#> 7 oldage_x5 -->   oldage_x6
-#> 8 youth_x3  -->   oldage_x5
-#> 9 youth_x4  -->   oldage_x6
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco PDAG: 6 nodes | 9 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x1-->youth_x3, child_x1-->youth_x4
+#>          child_x2-->oldage_x5, child_x2-->youth_x3, child_x2-->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
 
 
 # With all algorithm arguments specified
@@ -191,28 +135,8 @@ gs_bnlearn <- gs(
 )
 
 disco(tpc_example, gs_bnlearn)
-#> 
-#> ── caugi graph ─────────────────────────────────────────────────────────────────
-#> Graph class: PDAG
-#> 
-#> ── Edges ──
-#> 
-#>   from      edge  to       
-#>   <chr>     <chr> <chr>    
-#> 1 child_x1  ---   child_x2 
-#> 2 child_x2  ---   oldage_x6
-#> 3 child_x2  ---   youth_x4 
-#> 4 oldage_x6 ---   youth_x3 
-#> 5 oldage_x6 ---   youth_x4 
-#> ── Nodes ──
-#> 
-#>   name     
-#>   <chr>    
-#> 1 child_x2 
-#> 2 child_x1 
-#> 3 youth_x4 
-#> 4 youth_x3 
-#> 5 oldage_x6
-#> 6 oldage_x5
-#> ── Knowledge object ────────────────────────────────────────────────────────────
+#> <Disco CPDAG: 6 nodes | 5 edges>
+#>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
+#>   edges: child_x1---child_x2, child_x2---oldage_x6, child_x2---youth_x4
+#>          oldage_x6---youth_x3, oldage_x6---youth_x4
 ```

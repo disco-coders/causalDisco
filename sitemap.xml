@@ -26,6 +26,7 @@
 <url><loc>https://disco-coders.github.io/causalDisco/reference/add_to_tier.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/add_vars.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/as_bnlearn_knowledge.html</loc></url>
+<url><loc>https://disco-coders.github.io/causalDisco/reference/as_disco.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/as_pcalg_constraints.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/as_tetrad_knowledge.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/boss.html</loc></url>
@@ -64,12 +65,14 @@
 <url><loc>https://disco-coders.github.io/causalDisco/reference/install_tetrad.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/knowledge.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/knowledge_to_caugi.html</loc></url>
+<url><loc>https://disco-coders.github.io/causalDisco/reference/list_registered_engines.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/list_registered_tetrad_algorithms.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/make_method.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/make_runner.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/make_tikz.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/mix_data.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/new_disco_method.html</loc></url>
+<url><loc>https://disco-coders.github.io/causalDisco/reference/nlsy97.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/npv.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/num_data.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/num_data_latent.html</loc></url>
@@ -84,6 +87,7 @@
 <url><loc>https://disco-coders.github.io/causalDisco/reference/recall.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/reexports.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/reg_test.html</loc></url>
+<url><loc>https://disco-coders.github.io/causalDisco/reference/register_engine.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/register_tetrad_algorithm.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/remove_edge.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/remove_tiers.html</loc></url>
@@ -91,11 +95,13 @@
 <url><loc>https://disco-coders.github.io/causalDisco/reference/reorder_tiers.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/reposition_tier.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/require_edge.html</loc></url>
+<url><loc>https://disco-coders.github.io/causalDisco/reference/reset_engine_registry.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/reset_tetrad_alg_registry.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/rfci.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/seq_tiers.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/set_knowledge.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/sim_dag.html</loc></url>
+<url><loc>https://disco-coders.github.io/causalDisco/reference/sim_data.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/sp_fci.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/specificity.html</loc></url>
 <url><loc>https://disco-coders.github.io/causalDisco/reference/summary.Disco.html</loc></url>

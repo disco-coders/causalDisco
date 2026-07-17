@@ -70,7 +70,8 @@ engine and algorithm. This allows users to support new algorithms.</p>
 
 <dl><dt id="arg-engine">engine<a class="anchor" aria-label="anchor" href="#arg-engine"></a></dt>
 <dd><p>Character. The engine to use. Options include <code>"causalDisco"</code>,
-<code>"pcalg"</code>, <code>"bnlearn"</code>, <code>"tetrad"</code>.</p></dd>
+<code>"pcalg"</code>, <code>"bnlearn"</code>, <code>"tetrad"</code>, or the name of any engine added via
+<code><a href="register_engine.html">register_engine()</a></code>.</p></dd>
 
 
 <dt id="arg-alg">alg<a class="anchor" aria-label="anchor" href="#arg-alg"></a></dt>
@@ -105,11 +106,15 @@ The type depends on the engine.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Extending causalDisco:
+<code><a href="as_disco.html">as_disco()</a></code>,
 <code><a href="distribute_engine_args.html">distribute_engine_args()</a></code>,
+<code><a href="list_registered_engines.html">list_registered_engines()</a></code>,
 <code><a href="list_registered_tetrad_algorithms.html">list_registered_tetrad_algorithms()</a></code>,
 <code><a href="make_method.html">make_method()</a></code>,
 <code><a href="new_disco_method.html">new_disco_method()</a></code>,
+<code><a href="register_engine.html">register_engine()</a></code>,
 <code><a href="register_tetrad_algorithm.html">register_tetrad_algorithm()</a></code>,
+<code><a href="reset_engine_registry.html">reset_engine_registry()</a></code>,
 <code><a href="reset_tetrad_alg_registry.html">reset_tetrad_alg_registry()</a></code></p></div>
     </div>
 
@@ -122,7 +127,7 @@ The type depends on the engine.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

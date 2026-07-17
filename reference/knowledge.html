@@ -91,10 +91,14 @@ Arguments are evaluated in order; only these calls are allowed.</p></li>
     <p>Create a <code>Knowledge</code> object using a concise mini-DSL with <code>tier()</code>, <code>exogenous()</code> and infix edge operators
 <code>%--&gt;%</code> and <code>%!--&gt;%</code>.</p>
 <p>The first argument can be a data frame, which will be used to populate the
-<code>Knowledge</code> object with variable names. If you later add variables with
+<code>Knowledge</code> object with variable names. Supplying a data frame also gives
+<span class="pkg">tidyselect</span> helpers (e.g. <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">tidyselect::starts_with()</a></code>), a set of column
+names to resolve against, so they can be used throughout the mini-DSL, for example
+<code>tier(1 ~ starts_with("V"))</code> or <code>everything() %--&gt;% Y</code>. If you later add
+variables with
 <code>add_*</code> verbs, this will throw a warning, since the <code>Knowledge</code> object will
 be <em>frozen</em>. You can unfreeze a <code>Knowledge</code> object by using the function
-<code>unfreeze(knowledge)</code>.</p>
+<code><a href="unfreeze.html">unfreeze()</a></code>.</p>
 <p>If no data frame is provided, the object is initially empty. Variables can
 then be added via <code>tier()</code>, <code>forbidden()</code>, <code>required()</code>, infix operators, or <code><a href="add_vars.html">add_vars()</a></code>.</p><ul><li><p><code>tier()</code>: Assigns variables to tiers. Tiers may be numeric or string labels.
 The left-hand side (LHS) of the formula is the tier; the right-hand side (RHS)
@@ -208,6 +212,22 @@ For example:</p>
 <span class="r-in"><span>  <span class="va">oldage_x6</span> <span class="op">%!--&gt;%</span> <span class="va">child_x1</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Both sides of an edge operator accept tidyselect helpers, so a set of edges</span></span></span>
+<span class="r-in"><span><span class="co"># can be specified at once. Here every "child" variable is forbidden from</span></span></span>
+<span class="r-in"><span><span class="co"># pointing to every "youth" variable.</span></span></span>
+<span class="r-in"><span><span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu">knowledge</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">tpc_example</span>,</span></span>
+<span class="r-in"><span>  <span class="fu">starts_with</span><span class="op">(</span><span class="st">"child"</span><span class="op">)</span> <span class="op">%!--&gt;%</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"youth"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># tidyselect set operations such as `!` (negation) and `&amp;` (intersection)</span></span></span>
+<span class="r-in"><span><span class="co"># also work. Forbid edges from child_x1 to every variable that is not a</span></span></span>
+<span class="r-in"><span><span class="co"># "child" variable.</span></span></span>
+<span class="r-in"><span><span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu">knowledge</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">tpc_example</span>,</span></span>
+<span class="r-in"><span>  <span class="va">child_x1</span> <span class="op">%!--&gt;%</span> <span class="op">!</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"child"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># You can also add exogenous variables</span></span></span>
 <span class="r-in"><span><span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu">knowledge</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">tpc_example</span>,</span></span>
@@ -299,7 +319,7 @@ For example:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

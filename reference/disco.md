@@ -85,6 +85,14 @@ A `Disco` object (a list) containing the following components:
   object representing the learned causal graph from the causal discovery
   algorithm.
 
+- `graph_type` A string with the semantic class of the learned graph
+  (e.g. `"CPDAG"`, `"MPDAG"`, or `"PAG"`).
+
+Constraint-based algorithms may output graphs that are not valid
+CPDAGs/MPDAGs due to statistical errors in finite samples, violations of
+faithfulness, or latent confounding. In that case `disco()` emits a
+message and downgrades `graph_type`.
+
 ## Details
 
 For specific details on the supported algorithms, scores, tests, and

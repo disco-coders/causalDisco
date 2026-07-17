@@ -311,10 +311,10 @@ Test functions implemented for use in the TPC algorithm.
 
 ## Simulation
 
-- [`generate_dag_data()`](https://disco-coders.github.io/causalDisco/reference/generate_dag_data.md)
-  : Generate Synthetic Data from a Linear Gaussian DAG
 - [`sim_dag()`](https://disco-coders.github.io/causalDisco/reference/sim_dag.md)
   : Simulate a Random DAG
+- [`sim_data()`](https://disco-coders.github.io/causalDisco/reference/sim_data.md)
+  : Generate Synthetic Data from a Linear Gaussian DAG
 
 ## Example Datasets
 
@@ -328,6 +328,8 @@ Small simulated datasets to illustrate causalDisco workflows.
   : Simulated Ordered Categorical Data
 - [`mix_data`](https://disco-coders.github.io/causalDisco/reference/mix_data.md)
   : Simulated Mixed Data
+- [`nlsy97`](https://disco-coders.github.io/causalDisco/reference/nlsy97.md)
+  : US National Longitudinal Survey of Youth 1997
 - [`num_data`](https://disco-coders.github.io/causalDisco/reference/num_data.md)
   : Simulated Numerical Data
 - [`num_data_latent`](https://disco-coders.github.io/causalDisco/reference/num_data_latent.md)
@@ -341,10 +343,6 @@ Small simulated datasets to illustrate causalDisco workflows.
   : Print a Disco Object
 - [`print(`*`<Knowledge>`*`)`](https://disco-coders.github.io/causalDisco/reference/print.Knowledge.md)
   : Print a Knowledge Object
-- [`summary(`*`<Disco>`*`)`](https://disco-coders.github.io/causalDisco/reference/summary.Disco.md)
-  : Summarize a Disco Object
-- [`summary(`*`<Knowledge>`*`)`](https://disco-coders.github.io/causalDisco/reference/summary.Knowledge.md)
-  : Summarize a Knowledge Object
 - [`plot(`*`<Disco>`*`)`](https://disco-coders.github.io/causalDisco/reference/plot.Disco.md)
   : Plot a Disco Object
 - [`plot(`*`<Knowledge>`*`)`](https://disco-coders.github.io/causalDisco/reference/plot.Knowledge.md)
@@ -435,8 +433,12 @@ Small simulated datasets to illustrate causalDisco workflows.
 Functions for extending causalDisco with new algorithms from the
 available engines.
 
+- [`as_disco()`](https://disco-coders.github.io/causalDisco/reference/as_disco.md)
+  : Wrap a Graph as a Disco Object
 - [`distribute_engine_args()`](https://disco-coders.github.io/causalDisco/reference/distribute_engine_args.md)
   : Distribute and Validate Engine Arguments
+- [`list_registered_engines()`](https://disco-coders.github.io/causalDisco/reference/list_registered_engines.md)
+  : List Registered Engines
 - [`list_registered_tetrad_algorithms()`](https://disco-coders.github.io/causalDisco/reference/list_registered_tetrad_algorithms.md)
   : List Registered Tetrad Algorithms
 - [`make_method()`](https://disco-coders.github.io/causalDisco/reference/make_method.md)
@@ -446,8 +448,12 @@ available engines.
   Algorithm
 - [`new_disco_method()`](https://disco-coders.github.io/causalDisco/reference/new_disco_method.md)
   : Add a New causalDisco Method
+- [`register_engine()`](https://disco-coders.github.io/causalDisco/reference/register_engine.md)
+  : Register a New Engine
 - [`register_tetrad_algorithm()`](https://disco-coders.github.io/causalDisco/reference/register_tetrad_algorithm.md)
   : Register a New Tetrad Algorithm
+- [`reset_engine_registry()`](https://disco-coders.github.io/causalDisco/reference/reset_engine_registry.md)
+  : Reset the Engine Registry
 - [`reset_tetrad_alg_registry()`](https://disco-coders.github.io/causalDisco/reference/reset_tetrad_alg_registry.md)
   : Reset the Tetrad Algorithm Registry
 
