@@ -1,5 +1,7 @@
 # Changelog
 
+## causalDisco (development version)
+
 ## causalDisco 1.2.1
 
 ### New features
