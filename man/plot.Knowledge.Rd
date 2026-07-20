@@ -137,3 +137,9 @@ custom_layout <- data.frame(
 plot(kn_untiered, layout = custom_layout)
 
 }
+\seealso{
+Other plot:
+\code{\link{plot}},
+\code{\link[=plot.Disco]{plot.Disco()}}
+}
+\concept{plot}

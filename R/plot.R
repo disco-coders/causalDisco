@@ -112,7 +112,8 @@
 #' )
 #' plot(res_untiered, layout = custom_layout)
 #'
-#' @seealso [caugi::plot()]
+#' @concept plot
+#' @family plot
 #' @export
 plot.Disco <- function(
   x,
@@ -273,6 +274,8 @@ plot.Disco <- function(
 #' )
 #' plot(kn_untiered, layout = custom_layout)
 #'
+#' @concept plot
+#' @family plot
 #' @export
 plot.Knowledge <- function(
   x,
@@ -400,12 +403,10 @@ plot_caugi_common <- function(
 #' or `Disco`. It dispatches to the class-specific plotting methods
 #' [plot.Knowledge()] and [plot.Disco()].
 #'
-#' @param x An object to plot (class `Knowledge` or `Disco`).
-#' @param ... Additional arguments passed to class-specific plot methods and to [caugi::plot()].
-#'
 #' @return Invisibly returns the input object. The primary effect is the generated plot.
 #'
-#' @seealso [plot.Knowledge()], [plot.Disco()], [caugi::plot()]
+#' @concept plot
+#' @family plot
 #'
 #' @examples
 #' data(tpc_example)

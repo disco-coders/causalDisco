@@ -127,5 +127,8 @@ plot(res_untiered, layout = custom_layout)
 
 }
 \seealso{
-\code{\link[caugi:plot]{caugi::plot()}}
+Other plot:
+\code{\link{plot}},
+\code{\link[=plot.Knowledge]{plot.Knowledge()}}
 }
+\concept{plot}

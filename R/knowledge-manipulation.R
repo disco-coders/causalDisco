@@ -5,8 +5,8 @@
 #'
 #' @example inst/roxygen-examples/plus-knowledge-example.R
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #' @importFrom rlang .data
 #' @exportS3Method "+" Knowledge
 `+.Knowledge` <- function(kn1, kn2) {
@@ -107,8 +107,8 @@
 #'
 #' @example inst/roxygen-examples/reorder_tiers-example.R
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #'
 #' @export
 reorder_tiers <- function(kn, order, by_index = FALSE) {
@@ -207,8 +207,8 @@ reorder_tiers <- function(kn, order, by_index = FALSE) {
 #'
 #' @example inst/roxygen-examples/reorder_tiers-example.R
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #'
 #' @export
 reposition_tier <- function(

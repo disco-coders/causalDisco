@@ -72,8 +72,8 @@
 #'
 #' @example inst/roxygen-examples/knowledge-example.R
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #'
 #' @export
 knowledge <- function(...) {
@@ -541,6 +541,8 @@ knowledge <- function(...) {
 #' )
 #' print(kn)
 #'
+#' @concept print
+#' @family print
 #' @exportS3Method print Knowledge
 print.Knowledge <- function(x, ...) {
   .check_if_pkgs_are_installed(
@@ -637,14 +639,15 @@ print.Knowledge <- function(x, ...) {
   }
 }
 
-#' @title Summarize a Disco Object
+#' @title Summarize a Knowledge Object
 #'
 #' @description
 #' `r lifecycle::badge("deprecated")`
 #'
-#' `summary()` for `Disco` objects is deprecated. Use [print()] instead.
+#' `summary()` for `Knowledge` objects is deprecated. Use `print()` instead.
 #'
-#' @keywords internal
+#' @param object A `Disco` object.
+#' @param ... Additional arguments (not used).
 #' @exportS3Method summary Disco
 summary.Knowledge <- function(object, ...) {
   lifecycle::deprecate_warn(
@@ -666,8 +669,8 @@ summary.Knowledge <- function(object, ...) {
 #'
 #' @example inst/roxygen-examples/is_knowledge-example.R
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #' @noRd
 #' @keywords internal
 is_knowledge <- function(x) {
@@ -695,8 +698,8 @@ is_knowledge <- function(x) {
 #'
 #' @example inst/roxygen-examples/deparse_knowledge-example.R
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #'
 #' @export
 deparse_knowledge <- function(kn, df_name = NULL) {

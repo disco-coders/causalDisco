@@ -29,3 +29,8 @@ kn <- knowledge(
 print(kn)
 
 }
+\seealso{
+Other print:
+\code{\link[=print.Disco]{print.Disco()}}
+}
+\concept{print}

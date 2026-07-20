@@ -37,6 +37,8 @@ disco_method <- function(builder, method_class) {
 #'
 #' @param method A \code{"disco_method"} function.
 #' @param knowledge A `Knowledge` object appropriate for the engine.
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #' @export
 set_knowledge <- function(method, knowledge) {
   UseMethod("set_knowledge")

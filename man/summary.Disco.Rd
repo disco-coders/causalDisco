@@ -6,9 +6,13 @@
 \usage{
 \method{summary}{Disco}(object, ...)
 }
+\arguments{
+\item{object}{A \code{Disco} object.}
+
+\item{...}{Additional arguments (not used).}
+}
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 
-\code{summary()} for \code{Disco} objects is deprecated. Use \code{\link[=print]{print()}} instead.
+\code{summary()} for \code{Disco} objects is deprecated. Use \code{print()} instead.
 }
-\keyword{internal}

@@ -67,7 +67,7 @@ try(
 )
 }
 \seealso{
-Other knowledge functions:
+Other knowledge helpers:
 \code{\link[=+.Knowledge]{+.Knowledge()}},
 \code{\link[=add_exogenous]{add_exogenous()}},
 \code{\link[=add_tier]{add_tier()}},
@@ -88,7 +88,8 @@ Other knowledge functions:
 \code{\link[=reposition_tier]{reposition_tier()}},
 \code{\link[=require_edge]{require_edge()}},
 \code{\link[=seq_tiers]{seq_tiers()}},
+\code{\link[=set_knowledge]{set_knowledge()}},
 \code{\link[=unfreeze]{unfreeze()}}
 }
-\concept{knowledge}
-\concept{knowledge functions}
+\concept{knowledge helpers}
+\concept{knowledge-helper}

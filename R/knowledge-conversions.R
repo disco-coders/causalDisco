@@ -15,8 +15,8 @@
 #'
 #' @example inst/roxygen-examples/as_tetrad_knowledge-example.R
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #'
 #' @export
 as_tetrad_knowledge <- function(kn) {
@@ -93,8 +93,8 @@ as_tetrad_knowledge <- function(kn) {
 #'
 #' @example inst/roxygen-examples/as_pcalg_constraints-example.R
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #' @importFrom rlang .data
 #' @export
 as_pcalg_constraints <- function(
@@ -227,8 +227,8 @@ as_pcalg_constraints <- function(
 #'
 #' @example inst/roxygen-examples/as_bnlearn_knowledge-example.R
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #' @importFrom rlang .data
 #' @export
 as_bnlearn_knowledge <- function(kn) {
@@ -283,8 +283,8 @@ as_bnlearn_knowledge <- function(kn) {
 #' )
 #' cg <- knowledge_to_caugi(kn)
 #'
-#' @family knowledge functions
-#' @concept knowledge
+#' @family knowledge helpers
+#' @concept knowledge-helper
 #'
 #' @export
 knowledge_to_caugi <- function(kn) {

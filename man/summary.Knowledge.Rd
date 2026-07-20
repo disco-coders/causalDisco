@@ -2,13 +2,17 @@
 % Please edit documentation in R/knowledge.R
 \name{summary.Knowledge}
 \alias{summary.Knowledge}
-\title{Summarize a Disco Object}
+\title{Summarize a Knowledge Object}
 \usage{
 \method{summary}{Knowledge}(object, ...)
+}
+\arguments{
+\item{object}{A \code{Disco} object.}
+
+\item{...}{Additional arguments (not used).}
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 
-\code{summary()} for \code{Disco} objects is deprecated. Use \code{\link[=print]{print()}} instead.
+\code{summary()} for \code{Knowledge} objects is deprecated. Use \code{print()} instead.
 }
-\keyword{internal}

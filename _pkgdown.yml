@@ -55,9 +55,9 @@ reference:
 
   - title: "Printing, Summarizing, and Plotting Objects"
     contents:
-      - starts_with("print")
+      - has_concept("print")
       - starts_with("summary")
-      - starts_with("plot")
+      - has_concept("plot")
       - make_tikz
 
   - title: "Graph Metrics"
@@ -67,23 +67,7 @@ reference:
 
   - title: "Knowledge helpers"
     contents:
-      - starts_with("add")
-      - starts_with("remove")
-      - starts_with("require")
-      - starts_with("forbid")
-      - get_tiers
-      - reorder_tiers
-      - seq_tiers
-      - reposition_tier
-      - convert_tiers_to_forbidden
-      - set_knowledge
-      - as_tetrad_knowledge
-      - as_bnlearn_knowledge
-      - as_pcalg_constraints
-      - knowledge_to_caugi
-      - deparse_knowledge
-      - unfreeze
-      - +.Knowledge
+      - has_concept("knowledge-helper")
 
   - title: "Extend causalDisco"
     desc: "Functions for extending causalDisco with new algorithms from the available engines."

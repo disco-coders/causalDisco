@@ -278,6 +278,8 @@ as_disco.EssGraph <- function(
 #' disco_cd_tges <- disco(data = tpc_example, method = cd_tges, knowledge = kn)
 #' print(disco_cd_tges)
 #'
+#' @concept print
+#' @family print
 #' @exportS3Method print Disco
 print.Disco <- function(x, ...) {
   .check_if_pkgs_are_installed(
@@ -455,9 +457,10 @@ print.Disco <- function(x, ...) {
 #' @description
 #' `r lifecycle::badge("deprecated")`
 #'
-#' `summary()` for `Disco` objects is deprecated. Use [print()] instead.
+#' `summary()` for `Disco` objects is deprecated. Use `print()` instead.
 #'
-#' @keywords internal
+#' @param object A `Disco` object.
+#' @param ... Additional arguments (not used).
 #' @exportS3Method summary Disco
 summary.Disco <- function(object, ...) {
   lifecycle::deprecate_warn(

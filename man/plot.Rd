@@ -3,11 +3,6 @@
 \name{plot}
 \alias{plot}
 \title{Plot Method for causalDisco Objects}
-\arguments{
-\item{x}{An object to plot (class \code{Knowledge} or \code{Disco}).}
-
-\item{...}{Additional arguments passed to class-specific plot methods and to \code{\link[caugi:plot]{caugi::plot()}}.}
-}
 \value{
 Invisibly returns the input object. The primary effect is the generated plot.
 }
@@ -34,5 +29,8 @@ plot(disco_cd_tges)
 
 }
 \seealso{
-\code{\link[=plot.Knowledge]{plot.Knowledge()}}, \code{\link[=plot.Disco]{plot.Disco()}}, \code{\link[caugi:plot]{caugi::plot()}}
+Other plot:
+\code{\link[=plot.Disco]{plot.Disco()}},
+\code{\link[=plot.Knowledge]{plot.Knowledge()}}
 }
+\concept{plot}

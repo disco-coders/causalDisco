@@ -32,3 +32,8 @@ disco_cd_tges <- disco(data = tpc_example, method = cd_tges, knowledge = kn)
 print(disco_cd_tges)
 
 }
+\seealso{
+Other print:
+\code{\link[=print.Knowledge]{print.Knowledge()}}
+}
+\concept{print}
