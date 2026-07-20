@@ -30,10 +30,10 @@
 #'   \code{"twd"} (test-wise deletion).
 #' @param orientation_method Conflict-handling method when orienting edges.
 #'   Currently only the conservative method is available.
-#' @param directed_as_undirected Logical; if \code{TRUE}, treat any directed
-#'   edges in \code{knowledge} as undirected during skeleton learning. This
-#'   is due to the fact that \pkg{pcalg} does not allow directed edges in
-#'   \code{fixedEdges} or \code{fixedGaps}. Default is \code{FALSE}.
+#' @param directed_as_undirected `r lifecycle::badge("deprecated")` This
+#'   argument no longer has any effect and will be removed in a future
+#'   release. Directed forbidden edges are now resolved using tier
+#'   information, or must be specified in both directions.
 #' @param varnames Character vector of variable names. Only needed when
 #'   \code{data} is not supplied and all information is passed via
 #'   \code{suff_stat}.
@@ -71,11 +71,22 @@ tpc_run <- function(
   method = "stable.fast",
   na_method = "none",
   orientation_method = "conservative",
-  directed_as_undirected = FALSE,
+  directed_as_undirected = lifecycle::deprecated(),
   varnames = NULL,
   num_cores = 1,
   ...
 ) {
+  if (lifecycle::is_present(directed_as_undirected)) {
+    lifecycle::deprecate_warn(
+      when = "1.2.0",
+      what = "tpc_run(directed_as_undirected)",
+      details = paste0(
+        "The argument is ignored. Directed forbidden edges are now resolved ",
+        "using tier information, or must be specified in both directions."
+      )
+    )
+  }
+
   prep <- constraint_based_prepare_inputs(
     data = data,
     knowledge = knowledge,
@@ -83,7 +94,6 @@ tpc_run <- function(
     na_method = na_method,
     test = test,
     suff_stat = suff_stat,
-    directed_as_undirected = directed_as_undirected,
     function_name = "tpc"
   )
 
@@ -93,9 +103,9 @@ tpc_run <- function(
   vnames <- prep$vnames
   suff_stat <- prep$suff_stat
   na_method <- prep$na_method
-  directed_as_undirected <- prep$directed_as_undirected
   test <- prep$internal_test # Ensure we use the internal test with camelCase so it works downstream with pcalg
 
+  knowledge <- .infer_tiers_from_forbidden(knowledge)
   knowledge <- prepare_knowledge(knowledge) # Precompute variable ranks for efficient access
 
   # check orientation method
@@ -111,8 +121,7 @@ tpc_run <- function(
   # pcalg background constraints (forbidden/required) from knowledge
   constraints <- .pcalg_constraints_from_knowledge(
     knowledge,
-    labels = vnames,
-    directed_as_undirected = directed_as_undirected
+    labels = vnames
   )
 
   # learn skeleton
@@ -123,7 +132,6 @@ tpc_run <- function(
     labels = vnames,
     method = method,
     fixedGaps = constraints$fixed_gaps,
-    fixedEdges = constraints$fixed_edges,
     numCores = num_cores,
     ...
   )
@@ -285,6 +293,206 @@ find_adjacencies <- function(amatrix, index) {
   )
 }
 
+#' Infer tiers from tier-shaped forbidden knowledge
+#'
+#' @description
+#' If a `Knowledge` object has no tiers but its directed forbidden edges are
+#' exactly the set a tier ordering would generate (e.g. the output of
+#' [convert_tiers_to_forbidden()]), reconstruct that ordering: fill in the
+#' tiers and drop the tier-implied forbidden edges. Under a tier ordering,
+#' the set of variables each variable is forbidden to point at is exactly
+#' the union of all earlier tiers, which identifies the tiers uniquely.
+#' Symmetric forbidden pairs are gap constraints, not order statements, and
+#' are left untouched. If the forbidden edges are not tier-shaped, the input
+#' is returned unchanged.
+#'
+#' When the object already has tiers, directed forbidden edges involving
+#' untiered variables are instead resolved by
+#' `.assign_untiered_from_forbidden()`, which places those variables into
+#' the existing tier ordering when the edges pin down a unique position.
+#'
+#' @param kn A `Knowledge` object.
+#'
+#' @return A `Knowledge` object.
+#' @keywords internal
+#' @noRd
+.infer_tiers_from_forbidden <- function(kn) {
+  forb_idx <- which(kn$edges$status == "forbidden")
+  forb <- kn$edges[forb_idx, , drop = FALSE]
+  if (!nrow(forb)) {
+    return(kn)
+  }
+
+  sym <- paste(forb$from, forb$to) %in% paste(forb$to, forb$from)
+  dir_forb <- forb[!sym, , drop = FALSE]
+  dir_idx <- forb_idx[!sym]
+  if (!nrow(dir_forb)) {
+    return(kn)
+  }
+
+  if (!all(is.na(kn$vars$tier))) {
+    return(.assign_untiered_from_forbidden(kn, dir_forb, dir_idx))
+  }
+
+  participants <- sort(unique(c(dir_forb$from, dir_forb$to)))
+  earlier <- lapply(
+    participants,
+    function(v) unique(dir_forb$to[dir_forb$from == v])
+  )
+  names(earlier) <- participants
+
+  sig <- vapply(
+    earlier,
+    function(x) paste(sort(x), collapse = "\r"),
+    FUN.VALUE = ""
+  )
+  groups <- split(participants, sig)
+  groups <- groups[
+    order(vapply(groups, function(g) length(earlier[[g[[1]]]]), integer(1)))
+  ]
+
+  # tier-shaped iff each group's earlier-set is exactly the union of all
+  # preceding groups
+  seen <- character(0)
+  for (g in groups) {
+    if (!setequal(earlier[[g[[1]]]], seen)) {
+      return(kn)
+    }
+    seen <- c(seen, g)
+  }
+
+  message(
+    "The directed forbidden edges in `knowledge` encode a temporal order; ",
+    "treating them as ",
+    length(groups),
+    " tiers."
+  )
+
+  labels <- as.character(seq_along(groups))
+  tier_of <- stats::setNames(rep(labels, lengths(groups)), unlist(groups))
+  kn$tiers <- tibble::tibble(label = labels)
+  kn$vars$tier <- unname(tier_of[kn$vars$var])
+  kn$edges <- kn$edges[-dir_idx, , drop = FALSE]
+  kn
+}
+
+#' Place untiered variables into existing tiers via forbidden edges
+#'
+#' @description
+#' Given a `Knowledge` object that already has tiers, resolve
+#' forbidden edges involving untiered variables by assigning those variables
+#' a position in the tier ordering.
+#'
+#' @param kn A `Knowledge` object with at least one tiered variable.
+#' @param dir_forb Forbidden edges of \code{kn}.
+#' @param dir_idx Row indices of \code{dir_forb} within \code{kn$edges}.
+#'
+#' @return A `Knowledge` object.
+#' @keywords internal
+#' @noRd
+.assign_untiered_from_forbidden <- function(kn, dir_forb, dir_idx) {
+  rank_of <- stats::setNames(
+    match(kn$vars$tier, kn$tiers$label),
+    kn$vars$var
+  )
+  n_tiers <- nrow(kn$tiers)
+
+  involves_untiered <- is.na(rank_of[dir_forb$from]) |
+    is.na(rank_of[dir_forb$to])
+  if (!any(involves_untiered)) {
+    return(kn)
+  }
+
+  ue <- dir_forb[involves_untiered, , drop = FALSE]
+  participants <- unique(c(ue$from, ue$to))
+  new_vars <- participants[is.na(rank_of[participants])]
+  tiered_vars <- kn$vars$var[!is.na(rank_of[kn$vars$var])]
+
+  # place each untiered variable on a slot scale where existing tier k
+  # occupies slot 2k, so odd slots are the gaps between adjacent tiers
+  slot <- stats::setNames(integer(length(new_vars)), new_vars)
+  for (v in new_vars) {
+    later <- unique(ue$from[ue$to == v])
+    earlier <- unique(ue$to[ue$from == v])
+    later_tiered <- intersect(later, tiered_vars)
+    earlier_tiered <- intersect(earlier, tiered_vars)
+
+    a <- if (length(later_tiered)) {
+      min(rank_of[later_tiered])
+    } else {
+      n_tiers + 1L
+    }
+    b <- if (length(earlier_tiered)) max(rank_of[earlier_tiered]) else 0L
+
+    # exactness: everything from tier a on must be stated as later than v,
+    # everything up to tier b as earlier, and nothing else may be stated
+    if (
+      !setequal(later_tiered, tiered_vars[rank_of[tiered_vars] >= a]) ||
+        !setequal(earlier_tiered, tiered_vars[rank_of[tiered_vars] <= b])
+    ) {
+      return(kn)
+    }
+
+    if (a - b == 2L) {
+      # exactly one tier strictly between: v joins it, implying nothing new
+      slot[[v]] <- 2L * (b + 1L)
+    } else if (a - b == 1L) {
+      # no tier strictly between: v forms a new tier in the gap
+      slot[[v]] <- 2L * b + 1L
+    } else {
+      # several tiers between with no stated relation to v: any placement
+      # would imply unstated constraints, so this is not tier-shaped
+      return(kn)
+    }
+  }
+
+  # the same exactness must hold among the placed variables themselves
+  for (v in new_vars) {
+    for (w in new_vars) {
+      if (v == w) {
+        next
+      }
+      stated <- any(ue$from == w & ue$to == v)
+      if (stated != (slot[[w]] > slot[[v]])) {
+        return(kn)
+      }
+    }
+  }
+
+  slots <- sort(unique(c(2L * seq_len(n_tiers), slot)))
+  labels <- character(length(slots))
+  used <- kn$tiers$label
+  next_int <- 1L
+  for (i in seq_along(slots)) {
+    if (slots[[i]] %% 2L == 0L) {
+      labels[[i]] <- kn$tiers$label[[slots[[i]] %/% 2L]]
+    } else {
+      while (as.character(next_int) %in% used) {
+        next_int <- next_int + 1L
+      }
+      labels[[i]] <- as.character(next_int)
+      used <- c(used, labels[[i]])
+    }
+  }
+
+  message(
+    "The directed forbidden edges in `knowledge` place ",
+    length(new_vars),
+    " untiered variable(s) in the temporal order; assigning them to tiers."
+  )
+
+  kn$tiers <- tibble::tibble(label = labels)
+  slot_label <- stats::setNames(labels, slots)
+  kn$vars$tier[match(new_vars, kn$vars$var)] <-
+    unname(slot_label[as.character(slot)])
+  kn$edges <- kn$edges[-dir_idx[involves_untiered], , drop = FALSE]
+  if (nrow(kn$edges)) {
+    kn$edges$tier_from <- kn$vars$tier[match(kn$edges$from, kn$vars$var)]
+    kn$edges$tier_to <- kn$vars$tier[match(kn$edges$to, kn$vars$var)]
+  }
+  kn
+}
+
 #' Compute tier indices for variables
 #'
 #' @description
@@ -366,31 +574,52 @@ dir_test <- function(test, vnames, knowledge) {
 #' Convert knowledge to \pkg{pcalg} constraints
 #'
 #' @description
-#' Turn directed forbidden/required edges into undirected \code{fixedGaps} and
-#' \code{fixedEdges} matrices in the supplied \code{labels} order. Tier
-#' annotations are ignored here; use \code{order_restrict_amat_cpdag()} for
-#' tier-based pruning.
+#' Turn directed forbidden edges into an undirected \code{fixedGaps} matrix
+#' in the supplied \code{labels} order. Tier
+#' membership is used to resolve directed forbidden edges: an edge forbidden
+#' from a later tier into an earlier one is already enforced during
+#' orientation and yields no skeleton constraint, while a forbidden edge
+#' whose reverse direction is ruled out by the tier ordering amounts to a
+#' full gap and is mirrored. Any remaining asymmetric edge is an error, as
+#' in [as_pcalg_constraints()].
 #'
 #' @param kn A `Knowledge` object.
 #' @param labels Character vector of variable names in the desired order.
 #'
 #' @example inst/roxygen-examples/dot-pcalg_constraints_from_knowledge-example.R
 #'
-#' @return A list with logical matrices \code{fixedGaps} and \code{fixedEdges}.
+#' @return A list with the logical matrix \code{fixed_gaps}. Required edges
+#'   are dropped with a warning by [as_pcalg_constraints()].
 #' @keywords internal
 #' @noRd
-.pcalg_constraints_from_knowledge <- function(
-  kn,
-  labels,
-  directed_as_undirected
-) {
+.pcalg_constraints_from_knowledge <- function(kn, labels) {
+  edges <- kn$edges
+  ranks <- .tier_index(kn, labels)
+  from_rank <- unname(ranks[edges$from])
+  to_rank <- unname(ranks[edges$to])
+  cross_tier <- edges$status == "forbidden" &
+    !is.na(from_rank) &
+    !is.na(to_rank) &
+    from_rank != to_rank
+
+  # later -> earlier is already forbidden by the tier ordering (enforced
+  # during orientation), so it adds no skeleton constraint
+  drop <- cross_tier & from_rank > to_rank
+  # earlier -> later: the reverse direction is tier-forbidden, so forbidding
+  # this direction too amounts to a full gap between the pair
+  mirror <- cross_tier & from_rank < to_rank
+
+  mirrored <- edges[mirror, , drop = FALSE]
+  if (nrow(mirrored)) {
+    tmp <- mirrored$from
+    mirrored$from <- mirrored$to
+    mirrored$to <- tmp
+  }
+
   kn_undirected <- kn
+  kn_undirected$edges <- rbind(edges[!drop, , drop = FALSE], mirrored)
   kn_undirected$vars$tier <- NA_character_
-  as_pcalg_constraints(
-    kn_undirected,
-    labels = labels,
-    directed_as_undirected = TRUE
-  )
+  as_pcalg_constraints(kn_undirected, labels = labels)
 }
 
 #' Remove disallowed backward edges across tiers

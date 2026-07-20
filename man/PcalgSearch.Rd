@@ -301,14 +301,20 @@ that will be used to build the fixed constraints, but it can first be
 done when data is provided.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{PcalgSearch$set_knowledge(knowledge_obj, directed_as_undirected = FALSE)}
+    \preformatted{PcalgSearch$set_knowledge(
+  knowledge_obj,
+  directed_as_undirected = lifecycle::deprecated()
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{knowledge_obj}}{A \code{Knowledge} object that contains the fixed constraints.}
-      \item{\code{directed_as_undirected}}{Logical; whether to treat directed edges as undirected.}
+      \item{\code{directed_as_undirected}}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} This
+argument no longer has any effect and will be removed in a future
+release. Specify directed edges in both directions in \code{\link[=knowledge]{knowledge()}}
+instead.}
     }
     \if{html}{\out{</div>}}
   }

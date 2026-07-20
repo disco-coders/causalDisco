@@ -43,10 +43,10 @@ Kristensen
 Kummerfeld
 Kun
 MCAR
-MPDAG
 MPDAGs
 Maathuis
 Margaritis
+NLSY
 NML
 Ogarrio
 OpenJDK
@@ -63,6 +63,7 @@ Pseudoinverse
 RCIT
 RCoT
 RFCI
+RNUM
 Ramsej
 Raskutti
 Recognised
@@ -129,6 +130,7 @@ oldage
 pak
 pc
 pcalg
+pcalg's
 penalised
 pkgdown
 pre

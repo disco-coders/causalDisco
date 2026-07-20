@@ -13,7 +13,7 @@ tpc_run(
   method = "stable.fast",
   na_method = "none",
   orientation_method = "conservative",
-  directed_as_undirected = FALSE,
+  directed_as_undirected = lifecycle::deprecated(),
   varnames = NULL,
   num_cores = 1,
   ...
@@ -49,10 +49,10 @@ error on any \code{NA}), \code{"cc"} (complete-case analysis), or
 \item{orientation_method}{Conflict-handling method when orienting edges.
 Currently only the conservative method is available.}
 
-\item{directed_as_undirected}{Logical; if \code{TRUE}, treat any directed
-edges in \code{knowledge} as undirected during skeleton learning. This
-is due to the fact that \pkg{pcalg} does not allow directed edges in
-\code{fixedEdges} or \code{fixedGaps}. Default is \code{FALSE}.}
+\item{directed_as_undirected}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} This
+argument no longer has any effect and will be removed in a future
+release. Directed forbidden edges are now resolved using tier
+information, or must be specified in both directions.}
 
 \item{varnames}{Character vector of variable names. Only needed when
 \code{data} is not supplied and all information is passed via

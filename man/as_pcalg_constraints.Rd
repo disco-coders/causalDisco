@@ -4,7 +4,11 @@
 \alias{as_pcalg_constraints}
 \title{Convert Knowledge to pcalg Knowledge}
 \usage{
-as_pcalg_constraints(kn, labels = kn$vars$var, directed_as_undirected = FALSE)
+as_pcalg_constraints(
+  kn,
+  labels = kn$vars$var,
+  directed_as_undirected = lifecycle::deprecated()
+)
 }
 \arguments{
 \item{kn}{A \code{Knowledge} object.  Must have no tier information.}
@@ -13,34 +17,35 @@ as_pcalg_constraints(kn, labels = kn$vars$var, directed_as_undirected = FALSE)
 of your data columns.  Every variable referenced by an edge in \code{kn}
 must appear here.}
 
-\item{directed_as_undirected}{Logical (default \code{FALSE}).  If
-\code{FALSE}, we require that every edge in \code{kn} has its
-mirror-image present as well, and will error if any are missing.  If
-\code{TRUE}, we automatically mirror every directed edge into
-an undirected constraint.}
+\item{directed_as_undirected}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} This
+argument no longer has any effect and will be removed in a future
+release. Specify directed edges in both directions in \code{\link[=knowledge]{knowledge()}}
+instead.}
 }
 \value{
-A list with two elements, each an \code{n × n} logical matrix
-corresponding to \pkg{pcalg} \code{fixed_gaps} and \code{fixed_edges} arguments.
+A list with one element, \code{fixed_gaps}: an \code{n × n} logical
+matrix corresponding to the \pkg{pcalg} \code{fixedGaps} argument.
 }
 \description{
 \pkg{pcalg} only supports \emph{undirected} (symmetric) background constraints:
 \itemize{
-\item \strong{fixed_gaps}  - forbidding edges (zeros enforced)
-\item \strong{fixed_edges} - requiring edges (ones enforced)
+\item \strong{fixed_gaps} - forbidding edges (zeros enforced)
 }
 }
 \details{
-This function takes a \code{Knowledge} object (with only forbidden/required
-edges, no tiers) and returns the two logical matrices in the exact
-variable order you supply.
+This function takes a \code{Knowledge} object (with only forbidden edges, no
+tiers) and returns the logical constraint matrix in the exact variable
+order you supply.
+
+Required edges in a \code{Knowledge} object are directed statements. \pkg{pcalg}
+constraints are adjacency-level only, so a required edge cannot be honored;
+any required edges are dropped with a warning.
 }
 \section{Errors}{
 
 \itemize{
 \item If the \code{Knowledge} object contains tiered knowledge.
-\item If \code{directed_as_undirected = FALSE} and any edge lacks its
-symmetrical counterpart. This can only hold for forbidden edges.
+\item If any forbidden edge lacks its symmetrical counterpart.
 }
 }
 
@@ -54,7 +59,7 @@ kn <- knowledge(
   youth_x3 \%!-->\% child_x1
 )
 
-pc_constraints <- as_pcalg_constraints(kn, directed_as_undirected = FALSE)
+pc_constraints <- as_pcalg_constraints(kn)
 print(pc_constraints)
 
 # error paths

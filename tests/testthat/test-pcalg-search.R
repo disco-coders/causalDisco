@@ -265,21 +265,17 @@ test_that("set_knowledge defers building constraints and validates input", {
   s <- PcalgSearch$new()
   kn <- knowledge(
     my_df,
-    A %-->% B,
-    B %!-->% C
+    B %!-->% C,
+    C %!-->% B
   )
 
-  s$set_knowledge(kn, directed_as_undirected = TRUE)
+  s$set_knowledge(kn)
   # knowledge_function is deferred; becomes a concrete list during run_search()
   s$set_params(list(alpha = 0.05))
   s$set_test("fisher_z")
   s$set_alg("pc")
 
-  expect_warning(
-    out <- s$run_search(my_df),
-    "Engine pcalg does not use required edges; ignoring them.",
-    fixed = TRUE
-  )
+  out <- s$run_search(my_df)
   expect_s3_class(out, "Disco")
 })
 
@@ -297,7 +293,7 @@ test_that("knowledge builder errors if data missing", {
   )
 })
 
-test_that("set_knowledge defers building constraints and validates input", {
+test_that("set_knowledge deprecates and ignores directed_as_undirected", {
   s_bad <- PcalgSearch$new()
   expect_error(
     s_bad$set_knowledge(knowledge_obj = 123),
@@ -311,17 +307,19 @@ test_that("set_knowledge defers building constraints and validates input", {
     A %-->% B,
     B %!-->% C
   )
-  s$set_knowledge(kn, directed_as_undirected = TRUE)
+  lifecycle::expect_deprecated(
+    s$set_knowledge(kn, directed_as_undirected = TRUE)
+  )
   s$set_test("fisher_z")
   s$set_data(my_df, set_suff_stat = TRUE)
   s$set_alg("pc")
 
-  expect_warning(
-    out <- s$run_search(),
-    "Engine pcalg does not use required edges; ignoring them.",
-    fixed = TRUE
+  # the flag no longer mirrors, so the asymmetric forbidden edge errors at
+  # run time (the required edge is dropped first, with a warning)
+  expect_error(
+    suppressWarnings(s$run_search()),
+    "no symmetrical counterpart"
   )
-  expect_s3_class(out, "Disco")
 })
 
 
@@ -358,7 +356,7 @@ test_that("run_search errors in correct order and messages", {
   )
 })
 
-test_that("run_search without score_function (pc) works; with score_function (ges) warns on fixedEdges", {
+test_that("run_search without score_function (pc) works; with score_function (ges) warns on required edges", {
   set.seed(1405)
   my_df <- matrix(rnorm(100), ncol = 5) |> as.data.frame()
   colnames(my_df) <- LETTERS[1:5]
@@ -378,15 +376,16 @@ test_that("run_search without score_function (pc) works; with score_function (ge
   res_ges <- s_ges$run_search(my_df)
   expect_s3_class(res_ges, "Disco")
 
-  # GES with knowledge warns on fixedEdges
+  # GES with required edges in knowledge warns and drops them
   kn_req <- knowledge(my_df, A %-->% B)
   s_ges2 <- PcalgSearch$new()
   s_ges2$set_alg("ges")
   s_ges2$set_score("sem_bic")
-  s_ges2$set_knowledge(kn_req, directed_as_undirected = TRUE)
+  s_ges2$set_knowledge(kn_req)
   expect_warning(
-    s_ges2$run_search(my_df),
-    "Engine pcalg does not use required edges; ignoring them.",
+    res_ges2 <- s_ges2$run_search(my_df),
+    "pcalg constraints cannot represent required edges; ignoring them.",
     fixed = TRUE
   )
+  expect_s3_class(res_ges2, "Disco")
 })

@@ -417,17 +417,28 @@ CausalDiscoSearch <- R6::R6Class(
     #' Sets the background knowledge for the search with a `Knowledge` object.
     #'
     #' @param kn A `Knowledge` object.
-    #' @param directed_as_undirected Logical; whether to treat directed edges in
-    #' the knowledge as undirected. Default is `FALSE`. This is due to the
-    #' nature of how \pkg{pcalg} handles background knowledge when using
-    #' [pcalg::skeleton()] under the hood in
-    #' [tpc()] and
-    #' [tfci()].
+    #' @param directed_as_undirected `r lifecycle::badge("deprecated")` This
+    #' argument no longer has any effect and will be removed in a future
+    #' release. Directed forbidden edges are now resolved using tier
+    #' information, or must be specified in both directions.
     #' @seealso [knowledge()].
-    set_knowledge = function(kn, directed_as_undirected = FALSE) {
+    set_knowledge = function(
+      kn,
+      directed_as_undirected = lifecycle::deprecated()
+    ) {
+      if (lifecycle::is_present(directed_as_undirected)) {
+        lifecycle::deprecate_warn(
+          when = "1.2.0",
+          what = "CausalDiscoSearch$set_knowledge(directed_as_undirected)",
+          details = paste0(
+            "The argument is ignored. Directed forbidden edges are now ",
+            "resolved using tier information, or must be specified in both ",
+            "directions."
+          )
+        )
+      }
       is_knowledge(kn)
       self$knowledge <- kn
-      private$directed_as_undirected <- directed_as_undirected
       invisible(self)
     },
 
@@ -487,7 +498,6 @@ CausalDiscoSearch <- R6::R6Class(
     alg_method = NULL, # "tpc", "tfci", "tges", or "custom-alg"
     alg_family = NULL, # "constraint" or "score"
     test_key = NULL,
-    directed_as_undirected = FALSE,
     score_method = NULL,
     score_params = NULL,
     score_function = NULL,

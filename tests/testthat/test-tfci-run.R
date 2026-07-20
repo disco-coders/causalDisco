@@ -43,7 +43,23 @@ test_that("tfci_run respects forbidden knowledge (edge is removed)", {
   vars <- names(tpc_example)
   x <- vars[1]
   y <- vars[2]
-  kn_forb <- kn |> forbid_edge(!!as.name(x) ~ !!as.name(y))
+
+  # x and y are in the same tier, so a single direction is asymmetric
+  kn_forb_directed <- kn |> forbid_edge(!!as.name(x) ~ !!as.name(y))
+  expect_error(
+    tfci_run(
+      data = tpc_example,
+      knowledge = kn_forb_directed,
+      alpha = 0.02,
+      test = cor_test
+    ),
+    "asymmetric edges"
+  )
+
+  # forbidding both directions removes the adjacency
+  kn_forb <- kn |>
+    forbid_edge(!!as.name(x) ~ !!as.name(y)) |>
+    forbid_edge(!!as.name(y) ~ !!as.name(x))
 
   res <- tfci_run(
     data = tpc_example,
@@ -53,6 +69,12 @@ test_that("tfci_run respects forbidden knowledge (edge is removed)", {
   )
 
   expect_s3_class(res, "Disco")
+  edges <- res$caugi@edges
+  expect_false(
+    any(
+      (edges$from == x & edges$to == y) | (edges$from == y & edges$to == x)
+    )
+  )
 })
 
 test_that("tfci_run uses provided suff_stat (no data needed) and completes", {

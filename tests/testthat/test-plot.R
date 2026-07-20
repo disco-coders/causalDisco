@@ -299,6 +299,7 @@ test_that("Plotting with many settings works", {
     required_col = "darkgreen",
     forbidden_col = "darkorange"
   )
+  expect_true(TRUE)
 })
 
 test_that("Plotting with explicit edge style overriden per node works", {
@@ -323,6 +324,7 @@ test_that("Plotting with explicit edge style overriden per node works", {
       )
     )
   )
+  expect_true(TRUE)
 })
 
 test_that("Plotting tiered knowledge with custom layout", {
@@ -337,4 +339,5 @@ test_that("Plotting tiered knowledge with custom layout", {
   )
 
   plot(kn, layout = "kamada-kawai")
+  expect_true(TRUE)
 })

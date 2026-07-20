@@ -27,7 +27,26 @@
 - The `summary()` methods for `Knowledge` and `Disco` objects are deprecated;
   use `print()` instead.
 
+- The `directed_as_undirected` argument of `tpc_run()`, `tfci_run()`, and
+  `CausalDiscoSearch$set_knowledge()` is deprecated and ignored; see the related
+  bug-fix entry below for the new handling of directed forbidden edges.
+
+- The internal-only `directed_as_undirected_knowledge` argument of
+  `make_runner()` has been removed, and the `directed_as_undirected` argument of
+  `PcalgSearch$set_knowledge()` and `as_pcalg_constraints()` is deprecated and
+  ignored.
+
+- `as_pcalg_constraints()` no longer returns a `fixed_edges` matrix. pcalg's
+  `fixedEdges` argument only protects an undirected adjacency in the skeleton,
+  so a directed required edge (`A %-->% B`) cannot be honored through it.
+
 ## Bug fixes
+
+- Fixed `tpc()` and `tfci()` silently treating directed forbidden edges as
+  undirected: forbidding `i %!-->% j` also forbidden `j !--> i`. Forbidden edges
+  now follow the same rule as the pcalg engine: both directions must be supplied
+  explicitly, otherwise an error is raised. The exception is if the `Knowledge`
+  forbidden knowledge is equivalent to tiered knowledge.
 
 - Fixed `knowledge()` dropping variables from `tier()` formulas when infix edge
   operators (`%-->%`, `%!-->%`) appeared before the `tier()` call and had

@@ -344,8 +344,24 @@ PcalgSearch <- R6::R6Class(
     #' done when data is provided.
     #'
     #' @param knowledge_obj A `Knowledge` object that contains the fixed constraints.
-    #' @param directed_as_undirected Logical; whether to treat directed edges as undirected.
-    set_knowledge = function(knowledge_obj, directed_as_undirected = FALSE) {
+    #' @param directed_as_undirected `r lifecycle::badge("deprecated")` This
+    #' argument no longer has any effect and will be removed in a future
+    #' release. Specify directed edges in both directions in [knowledge()]
+    #' instead.
+    set_knowledge = function(
+      knowledge_obj,
+      directed_as_undirected = lifecycle::deprecated()
+    ) {
+      if (lifecycle::is_present(directed_as_undirected)) {
+        lifecycle::deprecate_warn(
+          when = "1.2.0",
+          what = "PcalgSearch$set_knowledge(directed_as_undirected)",
+          details = paste0(
+            "The argument is ignored. Specify directed edges in both ",
+            "directions in knowledge() instead."
+          )
+        )
+      }
       is_knowledge(knowledge_obj)
 
       private$knowledge_function <- function() {
@@ -353,18 +369,7 @@ PcalgSearch <- R6::R6Class(
           stop("Data must be set before knowledge.", call. = FALSE)
         }
         labels <- colnames(self$data)
-        constraints <- as_pcalg_constraints(
-          knowledge_obj,
-          labels,
-          directed_as_undirected = directed_as_undirected
-        )
-        if (any(constraints$fixed_edges)) {
-          warning(
-            "Engine pcalg does not use required edges; ignoring them.",
-            call. = FALSE
-          )
-        }
-        constraints
+        as_pcalg_constraints(knowledge_obj, labels)
       }
     },
 
@@ -412,8 +417,7 @@ PcalgSearch <- R6::R6Class(
           result <- self$alg(
             suffStat = self$suff_stat,
             labels = labels,
-            fixedGaps = self$knowledge$fixed_gaps,
-            fixedEdges = self$knowledge$fixed_edges
+            fixedGaps = self$knowledge$fixed_gaps
           )
         } else {
           if (inherits(self$data, "mids")) {
@@ -435,7 +439,7 @@ PcalgSearch <- R6::R6Class(
           self$score <- private$score_function()
           result <- self$alg(
             self$score,
-            fixedGaps = self$knowledge$fixedGaps
+            fixedGaps = self$knowledge$fixed_gaps
           )
         } else {
           self$score <- private$score_function()

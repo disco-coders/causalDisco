@@ -44,11 +44,22 @@ tfci_run <- function(
   method = "stable.fast",
   na_method = "none",
   orientation_method = "conservative",
-  directed_as_undirected = FALSE,
+  directed_as_undirected = lifecycle::deprecated(),
   varnames = NULL,
   num_cores = 1,
   ...
 ) {
+  if (lifecycle::is_present(directed_as_undirected)) {
+    lifecycle::deprecate_warn(
+      when = "1.2.0",
+      what = "tfci_run(directed_as_undirected)",
+      details = paste0(
+        "The argument is ignored. Directed forbidden edges are now resolved ",
+        "using tier information, or must be specified in both directions."
+      )
+    )
+  }
+
   prep <- constraint_based_prepare_inputs(
     data = data,
     knowledge = knowledge,
@@ -56,7 +67,6 @@ tfci_run <- function(
     na_method = na_method,
     test = test,
     suff_stat = suff_stat,
-    directed_as_undirected = directed_as_undirected,
     function_name = "tfci"
   )
 
@@ -66,9 +76,9 @@ tfci_run <- function(
   vnames <- prep$vnames
   suffStat <- prep$suff_stat
   na_method <- prep$na_method
-  directed_as_undirected <- prep$directed_as_undirected
   test <- prep$internal_test # Ensure we use the internal test with camelCase so it works downstream with pcalg
 
+  knowledge <- .infer_tiers_from_forbidden(knowledge)
   knowledge <- prepare_knowledge(knowledge) # Precompute variable ranks for efficient access
 
   # check orientation method
@@ -84,8 +94,7 @@ tfci_run <- function(
   # pcalg background constraints (forbidden/required) from knowledge
   constraints <- .pcalg_constraints_from_knowledge(
     knowledge,
-    labels = vnames,
-    directed_as_undirected = directed_as_undirected
+    labels = vnames
   )
 
   # learn skeleton
@@ -96,7 +105,6 @@ tfci_run <- function(
     labels = vnames,
     method = method,
     fixedGaps = constraints$fixed_gaps,
-    fixedEdges = constraints$fixed_edges,
     numCores = num_cores,
     ...
   )
