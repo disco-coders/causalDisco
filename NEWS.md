@@ -1,4 +1,4 @@
-# causalDisco (development version)
+# causalDisco 1.2.0
 
 ## New features
 
