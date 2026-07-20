@@ -178,7 +178,8 @@ plot(
 ```
 
 For more details on customizing plots and generating TikZ code for LaTeX
-documents, see the [visualization vignette](visualization.html).
+documents, see the [visualization
+article](https://disco-coders.github.io/causalDisco/articles/visualization.html).
 
 Instead of using `plot()`, another way to view and analyze the results is to use
 print the object:
@@ -228,7 +229,7 @@ kn <- knowledge(
 ```
 
 For more details on how to define knowledge, see the [knowledge
-vignette](knowledge.html).
+article](https://disco-coders.github.io/causalDisco/articles/knowledge.html).
 
 You can view the `Knowledge` object using `print()`, `summary()` or `plot()`:
 
@@ -275,10 +276,10 @@ appearance further by passing additional arguments to `plot()`.
 # Next steps
 
 For more information about how to incorporate knowledge, see the [knowledge
-article](knowledge.html).
+article](https://disco-coders.github.io/causalDisco/articles/knowledge.html).
 
 For more information about causal discovery, see the [causal discovery
-article](causal-discovery.html).
+article](https://disco-coders.github.io/causalDisco/articles/causal-discovery.html).
 
 For more information about visualization options, see the [visualization
-article](visualization.html).
+article](https://disco-coders.github.io/causalDisco/articles/visualization.html).
