@@ -119,8 +119,7 @@ exactly as we did for `hpc()` above. One thing to watch out for:
 `search$set_test()` doesn’t just resolve the test to a function
 (afterwards available as `search$test`), it also computes the sufficient
 statistic that `run_search()` passes into your algorithm’s `suff_stat`
-argument. So your custom algorithm should read the test off
-`search$test` rather than hardcoding one, to keep the two in sync.
+argument.
 
 ``` r
 

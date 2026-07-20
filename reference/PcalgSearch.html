@@ -291,14 +291,20 @@ we cannot set knowledge before we run it on data. So we set the function
 that will be used to build the fixed constraints, but it can first be
 done when data is provided.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PcalgSearch</span><span class="op">$</span><span class="fu">set_knowledge</span><span class="op">(</span><span class="va">knowledge_obj</span>, directed_as_undirected <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PcalgSearch</span><span class="op">$</span><span class="fu">set_knowledge</span><span class="op">(</span></span>
+<span>  <span class="va">knowledge_obj</span>,</span>
+<span>  directed_as_undirected <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>knowledge_obj</code></dt>
 <dd><p>A <code>Knowledge</code> object that contains the fixed constraints.</p></dd>
 
       <dt><code>directed_as_undirected</code></dt>
-<dd><p>Logical; whether to treat directed edges as undirected.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> This
+argument no longer has any effect and will be removed in a future
+release. Specify directed edges in both directions in <code><a href="knowledge.html">knowledge()</a></code>
+instead.</p></dd>
 
 
 </dl><p></p></div>

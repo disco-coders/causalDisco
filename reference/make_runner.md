@@ -8,15 +8,7 @@ algorithm. This allows users to support new algorithms.
 ## Usage
 
 ``` r
-make_runner(
-  engine,
-  alg,
-  test = NULL,
-  alpha = NULL,
-  score = NULL,
-  ...,
-  directed_as_undirected_knowledge = FALSE
-)
+make_runner(engine, alg, test = NULL, alpha = NULL, score = NULL, ...)
 ```
 
 ## Arguments
@@ -47,10 +39,6 @@ make_runner(
 - ...:
 
   Additional arguments passed to the engine-specific runner.
-
-- directed_as_undirected_knowledge:
-
-  Logical. Used internally for pcalg.
 
 ## Value
 

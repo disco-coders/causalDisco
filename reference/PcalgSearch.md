@@ -302,7 +302,10 @@ done when data is provided.
 
 #### Usage
 
-    PcalgSearch$set_knowledge(knowledge_obj, directed_as_undirected = FALSE)
+    PcalgSearch$set_knowledge(
+      knowledge_obj,
+      directed_as_undirected = lifecycle::deprecated()
+    )
 
 #### Arguments
 
@@ -312,7 +315,11 @@ done when data is provided.
 
 - `directed_as_undirected`:
 
-  Logical; whether to treat directed edges as undirected.
+  **\[deprecated\]** This argument no longer has any effect and will be
+  removed in a future release. Specify directed edges in both directions
+  in
+  [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)
+  instead.
 
 ------------------------------------------------------------------------
 

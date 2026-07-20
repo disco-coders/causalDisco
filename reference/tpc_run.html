@@ -62,7 +62,7 @@ knowledge about a partial temporal order. Supply the temporal order via a
 <span>  method <span class="op">=</span> <span class="st">"stable.fast"</span>,</span>
 <span>  na_method <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  orientation_method <span class="op">=</span> <span class="st">"conservative"</span>,</span>
-<span>  directed_as_undirected <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  directed_as_undirected <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  varnames <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  num_cores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -119,10 +119,10 @@ Currently only the conservative method is available.</p></dd>
 
 
 <dt id="arg-directed-as-undirected">directed_as_undirected<a class="anchor" aria-label="anchor" href="#arg-directed-as-undirected"></a></dt>
-<dd><p>Logical; if <code>TRUE</code>, treat any directed
-edges in <code>knowledge</code> as undirected during skeleton learning. This
-is due to the fact that <span class="pkg">pcalg</span> does not allow directed edges in
-<code>fixedEdges</code> or <code>fixedGaps</code>. Default is <code>FALSE</code>.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> This
+argument no longer has any effect and will be removed in a future
+release. Directed forbidden edges are now resolved using tier
+information, or must be specified in both directions.</p></dd>
 
 
 <dt id="arg-varnames">varnames<a class="anchor" aria-label="anchor" href="#arg-varnames"></a></dt>

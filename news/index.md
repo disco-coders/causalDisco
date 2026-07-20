@@ -39,7 +39,36 @@
   `Knowledge` and `Disco` objects are deprecated; use
   [`print()`](https://rdrr.io/r/base/print.html) instead.
 
+- The `directed_as_undirected` argument of
+  [`tpc_run()`](https://disco-coders.github.io/causalDisco/reference/tpc_run.md),
+  [`tfci_run()`](https://disco-coders.github.io/causalDisco/reference/tfci_run.md),
+  and `CausalDiscoSearch$set_knowledge()` is deprecated and ignored; see
+  the related bug-fix entry below for the new handling of directed
+  forbidden edges.
+
+- The internal-only `directed_as_undirected_knowledge` argument of
+  [`make_runner()`](https://disco-coders.github.io/causalDisco/reference/make_runner.md)
+  has been removed, and the `directed_as_undirected` argument of
+  `PcalgSearch$set_knowledge()` and
+  [`as_pcalg_constraints()`](https://disco-coders.github.io/causalDisco/reference/as_pcalg_constraints.md)
+  is deprecated and ignored.
+
+- [`as_pcalg_constraints()`](https://disco-coders.github.io/causalDisco/reference/as_pcalg_constraints.md)
+  no longer returns a `fixed_edges` matrix. pcalg’s `fixedEdges`
+  argument only protects an undirected adjacency in the skeleton, so a
+  directed required edge (`A %-->% B`) cannot be honored through it.
+
 ### Bug fixes
+
+- Fixed
+  [`tpc()`](https://disco-coders.github.io/causalDisco/reference/tpc.md)
+  and
+  [`tfci()`](https://disco-coders.github.io/causalDisco/reference/tfci.md)
+  silently treating directed forbidden edges as undirected: forbidding
+  `i %!-->% j` also forbidden `j !--> i`. Forbidden edges now follow the
+  same rule as the pcalg engine: both directions must be supplied
+  explicitly, otherwise an error is raised. The exception is if the
+  `Knowledge` forbidden knowledge is equivalent to tiered knowledge.
 
 - Fixed
   [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)

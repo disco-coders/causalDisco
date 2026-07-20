@@ -53,15 +53,7 @@ engine and algorithm. This allows users to support new algorithms.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">make_runner</span><span class="op">(</span></span>
-<span>  <span class="va">engine</span>,</span>
-<span>  <span class="va">alg</span>,</span>
-<span>  test <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  score <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span>,</span>
-<span>  directed_as_undirected_knowledge <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">make_runner</span><span class="op">(</span><span class="va">engine</span>, <span class="va">alg</span>, test <span class="op">=</span> <span class="cn">NULL</span>, alpha <span class="op">=</span> <span class="cn">NULL</span>, score <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -92,10 +84,6 @@ engine and algorithm. This allows users to support new algorithms.</p>
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments passed to the engine-specific runner.</p></dd>
-
-
-<dt id="arg-directed-as-undirected-knowledge">directed_as_undirected_knowledge<a class="anchor" aria-label="anchor" href="#arg-directed-as-undirected-knowledge"></a></dt>
-<dd><p>Logical. Used internally for <span class="pkg">pcalg</span>.</p></dd>
 
 </dl></div>
     <div class="section level2">

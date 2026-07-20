@@ -450,12 +450,6 @@ plot(output)
 
 ![](knowledge_files/figure-html/plot-bnlearn-1.png)
 
-### causalDisco
-
-The causalDisco engine only supports tiered and forbidden knowledge. If
-required knowledge is provided, it will give a warning and ignore the
-required knowledge.
-
 ### pcalg
 
 Only symmetric forbidden-edge constraints are supported by the pcalg
@@ -474,6 +468,33 @@ kn <- knowledge(
 pc_pcalg <- pc(engine = "pcalg", test = "fisher_z", alpha = 0.05)
 output <- disco(data = tpc_example, method = pc_pcalg, knowledge = kn)
 ```
+
+### causalDisco
+
+Supports tiered knowledge, symmetric forbidden-edge constraints (as for
+pcalg above), and directed forbidden edges that are equivalent to some
+tiered knowledge. For example, forbidding `oldage` from pointing to
+`child` is equivalent to placing `child` in the same tier as `youth`:
+
+``` r
+
+data(tpc_example)
+kn <- knowledge(
+  tpc_example,
+  starts_with("oldage") %!-->% starts_with("child"),
+  starts_with("oldage") %!-->% starts_with("youth"),
+  tier(
+    2 ~ starts_with("youth"),
+    3 ~ starts_with("oldage")
+  )
+)
+my_tpc <- tpc(test = "fisher_z", alpha = 0.05)
+output <- disco(data = tpc_example, method = my_tpc, knowledge = kn)
+#> The directed forbidden edges in `knowledge` place 2 untiered variable(s) in the temporal order; assigning them to tiers.
+```
+
+If the forbidden edges do not correspond to any tiered knowledge, an
+error is raised instead.
 
 ### Tetrad
 

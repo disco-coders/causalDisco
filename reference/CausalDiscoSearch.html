@@ -305,19 +305,20 @@ Only needed if <code>method</code> is a user-defined function with an
 <h3 id="causaldiscosearch-set-knowledge-"><code>CausalDiscoSearch$set_knowledge()</code><a class="anchor" aria-label="anchor" href="#causaldiscosearch-set-knowledge-"></a></h3>
 <p>Sets the background knowledge for the search with a <code>Knowledge</code> object.</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CausalDiscoSearch</span><span class="op">$</span><span class="fu">set_knowledge</span><span class="op">(</span><span class="va">kn</span>, directed_as_undirected <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">CausalDiscoSearch</span><span class="op">$</span><span class="fu">set_knowledge</span><span class="op">(</span></span>
+<span>  <span class="va">kn</span>,</span>
+<span>  directed_as_undirected <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>kn</code></dt>
 <dd><p>A <code>Knowledge</code> object.</p></dd>
 
       <dt><code>directed_as_undirected</code></dt>
-<dd><p>Logical; whether to treat directed edges in
-the knowledge as undirected. Default is <code>FALSE</code>. This is due to the
-nature of how <span class="pkg">pcalg</span> handles background knowledge when using
-<code><a href="https://rdrr.io/pkg/pcalg/man/skeleton.html" class="external-link">pcalg::skeleton()</a></code> under the hood in
-<code><a href="tpc.html">tpc()</a></code> and
-<code><a href="tfci.html">tfci()</a></code>.</p></dd>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> This
+argument no longer has any effect and will be removed in a future
+release. Directed forbidden edges are now resolved using tier
+information, or must be specified in both directions.</p></dd>
 
 
 </dl><p></p></div>
@@ -400,7 +401,7 @@ nature of how <span class="pkg">pcalg</span> handles background knowledge when u
 <span class="r-in"><span><span class="va">s_tpc</span><span class="op">$</span><span class="fu">set_params</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s_tpc</span><span class="op">$</span><span class="fu">set_test</span><span class="op">(</span><span class="st">"fisher_z"</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s_tpc</span><span class="op">$</span><span class="fu">set_alg</span><span class="op">(</span><span class="st">"tpc"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">s_tpc</span><span class="op">$</span><span class="fu">set_knowledge</span><span class="op">(</span><span class="va">kn</span>, directed_as_undirected <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">s_tpc</span><span class="op">$</span><span class="fu">set_knowledge</span><span class="op">(</span><span class="va">kn</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s_tpc</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res_tpc</span> <span class="op">&lt;-</span> <span class="va">s_tpc</span><span class="op">$</span><span class="fu">run_search</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">res_tpc</span><span class="op">)</span></span></span>

@@ -317,7 +317,10 @@ Sets the background knowledge for the search with a `Knowledge` object.
 
 #### Usage
 
-    CausalDiscoSearch$set_knowledge(kn, directed_as_undirected = FALSE)
+    CausalDiscoSearch$set_knowledge(
+      kn,
+      directed_as_undirected = lifecycle::deprecated()
+    )
 
 #### Arguments
 
@@ -327,14 +330,9 @@ Sets the background knowledge for the search with a `Knowledge` object.
 
 - `directed_as_undirected`:
 
-  Logical; whether to treat directed edges in the knowledge as
-  undirected. Default is `FALSE`. This is due to the nature of how pcalg
-  handles background knowledge when using
-  [`pcalg::skeleton()`](https://rdrr.io/pkg/pcalg/man/skeleton.html)
-  under the hood in
-  [`tpc()`](https://disco-coders.github.io/causalDisco/reference/tpc.md)
-  and
-  [`tfci()`](https://disco-coders.github.io/causalDisco/reference/tfci.md).
+  **\[deprecated\]** This argument no longer has any effect and will be
+  removed in a future release. Directed forbidden edges are now resolved
+  using tier information, or must be specified in both directions.
 
 ------------------------------------------------------------------------
 
@@ -410,7 +408,7 @@ s_tpc <- CausalDiscoSearch$new()
 s_tpc$set_params(list(verbose = FALSE))
 s_tpc$set_test("fisher_z", alpha = 0.2)
 s_tpc$set_alg("tpc")
-s_tpc$set_knowledge(kn, directed_as_undirected = TRUE)
+s_tpc$set_knowledge(kn)
 s_tpc$set_data(tpc_example)
 res_tpc <- s_tpc$run_search()
 print(res_tpc)

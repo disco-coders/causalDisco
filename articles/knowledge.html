@@ -433,9 +433,6 @@
 </div>
 </div>
 </div>
-</section><section class="level2"><h3 id="causaldisco">causalDisco<a class="anchor" aria-label="anchor" href="#causaldisco"></a>
-</h3>
-<p>The causalDisco engine only supports tiered and forbidden knowledge. If required knowledge is provided, it will give a warning and ignore the required knowledge.</p>
 </section><section class="level2"><h3 id="pcalg">pcalg<a class="anchor" aria-label="anchor" href="#pcalg"></a>
 </h3>
 <p>Only symmetric forbidden-edge constraints are supported by the pcalg engine. In practice, this means an edge must be forbidden in both directions. Such constraints can be specified using <code>%!--&gt;%</code> in both directions, as illustrated below:</p>
@@ -450,6 +447,26 @@
 <span><span class="va">pc_pcalg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pc.html">pc</a></span><span class="op">(</span>engine <span class="op">=</span> <span class="st">"pcalg"</span>, test <span class="op">=</span> <span class="st">"fisher_z"</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/disco.html">disco</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">tpc_example</span>, method <span class="op">=</span> <span class="va">pc_pcalg</span>, knowledge <span class="op">=</span> <span class="va">kn</span><span class="op">)</span></span></code></pre></div>
 </div>
+</section><section class="level2"><h3 id="causaldisco">causalDisco<a class="anchor" aria-label="anchor" href="#causaldisco"></a>
+</h3>
+<p>Supports tiered knowledge, symmetric forbidden-edge constraints (as for pcalg above), and directed forbidden edges that are equivalent to some tiered knowledge. For example, forbidding <code>oldage</code> from pointing to <code>child</code> is equivalent to placing <code>child</code> in the same tier as <code>youth</code>:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span>
+<span><span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/knowledge.html">knowledge</a></span><span class="op">(</span></span>
+<span>  <span class="va">tpc_example</span>,</span>
+<span>  <span class="fu">starts_with</span><span class="op">(</span><span class="st">"oldage"</span><span class="op">)</span> <span class="op">%!--&gt;%</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"child"</span><span class="op">)</span>,</span>
+<span>  <span class="fu">starts_with</span><span class="op">(</span><span class="st">"oldage"</span><span class="op">)</span> <span class="op">%!--&gt;%</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"youth"</span><span class="op">)</span>,</span>
+<span>  <span class="fu">tier</span><span class="op">(</span></span>
+<span>    <span class="fl">2</span> <span class="op">~</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"youth"</span><span class="op">)</span>,</span>
+<span>    <span class="fl">3</span> <span class="op">~</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"oldage"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">my_tpc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tpc.html">tpc</a></span><span class="op">(</span>test <span class="op">=</span> <span class="st">"fisher_z"</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
+<span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/disco.html">disco</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">tpc_example</span>, method <span class="op">=</span> <span class="va">my_tpc</span>, knowledge <span class="op">=</span> <span class="va">kn</span><span class="op">)</span></span>
+<span><span class="co">#&gt; The directed forbidden edges in `knowledge` place 2 untiered variable(s) in the temporal order; assigning them to tiers.</span></span></code></pre></div>
+</div>
+<p>If the forbidden edges do not correspond to any tiered knowledge, an error is raised instead.</p>
 </section><section class="level2"><h3 id="tetrad">Tetrad<a class="anchor" aria-label="anchor" href="#tetrad"></a>
 </h3>
 <p>All knowledge types are supported with the Tetrad engine.</p>

@@ -17,7 +17,7 @@ tfci_run(
   method = "stable.fast",
   na_method = "none",
   orientation_method = "conservative",
-  directed_as_undirected = FALSE,
+  directed_as_undirected = lifecycle::deprecated(),
   varnames = NULL,
   num_cores = 1,
   ...
@@ -79,10 +79,9 @@ tfci_run(
 
 - directed_as_undirected:
 
-  Logical; if `TRUE`, treat any directed edges in `knowledge` as
-  undirected during skeleton learning. This is due to the fact that
-  pcalg does not allow directed edges in `fixedEdges` or `fixedGaps`.
-  Default is `FALSE`.
+  **\[deprecated\]** This argument no longer has any effect and will be
+  removed in a future release. Directed forbidden edges are now resolved
+  using tier information, or must be specified in both directions.
 
 - varnames:
 

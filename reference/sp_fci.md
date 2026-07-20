@@ -153,5 +153,5 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
 }
 #> <Disco PAG: 6 nodes | 1 edges>
 #>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x2o-ochild_x1
+#>   edges: child_x2o-ooldage_x5
 ```

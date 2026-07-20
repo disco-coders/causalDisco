@@ -4,12 +4,14 @@ pcalg only supports *undirected* (symmetric) background constraints:
 
 - **fixed_gaps** - forbidding edges (zeros enforced)
 
-- **fixed_edges** - requiring edges (ones enforced)
-
 ## Usage
 
 ``` r
-as_pcalg_constraints(kn, labels = kn$vars$var, directed_as_undirected = FALSE)
+as_pcalg_constraints(
+  kn,
+  labels = kn$vars$var,
+  directed_as_undirected = lifecycle::deprecated()
+)
 ```
 
 ## Arguments
@@ -26,28 +28,32 @@ as_pcalg_constraints(kn, labels = kn$vars$var, directed_as_undirected = FALSE)
 
 - directed_as_undirected:
 
-  Logical (default `FALSE`). If `FALSE`, we require that every edge in
-  `kn` has its mirror-image present as well, and will error if any are
-  missing. If `TRUE`, we automatically mirror every directed edge into
-  an undirected constraint.
+  **\[deprecated\]** This argument no longer has any effect and will be
+  removed in a future release. Specify directed edges in both directions
+  in
+  [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)
+  instead.
 
 ## Value
 
-A list with two elements, each an `n × n` logical matrix corresponding
-to pcalg `fixed_gaps` and `fixed_edges` arguments.
+A list with one element, `fixed_gaps`: an `n × n` logical matrix
+corresponding to the pcalg `fixedGaps` argument.
 
 ## Details
 
-This function takes a `Knowledge` object (with only forbidden/required
-edges, no tiers) and returns the two logical matrices in the exact
-variable order you supply.
+This function takes a `Knowledge` object (with only forbidden edges, no
+tiers) and returns the logical constraint matrix in the exact variable
+order you supply.
+
+Required edges in a `Knowledge` object are directed statements. pcalg
+constraints are adjacency-level only, so a required edge cannot be
+honored; any required edges are dropped with a warning.
 
 ## Errors
 
 - If the `Knowledge` object contains tiered knowledge.
 
-- If `directed_as_undirected = FALSE` and any edge lacks its symmetrical
-  counterpart. This can only hold for forbidden edges.
+- If any forbidden edge lacks its symmetrical counterpart.
 
 ## See also
 
@@ -86,7 +92,7 @@ kn <- knowledge(
   youth_x3 %!-->% child_x1
 )
 
-pc_constraints <- as_pcalg_constraints(kn, directed_as_undirected = FALSE)
+pc_constraints <- as_pcalg_constraints(kn)
 print(pc_constraints)
 #> $fixed_gaps
 #>           child_x1 child_x2 oldage_x5 oldage_x6 youth_x3 youth_x4
@@ -95,15 +101,6 @@ print(pc_constraints)
 #> oldage_x5    FALSE    FALSE     FALSE     FALSE    FALSE    FALSE
 #> oldage_x6    FALSE    FALSE     FALSE     FALSE    FALSE    FALSE
 #> youth_x3      TRUE    FALSE     FALSE     FALSE    FALSE    FALSE
-#> youth_x4     FALSE    FALSE     FALSE     FALSE    FALSE    FALSE
-#> 
-#> $fixed_edges
-#>           child_x1 child_x2 oldage_x5 oldage_x6 youth_x3 youth_x4
-#> child_x1     FALSE    FALSE     FALSE     FALSE    FALSE    FALSE
-#> child_x2     FALSE    FALSE     FALSE     FALSE    FALSE    FALSE
-#> oldage_x5    FALSE    FALSE     FALSE     FALSE    FALSE    FALSE
-#> oldage_x6    FALSE    FALSE     FALSE     FALSE    FALSE    FALSE
-#> youth_x3     FALSE    FALSE     FALSE     FALSE    FALSE    FALSE
 #> youth_x4     FALSE    FALSE     FALSE     FALSE    FALSE    FALSE
 #> 
 
