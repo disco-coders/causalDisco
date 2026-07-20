@@ -14,25 +14,23 @@ library(causalDisco)
 This article demonstrates how to use the
 [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)
 function to incorporate prior knowledge into causal discovery
-algorithms. The different supported knowledge types are explained below,
-along with examples of how to create `Knowledge` objects and use them
-with causal discovery methods. All knowledge types can be freely
-combined. Multiple calls or operators are additive: each call adds new
-edges to the `Knowledge` object. For example, if we require an edge from
-`A` to `B` and then require an edge from A to C, the resulting
-`Knowledge` object will require both edges from `A` to `B` and from `A`
-to `C`.
+algorithms. The supported knowledge types are introduced below, along
+with examples of creating `Knowledge` objects and using them with causal
+discovery methods.
 
-At a conceptual level, all knowledge is represented as constraints on
-edges, specifying which edges are required and forbidden. Some knowledge
-types provide higher-level abstractions for expressing common modeling
-assumptions more conveniently.
+At its core, all prior knowledge is represented as constraints on
+directed edges, specifying which edges are required or forbidden.
+Higher-level knowledge types provide more convenient ways to express
+common modeling assumptions, but ultimately translate into these edge
+constraints. All knowledge types can be freely combined: each call or
+operator adds constraints to the same Knowledge object. For example,
+requiring an edge from `A` to `B` and then requiring an edge from `A` to
+`C` produces a `Knowledge` object that requires both edges.
 
 ## Required and forbidden knowledge
 
-At the most basic level, prior knowledge is expressed as required or
-forbidden edges between variables. These constraints apply to directed
-edges in the causal graph.
+The most fundamental constraints are required and forbidden directed
+edges:
 
 - Required edges specify that a directed edge must exist between two
   variables.
@@ -40,10 +38,9 @@ edges in the causal graph.
   two variables.
 
 These constraints are specified using the `%-->%` (required) and
-`%!-->%` (forbidden) operators, with the exclamation mark (`!`)
-indicating negation of the edge, i.e. the absence of the edge.
-Conceptually, this could be written as `%!(-->)%`, but we find this
-syntax too verbose.
+`%!-->%` (forbidden) operators. The exclamation mark (`!`) denotes
+negation of the edge, conceptually `%!(-->)%`, but we find this syntax
+too long.
 
 ### Specifying required and forbidden edges
 
@@ -417,13 +414,29 @@ By engine we mean the underlying implementation of the causal discovery
 algorithm, i.e. the engine you specify to an algorithm such as
 `pc(engine = "bnlearn")` or `tges(engine = "causalDisco")`.
 
+Support for background-knowledge constraints differs across engines, as
+summarized in [Table 1](#tbl-backend-knowledge). The asterisks for
+`causalDisco` and `pcalg` indicate that only symmetric forbidden-edge
+constraints are supported, i.e. an edge must be forbidden in both
+directions. In addition, `causalDisco` automatically detects when a set
+of forbidden edges is equivalent to a tiered ordering and, in that case,
+treats it as tiered knowledge.
+
+| Engine        | Forbidden edges | Required edges | Tiered knowledge |
+|:--------------|:---------------:|:--------------:|:----------------:|
+| `causalDisco` |       ✓\*       |                |        ✓         |
+| `pcalg`       |       ✓\*       |                |                  |
+| `bnlearn`     |        ✓        |       ✓        |        ✓         |
+| `Tetrad`      |        ✓        |       ✓        |        ✓         |
+
+Table 1: Support for background knowledge by engine.
+
 ### bnlearn
 
-All knowledge types are supported with the bnlearn engine. When required
-knowledge is provided, bnlearn may emit a warning during structure
-learning. This occurs when the algorithm identifies a candidate
-v-structure (collider) from the data whose orientation conflicts with
-edges already oriented due to background knowledge.
+When required knowledge is provided, bnlearn may emit a warning during
+structure learning. This occurs when the algorithm identifies a
+candidate v-structure (collider) from the data whose orientation
+conflicts with already oriented edges.
 
 ``` r
 
@@ -452,10 +465,8 @@ plot(output)
 
 ### pcalg
 
-Only symmetric forbidden-edge constraints are supported by the pcalg
-engine. In practice, this means an edge must be forbidden in both
-directions. Such constraints can be specified using `%!-->%` in both
-directions, as illustrated below:
+Symmetric forbidden-edge constraints can be specified using `%!-->%` in
+both directions, as illustrated below:
 
 ``` r
 
@@ -471,9 +482,9 @@ output <- disco(data = tpc_example, method = pc_pcalg, knowledge = kn)
 
 ### causalDisco
 
-Supports tiered knowledge, symmetric forbidden-edge constraints (as for
-pcalg above), and directed forbidden edges that are equivalent to some
-tiered knowledge. For example, forbidding `oldage` from pointing to
+Symmetric forbidden-edge constraints are also supported (as for pcalg
+above), in addition to directed forbidden edges that are equivalent to
+some tiered knowledge. For example, forbidding `oldage` from pointing to
 `child` is equivalent to placing `child` in the same tier as `youth`:
 
 ``` r
@@ -484,8 +495,8 @@ kn <- knowledge(
   starts_with("oldage") %!-->% starts_with("child"),
   starts_with("oldage") %!-->% starts_with("youth"),
   tier(
-    2 ~ starts_with("youth"),
-    3 ~ starts_with("oldage")
+    1 ~ starts_with("youth"),
+    2 ~ starts_with("oldage")
   )
 )
 my_tpc <- tpc(test = "fisher_z", alpha = 0.05)
@@ -495,7 +506,3 @@ output <- disco(data = tpc_example, method = my_tpc, knowledge = kn)
 
 If the forbidden edges do not correspond to any tiered knowledge, an
 error is raised instead.
-
-### Tetrad
-
-All knowledge types are supported with the Tetrad engine.

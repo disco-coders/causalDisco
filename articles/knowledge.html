@@ -89,16 +89,16 @@
 <span><span class="co">#&gt;   To change heap size, set options(java.heap.size = 'Ng') or Sys.setenv(JAVA_HEAP_SIZE = 'Ng') *before* loading.</span></span>
 <span><span class="co">#&gt;   Restart R to apply changes.</span></span></code></pre></div>
 </div>
-<p>This article demonstrates how to use the <code><a href="../reference/knowledge.html">knowledge()</a></code> function to incorporate prior knowledge into causal discovery algorithms. The different supported knowledge types are explained below, along with examples of how to create <code>Knowledge</code> objects and use them with causal discovery methods. All knowledge types can be freely combined. Multiple calls or operators are additive: each call adds new edges to the <code>Knowledge</code> object. For example, if we require an edge from <code>A</code> to <code>B</code> and then require an edge from A to C, the resulting <code>Knowledge</code> object will require both edges from <code>A</code> to <code>B</code> and from <code>A</code> to <code>C</code>.</p>
-<p>At a conceptual level, all knowledge is represented as constraints on edges, specifying which edges are required and forbidden. Some knowledge types provide higher-level abstractions for expressing common modeling assumptions more conveniently.</p>
+<p>This article demonstrates how to use the <code><a href="../reference/knowledge.html">knowledge()</a></code> function to incorporate prior knowledge into causal discovery algorithms. The supported knowledge types are introduced below, along with examples of creating <code>Knowledge</code> objects and using them with causal discovery methods.</p>
+<p>At its core, all prior knowledge is represented as constraints on directed edges, specifying which edges are required or forbidden. Higher-level knowledge types provide more convenient ways to express common modeling assumptions, but ultimately translate into these edge constraints. All knowledge types can be freely combined: each call or operator adds constraints to the same Knowledge object. For example, requiring an edge from <code>A</code> to <code>B</code> and then requiring an edge from <code>A</code> to <code>C</code> produces a <code>Knowledge</code> object that requires both edges.</p>
 <section class="section level2"><h2 id="required-and-forbidden-knowledge">Required and forbidden knowledge<a class="anchor" aria-label="anchor" href="#required-and-forbidden-knowledge"></a>
 </h2>
-<p>At the most basic level, prior knowledge is expressed as required or forbidden edges between variables. These constraints apply to directed edges in the causal graph.</p>
+<p>The most fundamental constraints are required and forbidden directed edges:</p>
 <ul>
 <li>Required edges specify that a directed edge must exist between two variables.</li>
 <li>Forbidden edges specify that a directed edge is not allowed between two variables.</li>
 </ul>
-<p>These constraints are specified using the <code>%--&gt;%</code> (required) and <code>%!--&gt;%</code> (forbidden) operators, with the exclamation mark (<code>!</code>) indicating negation of the edge, i.e. the absence of the edge. Conceptually, this could be written as <code>%!(--&gt;)%</code>, but we find this syntax too verbose.</p>
+<p>These constraints are specified using the <code>%--&gt;%</code> (required) and <code>%!--&gt;%</code> (forbidden) operators. The exclamation mark (<code>!</code>) denotes negation of the edge, conceptually <code>%!(--&gt;)%</code>, but we find this syntax too long.</p>
 <section class="level2"><h3 id="specifying-required-and-forbidden-edges">Specifying required and forbidden edges<a class="anchor" aria-label="anchor" href="#specifying-required-and-forbidden-edges"></a>
 </h3>
 <p>Suppose we want to require an edge from A to B, from A to C, and forbid an edge from B to C:</p>
@@ -404,9 +404,57 @@
 </section><section class="section level2"><h2 id="engine-specific-information-about-knowledge">Engine specific information about knowledge<a class="anchor" aria-label="anchor" href="#engine-specific-information-about-knowledge"></a>
 </h2>
 <p>By engine we mean the underlying implementation of the causal discovery algorithm, i.e. the engine you specify to an algorithm such as <code>pc(engine = "bnlearn")</code> or <code>tges(engine = "causalDisco")</code>.</p>
+<p>Support for background-knowledge constraints differs across engines, as summarized in <a href="#tbl-backend-knowledge" class="quarto-xref">Table 1</a>. The asterisks for <code>causalDisco</code> and <code>pcalg</code> indicate that only symmetric forbidden-edge constraints are supported, i.e. an edge must be forbidden in both directions. In addition, <code>causalDisco</code> automatically detects when a set of forbidden edges is equivalent to a tiered ordering and, in that case, treats it as tiered knowledge.</p>
+<div id="tbl-backend-knowledge" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-backend-knowledge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 1: Support for background knowledge by engine.
+</figcaption><div aria-describedby="tbl-backend-knowledge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 28%">
+</colgroup>
+<thead><tr class="header">
+<th style="text-align: left;">Engine</th>
+<th style="text-align: center;">Forbidden edges</th>
+<th style="text-align: center;">Required edges</th>
+<th style="text-align: center;">Tiered knowledge</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>causalDisco</code></td>
+<td style="text-align: center;">✓*</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>pcalg</code></td>
+<td style="text-align: center;">✓*</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>bnlearn</code></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Tetrad</code></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
 <section class="level2"><h3 id="bnlearn">bnlearn<a class="anchor" aria-label="anchor" href="#bnlearn"></a>
 </h3>
-<p>All knowledge types are supported with the bnlearn engine. When required knowledge is provided, bnlearn may emit a warning during structure learning. This occurs when the algorithm identifies a candidate v-structure (collider) from the data whose orientation conflicts with edges already oriented due to background knowledge.</p>
+<p>When required knowledge is provided, bnlearn may emit a warning during structure learning. This occurs when the algorithm identifies a candidate v-structure (collider) from the data whose orientation conflicts with already oriented edges.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span>
@@ -435,7 +483,7 @@
 </div>
 </section><section class="level2"><h3 id="pcalg">pcalg<a class="anchor" aria-label="anchor" href="#pcalg"></a>
 </h3>
-<p>Only symmetric forbidden-edge constraints are supported by the pcalg engine. In practice, this means an edge must be forbidden in both directions. Such constraints can be specified using <code>%!--&gt;%</code> in both directions, as illustrated below:</p>
+<p>Symmetric forbidden-edge constraints can be specified using <code>%!--&gt;%</code> in both directions, as illustrated below:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span>
@@ -449,7 +497,7 @@
 </div>
 </section><section class="level2"><h3 id="causaldisco">causalDisco<a class="anchor" aria-label="anchor" href="#causaldisco"></a>
 </h3>
-<p>Supports tiered knowledge, symmetric forbidden-edge constraints (as for pcalg above), and directed forbidden edges that are equivalent to some tiered knowledge. For example, forbidding <code>oldage</code> from pointing to <code>child</code> is equivalent to placing <code>child</code> in the same tier as <code>youth</code>:</p>
+<p>Symmetric forbidden-edge constraints are also supported (as for pcalg above), in addition to directed forbidden edges that are equivalent to some tiered knowledge. For example, forbidding <code>oldage</code> from pointing to <code>child</code> is equivalent to placing <code>child</code> in the same tier as <code>youth</code>:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tpc_example</span><span class="op">)</span></span>
@@ -458,8 +506,8 @@
 <span>  <span class="fu">starts_with</span><span class="op">(</span><span class="st">"oldage"</span><span class="op">)</span> <span class="op">%!--&gt;%</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"child"</span><span class="op">)</span>,</span>
 <span>  <span class="fu">starts_with</span><span class="op">(</span><span class="st">"oldage"</span><span class="op">)</span> <span class="op">%!--&gt;%</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"youth"</span><span class="op">)</span>,</span>
 <span>  <span class="fu">tier</span><span class="op">(</span></span>
-<span>    <span class="fl">2</span> <span class="op">~</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"youth"</span><span class="op">)</span>,</span>
-<span>    <span class="fl">3</span> <span class="op">~</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"oldage"</span><span class="op">)</span></span>
+<span>    <span class="fl">1</span> <span class="op">~</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"youth"</span><span class="op">)</span>,</span>
+<span>    <span class="fl">2</span> <span class="op">~</span> <span class="fu">starts_with</span><span class="op">(</span><span class="st">"oldage"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">my_tpc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tpc.html">tpc</a></span><span class="op">(</span>test <span class="op">=</span> <span class="st">"fisher_z"</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
@@ -467,9 +515,6 @@
 <span><span class="co">#&gt; The directed forbidden edges in `knowledge` place 2 untiered variable(s) in the temporal order; assigning them to tiers.</span></span></code></pre></div>
 </div>
 <p>If the forbidden edges do not correspond to any tiered knowledge, an error is raised instead.</p>
-</section><section class="level2"><h3 id="tetrad">Tetrad<a class="anchor" aria-label="anchor" href="#tetrad"></a>
-</h3>
-<p>All knowledge types are supported with the Tetrad engine.</p>
 </section></section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
