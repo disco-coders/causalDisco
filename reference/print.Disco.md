@@ -23,6 +23,11 @@ print(x, ...)
 
 Invisibly returns the `Disco` object.
 
+## See also
+
+Other print:
+[`print.Knowledge()`](https://disco-coders.github.io/causalDisco/reference/print.Knowledge.md)
+
 ## Examples
 
 ``` r

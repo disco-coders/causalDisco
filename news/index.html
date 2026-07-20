@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">causalDisco</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,9 +41,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="causaldisco-development-version">causalDisco (development version)<a class="anchor" aria-label="anchor" href="#causaldisco-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.2.1" id="causaldisco-121">causalDisco 1.2.1<a class="anchor" aria-label="anchor" href="#causaldisco-121"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-1-2-1">New features<a class="anchor" aria-label="anchor" href="#new-features-1-2-1"></a></h3>
 <ul><li><p>Added support for the RFCI algorithm via <code><a href="../reference/rfci.html">rfci()</a></code>, interfacing with implementations from pcalg and Tetrad.</p></li>
 <li><p>The infix edge operators <code>%--&gt;%</code> and <code>%!--&gt;%</code> in <code><a href="../reference/knowledge.html">knowledge()</a></code> now accept <code>+</code> on both sides to specify multiple variables, e.g. <code>A + B %--&gt;% C + D</code> is equivalent to <code>c(A, B) %--&gt;% c(C, D)</code>.</p></li>
 <li><p>The infix edge operators <code>%--&gt;%</code> and <code>%!--&gt;%</code> in <code><a href="../reference/knowledge.html">knowledge()</a></code> now support tidyselect set operations such as <code>!</code>, <code>&amp;</code>, and <code>|</code> on either side, e.g. <code>child_x1 %!--&gt;% !starts_with("child")</code>.</p></li>
@@ -51,19 +51,19 @@
 <li><p>Added <code><a href="../reference/register_engine.html">register_engine()</a></code>, which lets you plug in an entirely new engine backend (i.e. one not built on bnlearn, causalDisco, pcalg, or Tetrad) so. See the “Extending causalDisco with new algorithms” article for a worked example.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="deprecated-development-version">Deprecated<a class="anchor" aria-label="anchor" href="#deprecated-development-version"></a></h3>
+<h3 id="deprecated-1-2-1">Deprecated<a class="anchor" aria-label="anchor" href="#deprecated-1-2-1"></a></h3>
 <ul><li><p>The <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> methods for <code>Knowledge</code> and <code>Disco</code> objects are deprecated; use <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> instead.</p></li>
 <li><p>The <code>directed_as_undirected</code> argument of <code><a href="../reference/tpc_run.html">tpc_run()</a></code>, <code><a href="../reference/tfci_run.html">tfci_run()</a></code>, and <code>CausalDiscoSearch$set_knowledge()</code> is deprecated and ignored; see the related bug-fix entry below for the new handling of directed forbidden edges.</p></li>
 <li><p>The internal-only <code>directed_as_undirected_knowledge</code> argument of <code><a href="../reference/make_runner.html">make_runner()</a></code> has been removed, and the <code>directed_as_undirected</code> argument of <code>PcalgSearch$set_knowledge()</code> and <code><a href="../reference/as_pcalg_constraints.html">as_pcalg_constraints()</a></code> is deprecated and ignored.</p></li>
 <li><p><code><a href="../reference/as_pcalg_constraints.html">as_pcalg_constraints()</a></code> no longer returns a <code>fixed_edges</code> matrix. pcalg’s <code>fixedEdges</code> argument only protects an undirected adjacency in the skeleton, so a directed required edge (<code>A %--&gt;% B</code>) cannot be honored through it.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-1-2-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-2-1"></a></h3>
 <ul><li><p>Fixed <code><a href="../reference/tpc.html">tpc()</a></code> and <code><a href="../reference/tfci.html">tfci()</a></code> silently treating directed forbidden edges as undirected: forbidding <code>i %!--&gt;% j</code> also forbidden <code>j !--&gt; i</code>. Forbidden edges now follow the same rule as the pcalg engine: both directions must be supplied explicitly, otherwise an error is raised. The exception is if the <code>Knowledge</code> forbidden knowledge is equivalent to tiered knowledge.</p></li>
 <li><p>Fixed <code><a href="../reference/knowledge.html">knowledge()</a></code> dropping variables from <code>tier()</code> formulas when infix edge operators (<code>%--&gt;%</code>, <code>%!--&gt;%</code>) appeared before the <code>tier()</code> call and had already registered some (but not all) of the tier’s variables. This only affected the no-data-frame form of <code><a href="../reference/knowledge.html">knowledge()</a></code>.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="improvements-development-version">Improvements<a class="anchor" aria-label="anchor" href="#improvements-development-version"></a></h3>
+<h3 id="improvements-1-2-1">Improvements<a class="anchor" aria-label="anchor" href="#improvements-1-2-1"></a></h3>
 <ul><li><p>The <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> methods for <code>Knowledge</code> and <code>Disco</code> objects now give a more concise and readable summary.</p></li>
 <li><p><code>Disco</code> objects now store an attribute <code>graph_class</code> of the actual learned graph class.</p></li>
 <li><p><code>Knowledge</code> objects generated from <code><a href="../reference/knowledge.html">knowledge()</a></code> now verifies the knowledge for requires edges doesn’t contain a directed cycle.</p></li>
@@ -71,7 +71,7 @@
 <li><p>Reduced the number of package dependencies.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="other-changes-development-version">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-development-version"></a></h3>
+<h3 id="other-changes-1-2-1">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-1-2-1"></a></h3>
 <ul><li>Converted most vignettes to articles to reduce package size.</li>
 </ul></div>
 </div>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">causalDisco</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -419,6 +419,20 @@
 
         <dt>
 
+          <code><a href="summary.Disco.html">summary(<i>&lt;Disco&gt;</i>)</a></code>
+          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
+        </dt>
+        <dd>Summarize a Disco Object</dd>
+
+        <dt>
+
+          <code><a href="summary.Knowledge.html">summary(<i>&lt;Knowledge&gt;</i>)</a></code>
+          <span class="badge lifecycle lifecycle-deprecated">deprecated</span>
+        </dt>
+        <dd>Summarize a Knowledge Object</dd>
+
+        <dt>
+
           <code><a href="plot.Disco.html">plot(<i>&lt;Disco&gt;</i>)</a></code>
 
         </dt>
@@ -570,6 +584,76 @@
 
         <dt>
 
+          <code><a href="as_bnlearn_knowledge.html">as_bnlearn_knowledge()</a></code>
+
+        </dt>
+        <dd>Convert Knowledge to bnlearn Knowledge</dd>
+
+        <dt>
+
+          <code><a href="as_pcalg_constraints.html">as_pcalg_constraints()</a></code>
+
+        </dt>
+        <dd>Convert Knowledge to pcalg Knowledge</dd>
+
+        <dt>
+
+          <code><a href="as_tetrad_knowledge.html">as_tetrad_knowledge()</a></code>
+
+        </dt>
+        <dd>Convert Knowledge to Tetrad Knowledge</dd>
+
+        <dt>
+
+          <code><a href="convert_tiers_to_forbidden.html">convert_tiers_to_forbidden()</a></code>
+
+        </dt>
+        <dd>Convert Tiered Knowledge to Forbidden Knowledge</dd>
+
+        <dt>
+
+          <code><a href="deparse_knowledge.html">deparse_knowledge()</a></code>
+
+        </dt>
+        <dd>Deparse a Knowledge Object into Knowledge DSL Code</dd>
+
+        <dt>
+
+          <code><a href="forbid_edge.html">forbid_edge()</a></code>
+
+        </dt>
+        <dd>Add Forbidden Edges to Knowledge</dd>
+
+        <dt>
+
+          <code><a href="get_tiers.html">get_tiers()</a></code>
+
+        </dt>
+        <dd>Get Tiers from Knowledge</dd>
+
+        <dt>
+
+          <code><a href="knowledge.html">knowledge()</a></code>
+
+        </dt>
+        <dd>Define Background Knowledge</dd>
+
+        <dt>
+
+          <code><a href="knowledge_to_caugi.html">knowledge_to_caugi()</a></code>
+
+        </dt>
+        <dd>Convert Knowledge to Caugi</dd>
+
+        <dt>
+
+          <code><a href="plus-.Knowledge.html">`+`(<i>&lt;Knowledge&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Merge Knowledge Objects</dd>
+
+        <dt>
+
           <code><a href="remove_edge.html">remove_edge()</a></code>
 
         </dt>
@@ -591,38 +675,10 @@
 
         <dt>
 
-          <code><a href="require_edge.html">require_edge()</a></code>
-
-        </dt>
-        <dd>Add Required Edges to Knowledge</dd>
-
-        <dt>
-
-          <code><a href="forbid_edge.html">forbid_edge()</a></code>
-
-        </dt>
-        <dd>Add Forbidden Edges to Knowledge</dd>
-
-        <dt>
-
-          <code><a href="get_tiers.html">get_tiers()</a></code>
-
-        </dt>
-        <dd>Get Tiers from Knowledge</dd>
-
-        <dt>
-
           <code><a href="reorder_tiers.html">reorder_tiers()</a></code>
 
         </dt>
         <dd>Reorder Tiers in Knowledge</dd>
-
-        <dt>
-
-          <code><a href="seq_tiers.html">seq_tiers()</a></code>
-
-        </dt>
-        <dd>Generate a Bundle of Tier–Variable Formulas</dd>
 
         <dt>
 
@@ -633,10 +689,17 @@
 
         <dt>
 
-          <code><a href="convert_tiers_to_forbidden.html">convert_tiers_to_forbidden()</a></code>
+          <code><a href="require_edge.html">require_edge()</a></code>
 
         </dt>
-        <dd>Convert Tiered Knowledge to Forbidden Knowledge</dd>
+        <dd>Add Required Edges to Knowledge</dd>
+
+        <dt>
+
+          <code><a href="seq_tiers.html">seq_tiers()</a></code>
+
+        </dt>
+        <dd>Generate a Bundle of Tier–Variable Formulas</dd>
 
         <dt>
 
@@ -647,52 +710,10 @@
 
         <dt>
 
-          <code><a href="as_tetrad_knowledge.html">as_tetrad_knowledge()</a></code>
-
-        </dt>
-        <dd>Convert Knowledge to Tetrad Knowledge</dd>
-
-        <dt>
-
-          <code><a href="as_bnlearn_knowledge.html">as_bnlearn_knowledge()</a></code>
-
-        </dt>
-        <dd>Convert Knowledge to bnlearn Knowledge</dd>
-
-        <dt>
-
-          <code><a href="as_pcalg_constraints.html">as_pcalg_constraints()</a></code>
-
-        </dt>
-        <dd>Convert Knowledge to pcalg Knowledge</dd>
-
-        <dt>
-
-          <code><a href="knowledge_to_caugi.html">knowledge_to_caugi()</a></code>
-
-        </dt>
-        <dd>Convert Knowledge to Caugi</dd>
-
-        <dt>
-
-          <code><a href="deparse_knowledge.html">deparse_knowledge()</a></code>
-
-        </dt>
-        <dd>Deparse a Knowledge Object into Knowledge DSL Code</dd>
-
-        <dt>
-
           <code><a href="unfreeze.html">unfreeze()</a></code>
 
         </dt>
         <dd>Unfreeze a Knowledge Object.</dd>
-
-        <dt>
-
-          <code><a href="plus-.Knowledge.html">`+`(<i>&lt;Knowledge&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Merge Knowledge Objects</dd>
       </dl></div><div class="section level2">
       <h2 id="extend-causaldisco">Extend causalDisco<a class="anchor" aria-label="anchor" href="#extend-causaldisco"></a></h2>
 

@@ -66,6 +66,12 @@ plotting. The main effect is the plot.
   `edge_style`. The only way to override edge colors for specific edges
   is to specify them directly in `edge_style$by_edge[[from]][[to]]$col`.
 
+## See also
+
+Other plot:
+[`plot`](https://disco-coders.github.io/causalDisco/reference/plot.md),
+[`plot.Disco()`](https://disco-coders.github.io/causalDisco/reference/plot.Disco.md)
+
 ## Examples
 
 ``` r

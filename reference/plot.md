@@ -6,17 +6,6 @@ or `Disco`. It dispatches to the class-specific plotting methods
 and
 [`plot.Disco()`](https://disco-coders.github.io/causalDisco/reference/plot.Disco.md).
 
-## Arguments
-
-- x:
-
-  An object to plot (class `Knowledge` or `Disco`).
-
-- ...:
-
-  Additional arguments passed to class-specific plot methods and to
-  [`caugi::plot()`](https://caugi.org/reference/plot.html).
-
 ## Value
 
 Invisibly returns the input object. The primary effect is the generated
@@ -24,9 +13,9 @@ plot.
 
 ## See also
 
-[`plot.Knowledge()`](https://disco-coders.github.io/causalDisco/reference/plot.Knowledge.md),
+Other plot:
 [`plot.Disco()`](https://disco-coders.github.io/causalDisco/reference/plot.Disco.md),
-[`caugi::plot()`](https://caugi.org/reference/plot.html)
+[`plot.Knowledge()`](https://disco-coders.github.io/causalDisco/reference/plot.Knowledge.md)
 
 ## Examples
 

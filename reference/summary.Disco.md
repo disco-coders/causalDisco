@@ -12,3 +12,13 @@ instead.
 # S3 method for class 'Disco'
 summary(object, ...)
 ```
+
+## Arguments
+
+- object:
+
+  A `Disco` object.
+
+- ...:
+
+  Additional arguments (not used).

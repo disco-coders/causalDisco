@@ -57,7 +57,9 @@ edge using `edge_style$by_edge`).
 
 ## See also
 
-[`caugi::plot()`](https://caugi.org/reference/plot.html)
+Other plot:
+[`plot`](https://disco-coders.github.io/causalDisco/reference/plot.md),
+[`plot.Knowledge()`](https://disco-coders.github.io/causalDisco/reference/plot.Knowledge.md)
 
 ## Examples
 

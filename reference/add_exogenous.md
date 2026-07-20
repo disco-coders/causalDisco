@@ -28,7 +28,7 @@ Updated `Knowledge` object.
 
 ## See also
 
-Other knowledge functions:
+Other knowledge helpers:
 [`+.Knowledge()`](https://disco-coders.github.io/causalDisco/reference/plus-.Knowledge.md),
 [`add_tier()`](https://disco-coders.github.io/causalDisco/reference/add_tier.md),
 [`add_to_tier()`](https://disco-coders.github.io/causalDisco/reference/add_to_tier.md),
@@ -49,6 +49,7 @@ Other knowledge functions:
 [`reposition_tier()`](https://disco-coders.github.io/causalDisco/reference/reposition_tier.md),
 [`require_edge()`](https://disco-coders.github.io/causalDisco/reference/require_edge.md),
 [`seq_tiers()`](https://disco-coders.github.io/causalDisco/reference/seq_tiers.md),
+[`set_knowledge()`](https://disco-coders.github.io/causalDisco/reference/set_knowledge.md),
 [`unfreeze()`](https://disco-coders.github.io/causalDisco/reference/unfreeze.md)
 
 ## Examples

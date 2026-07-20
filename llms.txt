@@ -343,6 +343,10 @@ Small simulated datasets to illustrate causalDisco workflows.
   : Print a Disco Object
 - [`print(`*`<Knowledge>`*`)`](https://disco-coders.github.io/causalDisco/reference/print.Knowledge.md)
   : Print a Knowledge Object
+- [`summary(`*`<Disco>`*`)`](https://disco-coders.github.io/causalDisco/reference/summary.Disco.md)
+  **\[deprecated\]** : Summarize a Disco Object
+- [`summary(`*`<Knowledge>`*`)`](https://disco-coders.github.io/causalDisco/reference/summary.Knowledge.md)
+  **\[deprecated\]** : Summarize a Knowledge Object
 - [`plot(`*`<Disco>`*`)`](https://disco-coders.github.io/causalDisco/reference/plot.Disco.md)
   : Plot a Disco Object
 - [`plot(`*`<Knowledge>`*`)`](https://disco-coders.github.io/causalDisco/reference/plot.Knowledge.md)
@@ -391,42 +395,44 @@ Small simulated datasets to illustrate causalDisco workflows.
   : Add Variables to a Tier in Knowledge
 - [`add_vars()`](https://disco-coders.github.io/causalDisco/reference/add_vars.md)
   : Add Variables to Knowledge
+- [`as_bnlearn_knowledge()`](https://disco-coders.github.io/causalDisco/reference/as_bnlearn_knowledge.md)
+  : Convert Knowledge to bnlearn Knowledge
+- [`as_pcalg_constraints()`](https://disco-coders.github.io/causalDisco/reference/as_pcalg_constraints.md)
+  : Convert Knowledge to pcalg Knowledge
+- [`as_tetrad_knowledge()`](https://disco-coders.github.io/causalDisco/reference/as_tetrad_knowledge.md)
+  : Convert Knowledge to Tetrad Knowledge
+- [`convert_tiers_to_forbidden()`](https://disco-coders.github.io/causalDisco/reference/convert_tiers_to_forbidden.md)
+  : Convert Tiered Knowledge to Forbidden Knowledge
+- [`deparse_knowledge()`](https://disco-coders.github.io/causalDisco/reference/deparse_knowledge.md)
+  : Deparse a Knowledge Object into Knowledge DSL Code
+- [`forbid_edge()`](https://disco-coders.github.io/causalDisco/reference/forbid_edge.md)
+  : Add Forbidden Edges to Knowledge
+- [`get_tiers()`](https://disco-coders.github.io/causalDisco/reference/get_tiers.md)
+  : Get Tiers from Knowledge
+- [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md)
+  : Define Background Knowledge
+- [`knowledge_to_caugi()`](https://disco-coders.github.io/causalDisco/reference/knowledge_to_caugi.md)
+  : Convert Knowledge to Caugi
+- [`` `+`( ``*`<Knowledge>`*`)`](https://disco-coders.github.io/causalDisco/reference/plus-.Knowledge.md)
+  : Merge Knowledge Objects
 - [`remove_edge()`](https://disco-coders.github.io/causalDisco/reference/remove_edge.md)
   : Remove an Edge from Knowledge
 - [`remove_tiers()`](https://disco-coders.github.io/causalDisco/reference/remove_tiers.md)
   : Remove Tiers from Knowledge
 - [`remove_vars()`](https://disco-coders.github.io/causalDisco/reference/remove_vars.md)
   : Remove Variables from Knowledge
-- [`require_edge()`](https://disco-coders.github.io/causalDisco/reference/require_edge.md)
-  : Add Required Edges to Knowledge
-- [`forbid_edge()`](https://disco-coders.github.io/causalDisco/reference/forbid_edge.md)
-  : Add Forbidden Edges to Knowledge
-- [`get_tiers()`](https://disco-coders.github.io/causalDisco/reference/get_tiers.md)
-  : Get Tiers from Knowledge
 - [`reorder_tiers()`](https://disco-coders.github.io/causalDisco/reference/reorder_tiers.md)
   : Reorder Tiers in Knowledge
-- [`seq_tiers()`](https://disco-coders.github.io/causalDisco/reference/seq_tiers.md)
-  : Generate a Bundle of Tier–Variable Formulas
 - [`reposition_tier()`](https://disco-coders.github.io/causalDisco/reference/reposition_tier.md)
   : Move a Tier Relative to Another in Knowledge
-- [`convert_tiers_to_forbidden()`](https://disco-coders.github.io/causalDisco/reference/convert_tiers_to_forbidden.md)
-  : Convert Tiered Knowledge to Forbidden Knowledge
+- [`require_edge()`](https://disco-coders.github.io/causalDisco/reference/require_edge.md)
+  : Add Required Edges to Knowledge
+- [`seq_tiers()`](https://disco-coders.github.io/causalDisco/reference/seq_tiers.md)
+  : Generate a Bundle of Tier–Variable Formulas
 - [`set_knowledge()`](https://disco-coders.github.io/causalDisco/reference/set_knowledge.md)
   : Set Background Knowledge to Disco Method
-- [`as_tetrad_knowledge()`](https://disco-coders.github.io/causalDisco/reference/as_tetrad_knowledge.md)
-  : Convert Knowledge to Tetrad Knowledge
-- [`as_bnlearn_knowledge()`](https://disco-coders.github.io/causalDisco/reference/as_bnlearn_knowledge.md)
-  : Convert Knowledge to bnlearn Knowledge
-- [`as_pcalg_constraints()`](https://disco-coders.github.io/causalDisco/reference/as_pcalg_constraints.md)
-  : Convert Knowledge to pcalg Knowledge
-- [`knowledge_to_caugi()`](https://disco-coders.github.io/causalDisco/reference/knowledge_to_caugi.md)
-  : Convert Knowledge to Caugi
-- [`deparse_knowledge()`](https://disco-coders.github.io/causalDisco/reference/deparse_knowledge.md)
-  : Deparse a Knowledge Object into Knowledge DSL Code
 - [`unfreeze()`](https://disco-coders.github.io/causalDisco/reference/unfreeze.md)
   : Unfreeze a Knowledge Object.
-- [`` `+`( ``*`<Knowledge>`*`)`](https://disco-coders.github.io/causalDisco/reference/plus-.Knowledge.md)
-  : Merge Knowledge Objects
 
 ## Extend causalDisco
 

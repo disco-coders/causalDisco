@@ -206,7 +206,7 @@ plot(
 
 For more details on customizing plots and generating TikZ code for LaTeX
 documents, see the [visualization
-vignette](https://disco-coders.github.io/causalDisco/articles/visualization.md).
+article](https://disco-coders.github.io/causalDisco/articles/visualization.html).
 
 Instead of using
 [`plot()`](https://disco-coders.github.io/causalDisco/reference/plot.md),
@@ -265,7 +265,7 @@ kn <- knowledge(
 ```
 
 For more details on how to define knowledge, see the [knowledge
-vignette](https://disco-coders.github.io/causalDisco/articles/knowledge.md).
+article](https://disco-coders.github.io/causalDisco/articles/knowledge.html).
 
 You can view the `Knowledge` object using
 [`print()`](https://rdrr.io/r/base/print.html),
@@ -351,10 +351,10 @@ plot appearance further by passing additional arguments to
 
 For more information about how to incorporate knowledge, see the
 [knowledge
-article](https://disco-coders.github.io/causalDisco/articles/knowledge.md).
+article](https://disco-coders.github.io/causalDisco/articles/knowledge.html).
 
 For more information about causal discovery, see the [causal discovery
-article](https://disco-coders.github.io/causalDisco/articles/causal-discovery.md).
+article](https://disco-coders.github.io/causalDisco/articles/causal-discovery.html).
 
 For more information about visualization options, see the [visualization
-article](https://disco-coders.github.io/causalDisco/articles/visualization.md).
+article](https://disco-coders.github.io/causalDisco/articles/visualization.html).
