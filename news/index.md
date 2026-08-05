@@ -4,6 +4,8 @@
 
 ## causalDisco 1.2.1
 
+CRAN release: 2026-07-20
+
 ### New features
 
 - Added support for the RFCI algorithm via
