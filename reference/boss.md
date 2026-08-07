@@ -141,6 +141,6 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
 #> The learned graph is not a valid CPDAG because of conflicting edge orientations, which can happen due to statistical errors in finite samples, violations of faithfulness, or latent confounding; it is reported as PDAG instead.
 #> <Disco PDAG: 6 nodes | 6 edges>
 #>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x2-->child_x1, child_x2-->oldage_x5, oldage_x5-->oldage_x6
-#>          youth_x3-->oldage_x5, youth_x4-->child_x2, youth_x4-->oldage_x6
+#>   edges: child_x2-->child_x1, child_x2-->oldage_x5, child_x2-->youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
 ```

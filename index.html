@@ -81,12 +81,18 @@
 <p>Time to hit the disco 🪩</p>
 </div>
 <div class="section level2">
+<h2 id="available-algorithms">Available algorithms<a class="anchor" aria-label="anchor" href="#available-algorithms"></a>
+</h2>
+<p>causalDisco provides the following causal discovery algorithms, grouped by methodological class, with the supported engines and output graph class for each (function identifiers given in parentheses).</p>
+<p align="center">
+<img src="reference/figures/README-algorithms-table.svg" alt="Table of causal discovery algorithms available in causalDisco, grouped by methodological class (constraint-based, score-based, hybrid), with the supported engines and output graph class for each." width="380"></p>
+</div>
+<div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="section level3">
 <h3 id="install-causaldisco">Install causalDisco<a class="anchor" aria-label="anchor" href="#install-causaldisco"></a>
 </h3>
-<p>causalDisco depends on <a href="https://github.com/frederikfabriciusbjerre/caugi" class="external-link">caugi</a>, which requires Rust to build from source. If you don’t have Rust installed, you can either install it (instructions below) or use a binary version of caugi.</p>
 <p>You can install the stable version of causalDisco from CRAN with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"causalDisco"</span><span class="op">)</span></span></code></pre></div>
@@ -94,11 +100,6 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"disco-coders/causalDisco"</span><span class="op">)</span></span></code></pre></div>
 <p>If you want to use algorithms from <a href="https://github.com/cmu-phil/tetrad" class="external-link">Tetrad</a>, you also need to install the suggested dependency rJava (and a Java JDK &gt;= 21). See the instructions below for setting up Java and Tetrad.</p>
-</div>
-<div class="section level3">
-<h3 id="installing-rust">Installing Rust<a class="anchor" aria-label="anchor" href="#installing-rust"></a>
-</h3>
-<p>causalDisco depends on the package caugi, which requires Rust to be installed on your system to build from source. See <a href="https://rust-lang.org/tools/install/" class="external-link uri">https://rust-lang.org/tools/install/</a> for instructions on how to install Rust.</p>
 </div>
 <div class="section level3">
 <h3 id="installing-java--jdk">Installing Java / JDK<a class="anchor" aria-label="anchor" href="#installing-java--jdk"></a>

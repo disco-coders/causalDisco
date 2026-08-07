@@ -15,15 +15,20 @@ rather than package quirks.
 
 Time to hit the disco 🪩
 
+## Available algorithms
+
+causalDisco provides the following causal discovery algorithms, grouped
+by methodological class, with the supported engines and output graph
+class for each (function identifiers given in parentheses).
+
+![Table of causal discovery algorithms available in causalDisco, grouped
+by methodological class (constraint-based, score-based, hybrid), with
+the supported engines and output graph class for
+each.](reference/figures/README-algorithms-table.svg)
+
 ## Installation
 
 ### Install causalDisco
-
-causalDisco depends on
-[caugi](https://github.com/frederikfabriciusbjerre/caugi), which
-requires Rust to build from source. If you don’t have Rust installed,
-you can either install it (instructions below) or use a binary version
-of caugi.
 
 You can install the stable version of causalDisco from CRAN with:
 
@@ -43,13 +48,6 @@ If you want to use algorithms from
 [Tetrad](https://github.com/cmu-phil/tetrad), you also need to install
 the suggested dependency rJava (and a Java JDK \>= 21). See the
 instructions below for setting up Java and Tetrad.
-
-### Installing Rust
-
-causalDisco depends on the package caugi, which requires Rust to be
-installed on your system to build from source. See
-<https://rust-lang.org/tools/install/> for instructions on how to
-install Rust.
 
 ### Installing Java / JDK
 

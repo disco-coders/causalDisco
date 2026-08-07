@@ -156,7 +156,7 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
   )
   disco(tpc_example, boss_fci_tetrad)
 }
-#> <Disco PAG: 6 nodes | 2 edges>
+#> <Disco PAG: 6 nodes | 3 edges>
 #>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x2o-oyouth_x4, oldage_x6o-ooldage_x5
+#>   edges: child_x2o-ochild_x1, youth_x3o-ooldage_x5, youth_x4o-ooldage_x6
 ```
