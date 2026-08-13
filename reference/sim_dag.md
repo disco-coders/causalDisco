@@ -39,14 +39,14 @@ The sampled `caugi` object.
 ``` r
 # Simulate a DAG with 5 nodes and 3 edges
 sim_dag(n = 5, m = 3)
-#> <caugi object; 5 nodes, 3 edges; simple: TRUE; session=0x55605daecb60>
+#> <caugi object; 5 nodes, 3 edges; simple: TRUE; session=0x555ed57e1c50>
 #>   graph_class: DAG
 #>   nodes: V1, V2, V3, V4, V5
 #>   edges: V3-->V1, V3-->V2, V4-->V5
 
 # Simulate a DAG with 5 nodes and edge creation probability of 0.2
 sim_dag(n = 5, p = 0.2)
-#> <caugi object; 5 nodes, 2 edges; simple: TRUE; session=0x55606dead720>
+#> <caugi object; 5 nodes, 2 edges; simple: TRUE; session=0x555ee0f83680>
 #>   graph_class: DAG
 #>   nodes: V1, V2, V3, V4, V5
 #>   edges: V3-->V2, V4-->V1
