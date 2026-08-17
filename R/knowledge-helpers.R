@@ -34,6 +34,7 @@
         tier_from = character(),
         tier_to = character()
       ),
+      max_lag = NA_integer_,
       frozen = frozen
     ),
     class = "Knowledge"

@@ -88,6 +88,7 @@ Other knowledge helpers:
 \code{\link[=reposition_tier]{reposition_tier()}},
 \code{\link[=seq_tiers]{seq_tiers()}},
 \code{\link[=set_knowledge]{set_knowledge()}},
+\code{\link[=set_max_lag]{set_max_lag()}},
 \code{\link[=unfreeze]{unfreeze()}}
 }
 \concept{knowledge helpers}

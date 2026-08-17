@@ -42,8 +42,8 @@
 #'
 #' - `exogenous()` / `exo()`: Mark variables as exogenous.
 #'
-#' - `max_lag()`: Restricts edges to variables that are at most `n` tiers
-#'   apart, e.g. `max_lag(3)`. Requires tiers to already be defined.
+#' - `max_lag()`: Forbids edges between variables that are more than `n`
+#'   tiers apart, e.g. `max_lag(3)`. Requires tiers to already be defined.
 #'
 #' - Numeric vector shortcut for `tier()`:
 #'   `tier(c(1, 2, 1))` assigns tiers by index to all existing variables.

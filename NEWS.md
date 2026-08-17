@@ -1,5 +1,10 @@
 # causalDisco (development version)
 
+## New features
+
+- Added `max_lag()` / `set_max_lag()` to `knowledge()`, which forbids edges
+  between variables that are more than a given number of tiers apart.
+
 # causalDisco 1.2.1
 
 ## New features
