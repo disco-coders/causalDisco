@@ -42,6 +42,9 @@
 #'
 #' - `exogenous()` / `exo()`: Mark variables as exogenous.
 #'
+#' - `max_lag()`: Restricts edges to variables that are at most `n` tiers
+#'   apart, e.g. `max_lag(3)`. Requires tiers to already be defined.
+#'
 #' - Numeric vector shortcut for `tier()`:
 #'   `tier(c(1, 2, 1))` assigns tiers by index to all existing variables.
 #'
@@ -358,8 +361,12 @@ knowledge <- function(...) {
   # synonyms for exogenous
   exo <- exogenous
 
+  max_lag <- function(n) {
+    kn <<- set_max_lag(kn, n)
+  }
+
   # evaluate the call list
-  allowed <- c("tier", "forbidden", "required", "exogenous", "exo")
+  allowed <- c("tier", "forbidden", "required", "exogenous", "exo", "max_lag")
 
   for (expr in dots) {
     if (is.call(expr)) {
@@ -459,7 +466,7 @@ knowledge <- function(...) {
     # Standard function calls
     if (!is.call(expr) || !(as.character(expr[[1]]) %in% allowed)) {
       stop(
-        "Only tier(), exogenous(), ",
+        "Only tier(), exogenous(), max_lag(), ",
         "and infix edge operators (%-->%, %!-->%) are allowed.\n",
         "The expression that triggered this error was: ",
         deparse(expr),
@@ -564,6 +571,9 @@ print.Knowledge <- function(x, ...) {
   if (n_tiers > 0L) {
     parts <- c(parts, paste0(n_tiers, " tier", if (n_tiers != 1L) "s"))
   }
+  if (!is.null(x$max_lag) && !is.na(x$max_lag)) {
+    parts <- c(parts, paste0("max_lag = ", x$max_lag))
+  }
   if (n_vars > 0L) {
     parts <- c(parts, paste0(n_vars, " var", if (n_vars != 1L) "s"))
   }
@@ -646,9 +656,9 @@ print.Knowledge <- function(x, ...) {
 #'
 #' `summary()` for `Knowledge` objects is deprecated. Use `print()` instead.
 #'
-#' @param object A `Disco` object.
+#' @param object A `Knowledge` object.
 #' @param ... Additional arguments (not used).
-#' @exportS3Method summary Disco
+#' @exportS3Method summary Knowledge
 summary.Knowledge <- function(object, ...) {
   lifecycle::deprecate_warn(
     when = "1.2.0",
