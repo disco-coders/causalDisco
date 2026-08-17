@@ -43,7 +43,7 @@ verify_tetrad()
 #> [1] TRUE
 #> 
 #> $java_version
-#> [1] "25.0.3"
+#> [1] "25.0.4"
 #> 
 #> $message
 #> [1] "Tetrad version 7.6.10 is installed and ready to use."
