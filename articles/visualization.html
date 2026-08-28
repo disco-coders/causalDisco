@@ -90,10 +90,10 @@
 <span><span class="co">#&gt;   Restart R to apply changes.</span></span></code></pre></div>
 </div>
 <p>This article demonstrates how to visualize causal graphs. We cover plotting <code>Knowledge</code> objects and <code>Disco</code> objects, customizing layouts and styles, and exporting graphs to readable TikZ for inclusion and further customization in LaTeX documents.</p>
-<section class="section level2"><h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
+<section class="level2"><h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
 </h2>
 <p>You can visualize causal graphs using the <code><a href="../reference/plot.html">plot()</a></code> function, which works for both <code>Knowledge</code> and <code>Disco</code> objects. The function leverages the underlying <code><a href="https://caugi.org/reference/plot.html" class="external-link">caugi::plot()</a></code> method, providing flexible options for customizing the appearance of nodes and edges.</p>
-<section class="level2"><h3 id="plotting-knowledge-objects">Plotting Knowledge Objects<a class="anchor" aria-label="anchor" href="#plotting-knowledge-objects"></a>
+<section class="level3"><h3 id="plotting-knowledge-objects">Plotting Knowledge Objects<a class="anchor" aria-label="anchor" href="#plotting-knowledge-objects"></a>
 </h3>
 <p>We will use the dataset <code>num_data</code> for the following examples, which contains 5 numeric variables (<code>X1</code>, <code>X2</code>, <code>X3</code>, <code>Y</code>, and <code>Z</code>). We start by creating a simple <code>Knowledge</code> object and visualizing it with <code><a href="../reference/plot.html">plot()</a></code>.</p>
 <div class="cell" data-layout-align="center">
@@ -205,7 +205,7 @@
 </div>
 </div>
 </div>
-<section class="level3"><h4 id="plotting-tiered-knowledge">Plotting Tiered Knowledge<a class="anchor" aria-label="anchor" href="#plotting-tiered-knowledge"></a>
+<section class="level4"><h4 id="plotting-tiered-knowledge">Plotting Tiered Knowledge<a class="anchor" aria-label="anchor" href="#plotting-tiered-knowledge"></a>
 </h4>
 <p>We can also visualize tiered knowledge structures. Here is an example using a dataset with variables measured at different life stages:</p>
 <div class="cell" data-layout-align="center">
@@ -230,7 +230,7 @@
 </div>
 </div>
 <p>Variables are grouped by life stage, reflecting the tiered structure. This helps visually convey temporal or hierarchical relationships in the data.</p>
-</section></section><section class="level2"><h3 id="plotting-knowledgeable-caugi-objects">Plotting Knowledgeable Caugi Objects<a class="anchor" aria-label="anchor" href="#plotting-knowledgeable-caugi-objects"></a>
+</section></section><section class="level3"><h3 id="plotting-knowledgeable-caugi-objects">Plotting Knowledgeable Caugi Objects<a class="anchor" aria-label="anchor" href="#plotting-knowledgeable-caugi-objects"></a>
 </h3>
 <p>Here we run a causal discovery algorithm to get a <code>Disco</code> object, which is the knowledge object alongside the learned causal graph as a <code><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi::caugi</a></code> object. We can then plot this combined object to see both the prior knowledge and the learned relationships</p>
 <div class="cell" data-layout-align="center">
@@ -281,12 +281,12 @@
 </div>
 </div>
 <p>Where we can see the tiers reflected in the layout of the graph.</p>
-</section></section><section class="section level2"><h2 id="exporting-to-tikz">Exporting to TikZ<a class="anchor" aria-label="anchor" href="#exporting-to-tikz"></a>
+</section></section><section class="level2"><h2 id="exporting-to-tikz">Exporting to TikZ<a class="anchor" aria-label="anchor" href="#exporting-to-tikz"></a>
 </h2>
 <p>The <code><a href="../reference/make_tikz.html">make_tikz()</a></code> function exports plots as clean, fully editable TikZ code for inclusion in LaTeX documents.</p>
 <p>Unlike some graph export tools, edges are attached to nodes rather than positioned using hard-coded coordinates, making the output easier to modify.</p>
 <p>This functionality works for <code>Knowledge</code>, <code>Disco</code>, and <code><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi::caugi</a></code> objects, allowing you to customize layouts, styles, and edges further in your LaTeX document. It calls the underlying <code><a href="../reference/plot.html">causalDisco::plot()</a></code> method (which calls <code><a href="https://caugi.org/reference/plot.html" class="external-link">caugi::plot()</a></code>) to generate the initial plot object before converting it to TikZ code. Thus, you can supply any arguments to <code><a href="../reference/make_tikz.html">make_tikz()</a></code> that are supported by <code><a href="../reference/plot.html">causalDisco::plot()</a></code> and <code><a href="https://caugi.org/reference/plot.html" class="external-link">caugi::plot()</a></code>.</p>
-<section class="level2"><h3 id="exporting-knowledge-to-tikz">Exporting Knowledge to TikZ<a class="anchor" aria-label="anchor" href="#exporting-knowledge-to-tikz"></a>
+<section class="level3"><h3 id="exporting-knowledge-to-tikz">Exporting Knowledge to TikZ<a class="anchor" aria-label="anchor" href="#exporting-knowledge-to-tikz"></a>
 </h3>
 <p>We first demonstrate TikZ export for a <code>Knowledge</code> object.</p>
 <div class="cell" data-layout-align="center">
@@ -402,7 +402,7 @@
 </div>
 </div>
 </div>
-</section><section class="level2"><h3 id="exporting-knowledgeable-caugi-to-tikz">Exporting Knowledgeable Caugi to TikZ<a class="anchor" aria-label="anchor" href="#exporting-knowledgeable-caugi-to-tikz"></a>
+</section><section class="level3"><h3 id="exporting-knowledgeable-caugi-to-tikz">Exporting Knowledgeable Caugi to TikZ<a class="anchor" aria-label="anchor" href="#exporting-knowledgeable-caugi-to-tikz"></a>
 </h3>
 <p>The output of <code><a href="../reference/disco.html">disco()</a></code> gives a <code>Disco</code> object, which can also be exported to TikZ:</p>
 <div class="cell" data-layout-align="center">
@@ -456,7 +456,7 @@
 <span><span class="co">#&gt;       (youth_x4) edge[, -Latex] (oldage_x6);</span></span>
 <span><span class="co">#&gt; \end{tikzpicture}</span></span></code></pre></div>
 </div>
-</section><section class="level2"><h3 id="exporting-caugi-objects-to-tikz">Exporting Caugi Objects to TikZ<a class="anchor" aria-label="anchor" href="#exporting-caugi-objects-to-tikz"></a>
+</section><section class="level3"><h3 id="exporting-caugi-objects-to-tikz">Exporting Caugi Objects to TikZ<a class="anchor" aria-label="anchor" href="#exporting-caugi-objects-to-tikz"></a>
 </h3>
 <p>The same export mechanism also applies to standard <code><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi::caugi</a></code> objects:</p>
 <div class="cell" data-layout-align="center">

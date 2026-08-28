@@ -92,10 +92,10 @@
 <p>Please note, custom tests are experimental and subject to change to improve usability and consistency across engines. We welcome feedback on the current interface and suggestions for improvement.</p>
 <p>This article illustrates how to use custom conditional independence tests and custom scores with the <code><a href="../reference/disco.html">disco()</a></code> function in causalDisco. We show how to define user-specified tests and scores, and how to run causal discovery using these custom functions.</p>
 <p>Note that Tetrad-based algorithms do not currently support custom CI tests, so this article will only cover the engines bnlearn, causalDisco, and pcalg.</p>
-<section class="section level2"><h2 id="custom-tests">Custom Tests<a class="anchor" aria-label="anchor" href="#custom-tests"></a>
+<section class="level2"><h2 id="custom-tests">Custom Tests<a class="anchor" aria-label="anchor" href="#custom-tests"></a>
 </h2>
 <p>The interface for custom tests depends slightly on the engine being used. causalDisco and pcalg use the exact same interface, while bnlearn is slightly different for now. We plan to unify the interface across engines in a future release.</p>
-<section class="level2"><h3 id="causaldisco-and-pcalg-engines">causalDisco and pcalg engines<a class="anchor" aria-label="anchor" href="#causaldisco-and-pcalg-engines"></a>
+<section class="level3"><h3 id="causaldisco-and-pcalg-engines">causalDisco and pcalg engines<a class="anchor" aria-label="anchor" href="#causaldisco-and-pcalg-engines"></a>
 </h3>
 <p>A custom test takes the signature <code>function(x, y, conditioning_set, suff_stat, args)</code>, (<code>args</code> is an optional). <code>x</code> and <code>y</code> are the variables being tested for independence, <code>conditioning_set</code> is the conditioning set, and <code>suff_stat</code> is a list of sufficient statistics needed for the test (e.g. correlation matrix and sample size). The function should return a p-value indicating whether <code>x</code> and <code>y</code> are conditionally independent given <code>conditioning_set</code>.</p>
 <p>Of course the <code>suff_stat</code> argument could just be the raw data, but for efficiency reasons, it is often better to precompute some sufficient statistics.</p>
@@ -165,7 +165,7 @@
 </div>
 </div>
 <p>If the custom test requires additional arguments, then the function signature should include an <code>args</code> parameter, i.e. be <code>function(x, y, conditioning_set, suff_stat, args)</code>, and the additional arguments can be passed as a list to the <code>args</code> parameter when defining the method.</p>
-</section><section class="level2"><h3 id="bnlearn">bnlearn<a class="anchor" aria-label="anchor" href="#bnlearn"></a>
+</section><section class="level3"><h3 id="bnlearn">bnlearn<a class="anchor" aria-label="anchor" href="#bnlearn"></a>
 </h3>
 <p>For bnlearn the signature should be the same, but you must pass <code>suff_stat/data</code> directly in the function, since bnlearn does not have a way to precompute sufficient statistics and pass them to the test function.</p>
 <p>When defining a custom test for <code>bnlearn</code>, you can use either <code>conditioning_set</code> and <code>suff_stat</code> <strong>or</strong> <code>z</code> and <code>data</code>, which are the argument names bnlearn expects.</p>
@@ -211,7 +211,7 @@
 </div>
 </div>
 </div>
-</section></section><section class="section level2"><h2 id="custom-scores">Custom Scores<a class="anchor" aria-label="anchor" href="#custom-scores"></a>
+</section></section><section class="level2"><h2 id="custom-scores">Custom Scores<a class="anchor" aria-label="anchor" href="#custom-scores"></a>
 </h2>
 <p>Not yet implemented, but will be added in a future release. Stay tuned for updates on this feature!</p>
 </section><script id="quarto-html-after-body" type="application/javascript">

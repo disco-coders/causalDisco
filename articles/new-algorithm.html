@@ -90,7 +90,7 @@
 <span><span class="co">#&gt;   Restart R to apply changes.</span></span></code></pre></div>
 </div>
 <p>This article illustrates how to add a new algorithm to causalDisco from bnlearn, pcalg and Tetrad. Both bnlearn and pcalg are R packages and therefore share the same interface, while Tetrad is a Java library and requires a slightly different integration pattern.</p>
-<section class="section level2"><h2 id="bnlearn-and-pcalg">bnlearn and pcalg<a class="anchor" aria-label="anchor" href="#bnlearn-and-pcalg"></a>
+<section class="level2"><h2 id="bnlearn-and-pcalg">bnlearn and pcalg<a class="anchor" aria-label="anchor" href="#bnlearn-and-pcalg"></a>
 </h2>
 <p>Suppose we want to add the Hybrid Parents and Children (HPC) algorithm from bnlearn. We can integrate it into causalDisco by creating a new function <code>hpc()</code>.</p>
 <p>HPC is a constraint-based algorithm, so it requires a conditional independence test and a significance level alpha. It returns a PDAG, so we set the <code>graph_class</code> attribute to <code>"PDAG"</code>.</p>
@@ -137,7 +137,7 @@
 </div>
 <p>To implement a <strong>score-based</strong> algorithm instead, the structure would remain the same. The main difference is that the method would accept a <code>score</code> argument rather than <code>test</code> and <code>alpha</code>. A <strong>hybrid</strong> algorithm would accept <code>test</code>, <code>alpha</code>, and <code>score</code> arguments.</p>
 <p>To implement an algorithm from pcalg rather than bnlearn, we would follow the same structure but change all instances of <code>"bnlearn"</code> to <code>"pcalg"</code>.</p>
-</section><section class="section level2"><h2 id="a-fully-custom-algorithm-implemented-in-r">A fully custom algorithm implemented in R<a class="anchor" aria-label="anchor" href="#a-fully-custom-algorithm-implemented-in-r"></a>
+</section><section class="level2"><h2 id="a-fully-custom-algorithm-implemented-in-r">A fully custom algorithm implemented in R<a class="anchor" aria-label="anchor" href="#a-fully-custom-algorithm-implemented-in-r"></a>
 </h2>
 <p>Here we show how to use a plain R function you wrote yourself as an algorithm, instead of from a package. The <code>causalDisco</code> engine’s <code>CausalDiscoSearch$set_alg()</code> accepts such a function directly, so you can reuse its data/knowledge/test handling while swapping out only the search procedure.</p>
 <p>A <strong>constraint-based</strong> custom algorithm has the signature <code>function(data, knowledge, suff_stat)</code>, mirroring <code><a href="../reference/tpc_run.html">tpc_run()</a></code>/<code><a href="../reference/tfci_run.html">tfci_run()</a></code>. A <strong>score-based</strong> custom algorithm instead has the signature <code>function(score)</code>, mirroring <code><a href="../reference/tges_run.html">tges_run()</a></code>; pass <code>type = "score"</code> to <code>set_alg()</code> for these. Here we implement a (trivial) constraint-based algorithm that just calls <code><a href="../reference/tpc_run.html">tpc_run()</a></code> with whatever test the search object was configured with.</p>
@@ -201,7 +201,7 @@
 </div>
 </div>
 </div>
-</section><section class="section level2"><h2 id="tetrad">Tetrad<a class="anchor" aria-label="anchor" href="#tetrad"></a>
+</section><section class="level2"><h2 id="tetrad">Tetrad<a class="anchor" aria-label="anchor" href="#tetrad"></a>
 </h2>
 <p>We will illustrate how to make a custom version (which actually does the same as our implementation, just with some defensive programming omitted) of the BOSS algorithm from Tetrad. Tetrad algorithms follow a slightly different integration pattern because Tetrad is a Java library rather than an R package.</p>
 <p>To add a new Tetrad algorithm, first register it with <code><a href="../reference/register_tetrad_algorithm.html">register_tetrad_algorithm()</a></code>. This function requires:</p>
@@ -294,7 +294,7 @@
 <div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reset_tetrad_alg_registry.html">reset_tetrad_alg_registry</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
-</section><section class="section level2"><h2 id="a-brand-new-engine">A brand-new engine<a class="anchor" aria-label="anchor" href="#a-brand-new-engine"></a>
+</section><section class="level2"><h2 id="a-brand-new-engine">A brand-new engine<a class="anchor" aria-label="anchor" href="#a-brand-new-engine"></a>
 </h2>
 <p>Everything above adds a new <em>algorithm</em> to one of the built-in engines (<code>"bnlearn"</code>, <code>"causalDisco"</code>, <code>"pcalg"</code>, <code>"tetrad"</code>). This section shows how to add a new <em>engine</em> to causalDisco.</p>
 <p><code><a href="../reference/register_engine.html">register_engine()</a></code> takes an engine name, a <code>make_runner_fn</code>, and the packages it depends on. <code>make_runner_fn</code> must accept <code>alg</code> and <code>...</code>, and must return a <em>runner</em>: a list with a <code><a href="../reference/set_knowledge.html">set_knowledge()</a></code> function and a <code>run()</code> function. This is the same runner shape returned by <code><a href="../reference/make_runner.html">make_runner()</a></code> itself, and by the <code>engine_fns</code> we wrote by hand in the “fully custom algorithm” example above. <code>run()</code> should return its graph wrapped with <code><a href="../reference/as_disco.html">as_disco()</a></code>, which is what <code><a href="../reference/disco.html">disco()</a></code>, <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, and <code><a href="../reference/plot.html">plot()</a></code> expect.</p>
@@ -352,7 +352,7 @@
 <span><span class="co">#&gt; [1] "always_empty"</span></span>
 <span><span class="fu"><a href="../reference/reset_engine_registry.html">reset_engine_registry</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
-</section><section class="section level2"><h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
+</section><section class="level2"><h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
 </h2>
 <p>In this article, we have illustrated how to add new algorithms to causalDisco, both from the R packages pcalg and bnlearn and from Tetrad, as well as how to register an entirely new engine backend.</p>
 <p>If you have any feedback or suggestions for improvement on the API and functionality for extending causalDisco, please let us know by opening an issue on GitHub.</p>
@@ -439,7 +439,8 @@
       }
     }
   });
-  </script></main>
+  </script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

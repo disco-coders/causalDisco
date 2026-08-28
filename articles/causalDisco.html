@@ -90,7 +90,7 @@
 <span><span class="co">#&gt;   Restart R to apply changes.</span></span></code></pre></div>
 </div>
 <p>This vignette provides an overview of the causalDisco package, which offers tools for causal discovery from observational data. It covers the main features of the package, including various causal discovery algorithms, knowledge incorporation, and result visualization.</p>
-<section class="section level2"><h2 id="running-causal-discovery-algorithms">Running causal discovery algorithms<a class="anchor" aria-label="anchor" href="#running-causal-discovery-algorithms"></a>
+<section class="level2"><h2 id="running-causal-discovery-algorithms">Running causal discovery algorithms<a class="anchor" aria-label="anchor" href="#running-causal-discovery-algorithms"></a>
 </h2>
 <p>We will for this section use the <code>num_data</code> dataset included in the package for demonstrating how to run causal discovery algorithms. It contains 5 numerical variables, <code>X1, X2, X3, Z</code>, and <code>Y</code>.</p>
 <div class="cell">
@@ -184,7 +184,7 @@ Tetrad Setup Instructions
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $java_version</span></span>
-<span><span class="co">#&gt; [1] "25.0.4"</span></span>
+<span><span class="co">#&gt; [1] "25.0.4.1"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $message</span></span>
 <span><span class="co">#&gt; [1] "Tetrad version 7.6.10 is installed and ready to use."</span></span></code></pre></div>
@@ -238,7 +238,7 @@ Tetrad Setup Instructions
 <span><span class="co">#&gt;   nodes: X1, X2, X3, Z, Y</span></span>
 <span><span class="co">#&gt;   edges: X1--&gt;Y, X1---Z, X2---X3, X2--&gt;Y, X3--&gt;Y, Z--&gt;Y</span></span></code></pre></div>
 </div>
-</section><section class="section level2"><h2 id="incorporating-knowledge">Incorporating knowledge<a class="anchor" aria-label="anchor" href="#incorporating-knowledge"></a>
+</section><section class="level2"><h2 id="incorporating-knowledge">Incorporating knowledge<a class="anchor" aria-label="anchor" href="#incorporating-knowledge"></a>
 </h2>
 <p>We will for this section use the dataset <code>tpc_example</code>, which contains variables, which are measured at three different life stages: childhood, youth, and old age.</p>
 <div class="cell">
@@ -333,7 +333,7 @@ Tetrad Setup Instructions
 </div>
 </div>
 <p>Like before, the tiered knowledge is reflected in the plot layout, with variables grouped by life stage. Additionally, you can customize the plot appearance further by passing additional arguments to <code><a href="../reference/plot.html">plot()</a></code>.</p>
-</section><section class="section level2"><h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</section><section class="level2"><h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h2>
 <p>For more information about how to incorporate knowledge, see the <a href="https://disco-coders.github.io/causalDisco/articles/knowledge.html">knowledge article</a>.</p>
 <p>For more information about causal discovery, see the <a href="https://disco-coders.github.io/causalDisco/articles/causal-discovery.html">causal discovery article</a>.</p>
@@ -421,7 +421,8 @@ Tetrad Setup Instructions
       }
     }
   });
-  </script></main>
+  </script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

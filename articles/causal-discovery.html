@@ -91,7 +91,7 @@
 </div>
 <p>This article provides a very brief introduction to causal discovery using simulated data. For a thorough introduction to causal discovery concepts, we recommend Glymour et al. (2019) <a href="https://www.frontiersin.org/journals/genetics/articles/10.3389/fgene.2019.00524/full" class="external-link">Review of Causal Discovery Methods Based on Graphical Models</a> or Zanga et al. (2022) <a href="https://arxiv.org/abs/2305.10032" class="external-link">A Survey on Causal Discovery: Theory and Practice</a>.</p>
 <p>The goal of causal discovery is to infer the causal relationships among a set of observed variables using observational data.</p>
-<section class="section level2"><h2 id="example-of-causal-discovery">Example of causal discovery<a class="anchor" aria-label="anchor" href="#example-of-causal-discovery"></a>
+<section class="level2"><h2 id="example-of-causal-discovery">Example of causal discovery<a class="anchor" aria-label="anchor" href="#example-of-causal-discovery"></a>
 </h2>
 <p>Suppose we have this DAG:</p>
 <div class="cell" data-layout-align="center">
@@ -207,7 +207,7 @@
 </div>
 </div>
 <p>We learn the same causal structure as before, demonstrating that the direction of influence between <code>X2</code> and <code>X3</code> cannot be determined from the data alone.</p>
-</section><section class="section level2"><h2 id="unobserved-confounding">Unobserved confounding<a class="anchor" aria-label="anchor" href="#unobserved-confounding"></a>
+</section><section class="level2"><h2 id="unobserved-confounding">Unobserved confounding<a class="anchor" aria-label="anchor" href="#unobserved-confounding"></a>
 </h2>
 <p>In practice, unobserved confounding may be present, violating one of the assumptions of the PC algorithm. Suppose we have the following DAG with an unobserved confounder <code>U</code> between <code>X1</code> and <code>X2</code>:</p>
 <div class="cell" data-layout-align="center">
@@ -284,7 +284,7 @@
 </div>
 </div>
 <p>We see that the PC algorithm does not recover the correct causal structure due to the presence of the unobserved confounder. In particular, it found an incorrect edge between <code>X1</code> and <code>X2</code>.</p>
-</section><section class="section level2"><h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</section><section class="level2"><h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h2>
 <p>For more information about how to incorporate knowledge into causal discovery methods, see the <a href="knowledge.html">knowledge article</a>.</p>
 <p>For more information about how to visualize causal discovery results, see the <a href="visualization.html">visualization article</a>.</p>
@@ -371,7 +371,8 @@
       }
     }
   });
-  </script></main>
+  </script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

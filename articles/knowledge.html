@@ -91,7 +91,7 @@
 </div>
 <p>This article demonstrates how to use the <code><a href="../reference/knowledge.html">knowledge()</a></code> function to incorporate prior knowledge into causal discovery algorithms. The supported knowledge types are introduced below, along with examples of creating <code>Knowledge</code> objects and using them with causal discovery methods.</p>
 <p>At its core, all prior knowledge is represented as constraints on directed edges, specifying which edges are required or forbidden. Higher-level knowledge types provide more convenient ways to express common modeling assumptions, but ultimately translate into these edge constraints. All knowledge types can be freely combined: each call or operator adds constraints to the same Knowledge object. For example, requiring an edge from <code>A</code> to <code>B</code> and then requiring an edge from <code>A</code> to <code>C</code> produces a <code>Knowledge</code> object that requires both edges.</p>
-<section class="section level2"><h2 id="required-and-forbidden-knowledge">Required and forbidden knowledge<a class="anchor" aria-label="anchor" href="#required-and-forbidden-knowledge"></a>
+<section class="level2"><h2 id="required-and-forbidden-knowledge">Required and forbidden knowledge<a class="anchor" aria-label="anchor" href="#required-and-forbidden-knowledge"></a>
 </h2>
 <p>The most fundamental constraints are required and forbidden directed edges:</p>
 <ul>
@@ -99,7 +99,7 @@
 <li>Forbidden edges specify that a directed edge is not allowed between two variables.</li>
 </ul>
 <p>These constraints are specified using the <code>%--&gt;%</code> (required) and <code>%!--&gt;%</code> (forbidden) operators. The exclamation mark (<code>!</code>) denotes negation of the edge, conceptually <code>%!(--&gt;)%</code>, but we find this syntax too long.</p>
-<section class="level2"><h3 id="specifying-required-and-forbidden-edges">Specifying required and forbidden edges<a class="anchor" aria-label="anchor" href="#specifying-required-and-forbidden-edges"></a>
+<section class="level3"><h3 id="specifying-required-and-forbidden-edges">Specifying required and forbidden edges<a class="anchor" aria-label="anchor" href="#specifying-required-and-forbidden-edges"></a>
 </h3>
 <p>Suppose we want to require an edge from A to B, from A to C, and forbid an edge from B to C:</p>
 <div class="cell" data-layout-align="center">
@@ -133,7 +133,7 @@
 </div>
 </div>
 </div>
-</section><section class="level2"><h3 id="specifying-required-and-forbidden-edges-in-a-dataset">Specifying required and forbidden edges in a dataset<a class="anchor" aria-label="anchor" href="#specifying-required-and-forbidden-edges-in-a-dataset"></a>
+</section><section class="level3"><h3 id="specifying-required-and-forbidden-edges-in-a-dataset">Specifying required and forbidden edges in a dataset<a class="anchor" aria-label="anchor" href="#specifying-required-and-forbidden-edges-in-a-dataset"></a>
 </h3>
 <p>We will use the <code>tpc_example</code> dataset available in the package for the following examples. The dataset contains 6 variables, as shown below:</p>
 <div class="cell" data-layout-align="center">
@@ -173,7 +173,7 @@
 </div>
 </div>
 <p>The plot then plots all variables in the dataset, with the required edges as blue edges and forbidden edges as red edges.</p>
-<section class="level3"><h4 id="using-tidyselect-helpers">Using tidyselect helpers<a class="anchor" aria-label="anchor" href="#using-tidyselect-helpers"></a>
+<section class="level4"><h4 id="using-tidyselect-helpers">Using tidyselect helpers<a class="anchor" aria-label="anchor" href="#using-tidyselect-helpers"></a>
 </h4>
 <p>To make specifying variables easier, you can use tidyselect helpers such as <code>starts_with</code>:</p>
 <div class="cell" data-layout-align="center">
@@ -204,12 +204,12 @@
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>For a list of all available tidyselect helpers we refer to the <a href="https://tidyselect.r-lib.org/reference/index.html" class="external-link">tidyselect reference documentation</a>.</p>
-</section></section></section><section class="section level2"><h2 id="tiered-knowledge">Tiered knowledge<a class="anchor" aria-label="anchor" href="#tiered-knowledge"></a>
+</section></section></section><section class="level2"><h2 id="tiered-knowledge">Tiered knowledge<a class="anchor" aria-label="anchor" href="#tiered-knowledge"></a>
 </h2>
 <p>Tiered knowledge provides a higher-level abstraction for expressing systematic ordering assumptions, such as temporal or logical precedence. Internally, tiered knowledge is translated into a collection of forbidden edges, but it is exposed separately because it provides a concise and structured way to express common ordering assumptions.</p>
 <p>For example, consider a dataset with three groups of variables: child, youth, and old. We may wish to enforce that child variables precede youth variables, which in turn precede old variables. This can be expressed using tiered knowledge.</p>
 <p>Tiered knowledge enforces that edges may only point from earlier tiers to later tiers. Edges within the same tier are unrestricted unless additional knowledge is supplied.</p>
-<section class="level2"><h3 id="creating-a-tiered-knowledge-object">Creating a tiered <code>Knowledge</code> object<a class="anchor" aria-label="anchor" href="#creating-a-tiered-knowledge-object"></a>
+<section class="level3"><h3 id="creating-a-tiered-knowledge-object">Creating a tiered <code>Knowledge</code> object<a class="anchor" aria-label="anchor" href="#creating-a-tiered-knowledge-object"></a>
 </h3>
 <p>Suppose we observe variables over time: first the <code>A</code>’s, then the <code>B</code>’s, and finally the <code>C</code>’s. This ordering implies that causal direction cannot go backward in time (e.g., <code>B</code>’s cannot cause <code>A</code>’s). A tiered <code>Knowledge</code> object captures this temporal structure by specifying tiers and their associated variables. If numeric tiers are used, lower numbers indicate earlier tiers; otherwise, tiers are ordered by their appearance.</p>
 <p>The following specifications encode the same tier structure:</p>
@@ -309,10 +309,10 @@
 </div>
 </div>
 </div>
-</section></section><section class="section level2"><h2 id="exogenous-variables-knowledge">Exogenous variables knowledge<a class="anchor" aria-label="anchor" href="#exogenous-variables-knowledge"></a>
+</section></section><section class="level2"><h2 id="exogenous-variables-knowledge">Exogenous variables knowledge<a class="anchor" aria-label="anchor" href="#exogenous-variables-knowledge"></a>
 </h2>
 <p>Exogenous variables are those that have no incoming edges in the causal graph. That is, variables which are known causes but are not affected by other variables. Exogenous variables can be specified using the <code>exogenous()</code> function within <code><a href="../reference/knowledge.html">knowledge()</a></code>.</p>
-<section class="level2"><h3 id="specifying-exogenous-variables">Specifying exogenous variables<a class="anchor" aria-label="anchor" href="#specifying-exogenous-variables"></a>
+<section class="level3"><h3 id="specifying-exogenous-variables">Specifying exogenous variables<a class="anchor" aria-label="anchor" href="#specifying-exogenous-variables"></a>
 </h3>
 <p>The most natural usage is to supply the dataset so that the variables are checked for existence and selected correctly:</p>
 <div class="cell" data-layout-align="center">
@@ -348,7 +348,7 @@
 </div>
 </div>
 </div>
-</section></section><section class="section level2"><h2 id="combining-different-knowledge-types">Combining different knowledge types<a class="anchor" aria-label="anchor" href="#combining-different-knowledge-types"></a>
+</section></section><section class="level2"><h2 id="combining-different-knowledge-types">Combining different knowledge types<a class="anchor" aria-label="anchor" href="#combining-different-knowledge-types"></a>
 </h2>
 <p>Different knowledge types can be freely combined in a single <code>Knowledge</code> object. For example, we can combine tiered knowledge with required and forbidden edges:</p>
 <div class="cell" data-layout-align="center">
@@ -372,7 +372,7 @@
 </div>
 </div>
 </div>
-</section><section class="section level2"><h2 id="using-knowledge-with-causal-discovery">Using knowledge with causal discovery<a class="anchor" aria-label="anchor" href="#using-knowledge-with-causal-discovery"></a>
+</section><section class="level2"><h2 id="using-knowledge-with-causal-discovery">Using knowledge with causal discovery<a class="anchor" aria-label="anchor" href="#using-knowledge-with-causal-discovery"></a>
 </h2>
 <p>Once prior knowledge has been specified, it can be supplied to causal discovery algorithms by passing the <code>Knowledge</code> object to the <code><a href="../reference/disco.html">disco()</a></code> function via the <code>knowledge</code> argument. For example, we can use the Temporal GES algorithm <code><a href="../reference/tges.html">tges()</a></code> with engine “causalDisco” and temporal BIC (“tbic”) score, while providing tiered knowledge:</p>
 <div class="cell" data-layout-align="center">
@@ -401,7 +401,7 @@
 </div>
 </div>
 <p>The black edges are those inferred from the data.</p>
-</section><section class="section level2"><h2 id="engine-specific-information-about-knowledge">Engine specific information about knowledge<a class="anchor" aria-label="anchor" href="#engine-specific-information-about-knowledge"></a>
+</section><section class="level2"><h2 id="engine-specific-information-about-knowledge">Engine specific information about knowledge<a class="anchor" aria-label="anchor" href="#engine-specific-information-about-knowledge"></a>
 </h2>
 <p>By engine we mean the underlying implementation of the causal discovery algorithm, i.e. the engine you specify to an algorithm such as <code>pc(engine = "bnlearn")</code> or <code>tges(engine = "causalDisco")</code>.</p>
 <p>Support for background-knowledge constraints differs across engines, as summarized in <a href="#tbl-backend-knowledge" class="quarto-xref">Table 1</a>. The asterisks for <code>causalDisco</code> and <code>pcalg</code> indicate that only symmetric forbidden-edge constraints are supported, i.e. an edge must be forbidden in both directions. In addition, <code>causalDisco</code> automatically detects when a set of forbidden edges is equivalent to a tiered ordering and, in that case, treats it as tiered knowledge.</p>
@@ -452,7 +452,7 @@ Table 1: Support for background knowledge by engine.
 </div>
 </figure>
 </div>
-<section class="level2"><h3 id="bnlearn">bnlearn<a class="anchor" aria-label="anchor" href="#bnlearn"></a>
+<section class="level3"><h3 id="bnlearn">bnlearn<a class="anchor" aria-label="anchor" href="#bnlearn"></a>
 </h3>
 <p>When required knowledge is provided, bnlearn may emit a warning during structure learning. This occurs when the algorithm identifies a candidate v-structure (collider) from the data whose orientation conflicts with already oriented edges.</p>
 <div class="cell" data-layout-align="center">
@@ -481,7 +481,7 @@ Table 1: Support for background knowledge by engine.
 </div>
 </div>
 </div>
-</section><section class="level2"><h3 id="pcalg">pcalg<a class="anchor" aria-label="anchor" href="#pcalg"></a>
+</section><section class="level3"><h3 id="pcalg">pcalg<a class="anchor" aria-label="anchor" href="#pcalg"></a>
 </h3>
 <p>Symmetric forbidden-edge constraints can be specified using <code>%!--&gt;%</code> in both directions, as illustrated below:</p>
 <div class="cell" data-layout-align="center">
@@ -495,7 +495,7 @@ Table 1: Support for background knowledge by engine.
 <span><span class="va">pc_pcalg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pc.html">pc</a></span><span class="op">(</span>engine <span class="op">=</span> <span class="st">"pcalg"</span>, test <span class="op">=</span> <span class="st">"fisher_z"</span>, alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/disco.html">disco</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">tpc_example</span>, method <span class="op">=</span> <span class="va">pc_pcalg</span>, knowledge <span class="op">=</span> <span class="va">kn</span><span class="op">)</span></span></code></pre></div>
 </div>
-</section><section class="level2"><h3 id="causaldisco">causalDisco<a class="anchor" aria-label="anchor" href="#causaldisco"></a>
+</section><section class="level3"><h3 id="causaldisco">causalDisco<a class="anchor" aria-label="anchor" href="#causaldisco"></a>
 </h3>
 <p>Symmetric forbidden-edge constraints are also supported (as for pcalg above), in addition to directed forbidden edges that are equivalent to some tiered knowledge. For example, forbidding <code>oldage</code> from pointing to <code>child</code> is equivalent to placing <code>child</code> in the same tier as <code>youth</code>:</p>
 <div class="cell" data-layout-align="center">
