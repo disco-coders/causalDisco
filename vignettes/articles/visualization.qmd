@@ -18,14 +18,14 @@ This article demonstrates how to visualize causal graphs. We cover plotting
 exporting graphs to readable TikZ for inclusion and further customization in
 LaTeX documents.
 
-# Plotting
+## Plotting
 
 You can visualize causal graphs using the `plot()` function, which works for
 both `Knowledge` and `Disco` objects. The function leverages the underlying
 `caugi::plot()` method, providing flexible options for customizing the
 appearance of nodes and edges.
 
-## Plotting Knowledge Objects
+### Plotting Knowledge Objects
 
 We will use the dataset `num_data` for the following examples, which contains 5
 numeric variables (`X1`, `X2`, `X3`, `Y`, and `Z`). We start by creating a
@@ -136,7 +136,7 @@ my_layout <- data.frame(
 plot(kn, layout = my_layout)
 ```
 
-### Plotting Tiered Knowledge
+#### Plotting Tiered Knowledge
 
 We can also visualize tiered knowledge structures. Here is an example using a
 dataset with variables measured at different life stages:
@@ -161,7 +161,7 @@ plot(kn_tiered)
 Variables are grouped by life stage, reflecting the tiered structure. This helps
 visually convey temporal or hierarchical relationships in the data.
 
-## Plotting Knowledgeable Caugi Objects
+### Plotting Knowledgeable Caugi Objects
 
 Here we run a causal discovery algorithm to get a `Disco` object, which is the
 knowledge object alongside the learned causal graph as a `caugi::caugi` object.
@@ -213,7 +213,7 @@ plot(disco_cd_tges)
 
 Where we can see the tiers reflected in the layout of the graph.
 
-# Exporting to TikZ
+## Exporting to TikZ
 
 The `make_tikz()` function exports plots as clean, fully editable TikZ code for
 inclusion in LaTeX documents.
@@ -228,7 +228,7 @@ document. It calls the underlying `causalDisco::plot()` method (which calls
 TikZ code. Thus, you can supply any arguments to `make_tikz()` that are
 supported by `causalDisco::plot()` and `caugi::plot()`.
 
-## Exporting Knowledge to TikZ
+### Exporting Knowledge to TikZ
 
 We first demonstrate TikZ export for a `Knowledge` object.
 
@@ -299,7 +299,7 @@ The TikZ plot can be seen here:
 knitr::include_graphics("tikz-tier-plot.png")
 ```
 
-## Exporting Knowledgeable Caugi to TikZ
+### Exporting Knowledgeable Caugi to TikZ
 
 The output of `disco()` gives a `Disco` object, which can also be exported to
 TikZ:
@@ -332,7 +332,7 @@ tikz_snippet <- make_tikz(
 cat(tikz_snippet)
 ```
 
-## Exporting Caugi Objects to TikZ
+### Exporting Caugi Objects to TikZ
 
 The same export mechanism also applies to standard `caugi::caugi` objects:
 

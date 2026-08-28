@@ -18,7 +18,7 @@ pcalg and Tetrad. Both bnlearn and pcalg are R packages and therefore share the
 same interface, while Tetrad is a Java library and requires a slightly different
 integration pattern.
 
-# bnlearn and pcalg
+## bnlearn and pcalg
 
 Suppose we want to add the Hybrid Parents and Children (HPC) algorithm from
 bnlearn. We can integrate it into causalDisco by creating a new function
@@ -85,7 +85,7 @@ rather than `test` and `alpha`. A **hybrid** algorithm would accept `test`,
 To implement an algorithm from pcalg rather than bnlearn, we would follow the
 same structure but change all instances of `"bnlearn"` to `"pcalg"`.
 
-# A fully custom algorithm implemented in R
+## A fully custom algorithm implemented in R
 
 Here we show how to use a plain R function you wrote yourself as an algorithm,
 instead of from a package. The `causalDisco` engine's
@@ -164,7 +164,7 @@ result <- disco(
 plot(result)
 ```
 
-# Tetrad
+## Tetrad
 
 We will illustrate how to make a custom version (which actually does the same as
 our implementation, just with some defensive programming omitted) of the BOSS
@@ -285,7 +285,7 @@ Finally, we clean up the custom registered Tetrad algorithm
 reset_tetrad_alg_registry()
 ```
 
-# A brand-new engine
+## A brand-new engine
 
 Everything above adds a new *algorithm* to one of the built-in engines
 (`"bnlearn"`, `"causalDisco"`, `"pcalg"`, `"tetrad"`). This section shows how to
@@ -365,7 +365,7 @@ list_registered_engines()
 reset_engine_registry()
 ```
 
-# Conclusion
+## Conclusion
 
 In this article, we have illustrated how to add new algorithms to causalDisco,
 both from the R packages pcalg and bnlearn and from Tetrad, as well as how to

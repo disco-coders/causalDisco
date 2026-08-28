@@ -26,7 +26,7 @@ operator adds constraints to the same Knowledge object. For example, requiring a
 from `A` to `B` and then requiring an edge from `A` to `C` produces a `Knowledge` object
 that requires both edges.
 
-# Required and forbidden knowledge
+## Required and forbidden knowledge
 
 The most fundamental constraints are required and forbidden directed edges:
 
@@ -38,7 +38,7 @@ These constraints are specified using the `%-->%` (required) and `%!-->%`
 (forbidden) operators. The exclamation mark (`!`) denotes negation of the edge,
 conceptually `%!(-->)%`, but we find this syntax too long.
 
-## Specifying required and forbidden edges
+### Specifying required and forbidden edges
 
 Suppose we want to require an edge from A to B, from A to C, and forbid an edge
 from B to C:
@@ -74,7 +74,7 @@ kn_1_removed <- remove_edge(kn_1, from = A, to = B)
 plot(kn_1_removed)
 ```
 
-## Specifying required and forbidden edges in a dataset
+### Specifying required and forbidden edges in a dataset
 
 We will use the `tpc_example` dataset available in the package for the following
 examples. The dataset contains 6 variables, as shown below:
@@ -116,7 +116,7 @@ plot(kn_2, layout = layout)
 The plot then plots all variables in the dataset, with the required edges as
 blue edges and forbidden edges as red edges.
 
-### Using tidyselect helpers
+#### Using tidyselect helpers
 
 To make specifying variables easier, you can use tidyselect helpers such as
 `starts_with`:
@@ -157,7 +157,7 @@ kn_4 <- knowledge(
 For a list of all available tidyselect helpers we refer to the [tidyselect
 reference documentation](https://tidyselect.r-lib.org/reference/index.html).
 
-# Tiered knowledge
+## Tiered knowledge
 
 Tiered knowledge provides a higher-level abstraction for expressing systematic
 ordering assumptions, such as temporal or logical precedence. Internally, tiered
@@ -174,7 +174,7 @@ Tiered knowledge enforces that edges may only point from earlier tiers to later
 tiers. Edges within the same tier are unrestricted unless additional knowledge
 is supplied.
 
-## Creating a tiered `Knowledge` object
+### Creating a tiered `Knowledge` object
 
 Suppose we observe variables over time: first the `A`'s, then the `B`'s, and
 finally the `C`'s. This ordering implies that causal direction cannot go
@@ -274,14 +274,14 @@ kn_tier_tidyselect <- knowledge(
 plot(kn_tier_tidyselect)
 ```
 
-# Exogenous variables knowledge
+## Exogenous variables knowledge
 
 Exogenous variables are those that have no incoming edges in the causal graph.
 That is, variables which are known causes but are not affected by other
 variables. Exogenous variables can be specified using the `exogenous()` function
 within `knowledge()`.
 
-## Specifying exogenous variables
+### Specifying exogenous variables
 
 The most natural usage is to supply the dataset so that the variables are
 checked for existence and selected correctly:
@@ -317,7 +317,7 @@ kn_exo_2 <- knowledge(
 plot(kn_exo_2, layout = "bipartite", orientation = "columns")
 ```
 
-# Combining different knowledge types
+## Combining different knowledge types
 
 Different knowledge types can be freely combined in a single `Knowledge` object.
 For example, we can combine tiered knowledge with required and forbidden edges:
@@ -339,7 +339,7 @@ kn_combined <- knowledge(
 plot(kn_combined)
 ```
 
-# Using knowledge with causal discovery
+## Using knowledge with causal discovery
 
 Once prior knowledge has been specified, it can be supplied to causal discovery
 algorithms by passing the `Knowledge` object to the `disco()` function via the
@@ -374,7 +374,7 @@ plot(disco_cd_tges)
 
 The black edges are those inferred from the data.
 
-# Engine specific information about knowledge
+## Engine specific information about knowledge
 
 By engine we mean the underlying implementation of the causal discovery
 algorithm, i.e. the engine you specify to an algorithm such as
@@ -397,7 +397,7 @@ knowledge.
 
 : Support for background knowledge by engine. {#tbl-backend-knowledge}
 
-## bnlearn
+### bnlearn
 
 When required knowledge is provided, bnlearn may emit a warning during
 structure learning. This occurs when the algorithm identifies a candidate
@@ -426,7 +426,7 @@ The resulting causal graph will still respect the provided knowledge.
 plot(output)
 ```
 
-## pcalg
+### pcalg
 
 Symmetric forbidden-edge constraints can be specified using `%!-->%` in both
 directions, as illustrated below:
@@ -444,7 +444,7 @@ pc_pcalg <- pc(engine = "pcalg", test = "fisher_z", alpha = 0.05)
 output <- disco(data = tpc_example, method = pc_pcalg, knowledge = kn)
 ```
 
-## causalDisco
+### causalDisco
 
 Symmetric forbidden-edge constraints are also supported (as for pcalg above),
 in addition to directed forbidden edges that are equivalent to some tiered
