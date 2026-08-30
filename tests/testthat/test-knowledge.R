@@ -1041,14 +1041,14 @@ test_that("knowledge() throws error when using another a not defined function", 
       my_df,
       musthave(V1 ~ 1)
     ),
-    "Only tier(), exogenous(), and infix edge operators (%-->%, %!-->%) are allowed.",
+    "Only tier(), exogenous(), max_lag(), and infix edge operators (%-->%, %!-->%) are allowed.",
     fixed = TRUE
   )
   expect_error(
     knowledge(
       makingmistakes(V1 ~ 1)
     ),
-    "Only tier(), exogenous(), and infix edge operators (%-->%, %!-->%) are allowed.",
+    "Only tier(), exogenous(), max_lag(), and infix edge operators (%-->%, %!-->%) are allowed.",
     fixed = TRUE
   )
 })

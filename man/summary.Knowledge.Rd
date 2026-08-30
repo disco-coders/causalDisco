@@ -7,7 +7,7 @@
 \method{summary}{Knowledge}(object, ...)
 }
 \arguments{
-\item{object}{A \code{Disco} object.}
+\item{object}{A \code{Knowledge} object.}
 
 \item{...}{Additional arguments (not used).}
 }

@@ -57,6 +57,8 @@ specifies variables. Variables can also be selected using tidyselect syntax:
 \item \verb{\%-->\%} and \verb{\%!-->\%}: Infix operators to define required and forbidden edges, respectively.
 Both sides of the operator can use tidyselect syntax to select multiple variables.
 \item \code{exogenous()} / \code{exo()}: Mark variables as exogenous.
+\item \code{max_lag()}: Forbids edges between variables that are more than \code{n}
+tiers apart, e.g. \code{max_lag(3)}. Requires tiers to already be defined.
 \item Numeric vector shortcut for \code{tier()}:
 \code{tier(c(1, 2, 1))} assigns tiers by index to all existing variables.
 }
@@ -258,6 +260,7 @@ Other knowledge helpers:
 \code{\link[=require_edge]{require_edge()}},
 \code{\link[=seq_tiers]{seq_tiers()}},
 \code{\link[=set_knowledge]{set_knowledge()}},
+\code{\link[=set_max_lag]{set_max_lag()}},
 \code{\link[=unfreeze]{unfreeze()}}
 }
 \concept{knowledge helpers}
