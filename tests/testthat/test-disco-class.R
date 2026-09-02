@@ -304,25 +304,32 @@ test_that(".validate_graph_type downgrades invalid CPDAGs/MPDAGs to PDAG with a 
 })
 
 test_that("as_disco.pcAlgo falls back to UNKNOWN with a message on a cyclic PDAG", {
+  # pcalg amat coding: amat[i,j] = 1, amat[j,i] = 0 means j -> i. This encodes
+  # the directed cycle A -> B -> C -> A.
   nodes <- c("A", "B", "C")
-  g <- methods::new("graphNEL", nodes = nodes, edgemode = "directed")
-  g <- graph::addEdge("A", "B", g, 1)
-  g <- graph::addEdge("B", "C", g, 1)
-  g <- graph::addEdge("C", "A", g, 1)
-  pa <- methods::new(
-    "pcAlgo",
-    graph = g,
-    call = call("pc"),
-    n = 10L,
-    max.ord = 1L,
-    n.edgetests = 0,
-    sepset = list(),
-    pMax = matrix(0, 3, 3),
-    zMin = matrix(0, 3, 3)
+  amat <- matrix(
+    c(
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+    ),
+    nrow = 3,
+    byrow = TRUE,
+    dimnames = list(nodes, nodes)
   )
+  mockery::stub(as_disco.pcAlgo, "methods::as", function(object, class) amat)
 
   expect_message(
-    result <- as_disco.pcAlgo(pa, knowledge()),
+    result <- as_disco.pcAlgo(
+      structure(list(), class = "pcAlgo"),
+      knowledge()
+    ),
     "Cannot mutate graph to class 'PDAG'. The graph contains a directed cycle.",
     fixed = TRUE
   )
