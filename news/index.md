@@ -5,7 +5,7 @@
 ### Bug fixes
 
 - `pc(engine = "pcalg")` no longer errors when the estimated graph
-  contains a cycle. Now emits a message and returns the graph with its
+  contains a cycle. Now emits a warning and returns the graph with its
   class downgraded to `"UNKNOWN"`.
 
 ## causalDisco 1.2.1
