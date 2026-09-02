@@ -85,7 +85,7 @@ test_that("disco() injects knowledge and validates method type (pc + fci)", {
         next
       } else {
         if (engine == "tetrad" && method_name == "pc") {
-          expect_warning(
+          expect_message(
             {
               res <- disco(num_data, method = m, knowledge = kn)
             },

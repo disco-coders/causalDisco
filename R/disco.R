@@ -94,28 +94,9 @@ disco <- function(data, method, knowledge = NULL) {
   out <- method(data)
 
   if (!is.null(out$caugi)) {
-    out$caugi <- tryCatch(
-      {
-        caugi::mutate_caugi(out$caugi, graph_class)
-      },
-      error = function(e) {
-        detail <- ""
-        if (identical(graph_class, "PDAG")) {
-          detail <- paste0(
-            " The graph is not a valid PDAG (it may contain a directed cycle ",
-            "or bidirected conflict edges)."
-          )
-        }
-        warning(
-          sprintf(
-            "Cannot mutate graph to class '%s'.%s",
-            graph_class,
-            detail
-          ),
-          call. = FALSE
-        )
-        out$caugi
-      }
+    out$caugi <- .caugi_with_fallback(
+      build = function(cls) caugi::mutate_caugi(out$caugi, cls),
+      class = graph_class
     )
   }
 

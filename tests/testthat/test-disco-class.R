@@ -303,7 +303,7 @@ test_that(".validate_graph_type downgrades invalid CPDAGs/MPDAGs to PDAG with a 
   expect_equal(res2, "PDAG")
 })
 
-test_that("as_disco.pcAlgo falls back to UNKNOWN with a warning on a cyclic PDAG", {
+test_that("as_disco.pcAlgo falls back to UNKNOWN with a message on a cyclic PDAG", {
   nodes <- c("A", "B", "C")
   g <- methods::new("graphNEL", nodes = nodes, edgemode = "directed")
   g <- graph::addEdge("A", "B", g, 1)
@@ -321,9 +321,10 @@ test_that("as_disco.pcAlgo falls back to UNKNOWN with a warning on a cyclic PDAG
     zMin = matrix(0, 3, 3)
   )
 
-  expect_warning(
+  expect_message(
     result <- as_disco.pcAlgo(pa, knowledge()),
-    "Cannot mutate graph to class 'PDAG'"
+    "Cannot mutate graph to class 'PDAG'. The graph contains a directed cycle.",
+    fixed = TRUE
   )
   expect_s3_class(result, "Disco")
   expect_true(caugi::is_caugi(result$caugi))
