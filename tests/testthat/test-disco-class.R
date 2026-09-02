@@ -303,6 +303,32 @@ test_that(".validate_graph_type downgrades invalid CPDAGs/MPDAGs to PDAG with a 
   expect_equal(res2, "PDAG")
 })
 
+test_that("as_disco.pcAlgo falls back to UNKNOWN with a warning on a cyclic PDAG", {
+  nodes <- c("A", "B", "C")
+  g <- methods::new("graphNEL", nodes = nodes, edgemode = "directed")
+  g <- graph::addEdge("A", "B", g, 1)
+  g <- graph::addEdge("B", "C", g, 1)
+  g <- graph::addEdge("C", "A", g, 1)
+  pa <- methods::new(
+    "pcAlgo",
+    graph = g,
+    call = call("pc"),
+    n = 10L,
+    max.ord = 1L,
+    n.edgetests = 0,
+    sepset = list(),
+    pMax = matrix(0, 3, 3),
+    zMin = matrix(0, 3, 3)
+  )
+
+  expect_warning(
+    result <- as_disco.pcAlgo(pa, knowledge()),
+    "Cannot mutate graph to class 'PDAG'"
+  )
+  expect_s3_class(result, "Disco")
+  expect_true(caugi::is_caugi(result$caugi))
+})
+
 test_that(".pcalg_amat_to_edges decodes directed, undirected, and bidirected edges", {
   nodes <- c("A", "B", "C", "D")
   # pcalg cpdag coding:
