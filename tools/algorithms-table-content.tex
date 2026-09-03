@@ -1,0 +1,38 @@
+% Shared table body for man/figures/algorithms-table-{light,dark}.svg.
+% Edit here to add/change algorithms; edit the light/dark wrapper files to
+% change colors. Regenerate both SVGs with tools/render-algorithms-table.R.
+
+\small
+\arrayrulecolor{rule}
+\begin{tabular}{lll}
+  \toprule
+  \textbf{Algorithm} & \textbf{Engine(s)} & \textbf{Output} \\
+  \midrule
+
+  \multicolumn{3}{l}{\textcolor{muted}{\textit{Constraint-based}}} \\
+  Fast-IAMB (\texttt{fast\_iamb}) & bnlearn & PDAG$^{*\dagger}$ \\
+  FCI (\texttt{fci}) & pcalg, Tetrad & PAG \\
+  GS (\texttt{gs}) & bnlearn & PDAG$^{*\dagger}$ \\
+  IAMB (\texttt{iamb}) & bnlearn & PDAG$^{*\dagger}$ \\
+  IAMB-FDR (\texttt{iamb\_fdr}) & bnlearn & PDAG$^{*\dagger}$ \\
+  Inter-IAMB (\texttt{inter\_iamb}) & bnlearn & PDAG$^{*\dagger}$ \\
+  PC (\texttt{pc}) & bnlearn, pcalg, Tetrad & PDAG$^{*\dagger}$ \\
+  RFCI (\texttt{rfci}) & pcalg, Tetrad & PAG \\
+  TPC (\texttt{tpc}) & causalDisco & PDAG$^{*\dagger}$ \\
+  TFCI (\texttt{tfci}) & causalDisco & PAG \\
+  \midrule
+
+  \multicolumn{3}{l}{\textcolor{muted}{\textit{Score-based}}} \\
+  BOSS (\texttt{boss}) & Tetrad & PDAG\textsuperscript{*} \\
+  GES (\texttt{ges}) & pcalg, Tetrad & PDAG\textsuperscript{*} \\
+  TGES (\texttt{tges}) & causalDisco & PDAG\textsuperscript{*} \\
+  \midrule
+
+  \multicolumn{3}{l}{\textcolor{muted}{\textit{Hybrid}}} \\
+  BOSS-FCI (\texttt{boss\_fci}) & Tetrad & PAG \\
+  GFCI (\texttt{gfci}) & Tetrad & PAG \\
+  GRaSP (\texttt{grasp}) & Tetrad & PDAG\textsuperscript{*} \\
+  GRaSP-FCI (\texttt{grasp\_fci}) & Tetrad & PAG \\
+  SP-FCI (\texttt{sp\_fci}) & Tetrad & PAG \\
+  \bottomrule
+\end{tabular}
