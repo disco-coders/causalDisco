@@ -24,7 +24,7 @@ class for each (function identifiers given in parentheses).
 ![Table of causal discovery algorithms available in causalDisco, grouped
 by methodological class (constraint-based, score-based, hybrid), with
 the supported engines and output graph class for
-each.](reference/figures/README-algorithms-table.svg)
+each.](reference/figures/algorithms-table-light.svg)
 
 ## Installation
 
