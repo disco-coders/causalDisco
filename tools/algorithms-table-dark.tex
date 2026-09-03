@@ -1,0 +1,18 @@
+% Dark-mode wrapper. See algorithms-table-content.tex for the table
+% itself and render-algorithms-table.R to regenerate the SVGs.
+\documentclass[preview,border=2pt,varwidth]{standalone}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+
+\definecolor{fg}{HTML}{E6EDF3}
+\definecolor{rule}{HTML}{E6EDF3}
+\definecolor{muted}{HTML}{9198A1}
+
+\renewcommand{\arraystretch}{1.15}
+
+\begin{document}
+\color{fg}
+\input{algorithms-table-content.tex}
+\end{document}
