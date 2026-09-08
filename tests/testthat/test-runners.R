@@ -98,7 +98,9 @@ test_that("a registered engine can be driven end-to-end via make_method() and di
   always_empty_runner <- function(alg, ...) {
     kn <- knowledge()
     list(
-      set_knowledge = function(knowledge) kn <<- knowledge,
+      set_knowledge = function(knowledge) {
+        kn <<- knowledge
+      },
       run = function(data) {
         cg <- caugi::caugi(
           from = character(0),
