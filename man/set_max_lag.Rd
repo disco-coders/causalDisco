@@ -36,15 +36,15 @@ kn1 <- knowledge(
 
 print(kn1)
 
-# DSL form: max_lag() inside knowledge() is equivalent
+# DSL form: max_lag() inside tier() is equivalent
 kn2 <- knowledge(
   tpc_example,
   tier(
     child ~ starts_with("child"),
     youth ~ starts_with("youth"),
-    old ~ starts_with("oldage")
-  ),
-  max_lag(1)
+    old ~ starts_with("oldage"),
+    max_lag(1)
+  )
 )
 
 print(identical(kn1, kn2))

@@ -14,7 +14,8 @@ initialize and freeze the variable set.
 \item Zero or more mini-DSL calls:
 \code{tier()}, \code{exogenous()}, (shorthand \code{exo()}), or infix operators \verb{\%-->\%}, \verb{\%!-->\%}.
 \itemize{
-\item \code{tier()}: One or more two-sided formulas (\code{tier(1 ~ x + y)}), or a numeric vector.
+\item \code{tier()}: One or more two-sided formulas (\code{tier(1 ~ x + y)}), or a numeric vector,
+optionally followed by \code{max_lag(n)}.
 \item \code{exogenous()} / \code{exo()}: Variable names or tidyselect selectors.
 Arguments are evaluated in order; only these calls are allowed.
 }
@@ -58,7 +59,8 @@ specifies variables. Variables can also be selected using tidyselect syntax:
 Both sides of the operator can use tidyselect syntax to select multiple variables.
 \item \code{exogenous()} / \code{exo()}: Mark variables as exogenous.
 \item \code{max_lag()}: Forbids edges between variables that are more than \code{n}
-tiers apart, e.g. \code{max_lag(3)}. Requires tiers to already be defined.
+tiers apart, e.g. \code{max_lag(3)}. Set inside \code{tier()}, alongside its
+formulas: \code{tier(1 ~ V1, 2 ~ V2, max_lag(3))}.
 \item Numeric vector shortcut for \code{tier()}:
 \code{tier(c(1, 2, 1))} assigns tiers by index to all existing variables.
 }

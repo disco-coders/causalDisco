@@ -4,6 +4,8 @@
 
 - Added `max_lag()` / `set_max_lag()` to `knowledge()`, which forbids edges
   between variables that are more than a given number of tiers apart.
+  `max_lag()` is set inside `tier()`, alongside its formulas:
+  `tier(1 ~ V1, 2 ~ V2, max_lag(1))`.
 
 # causalDisco 1.2.1
 

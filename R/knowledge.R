@@ -43,7 +43,8 @@
 #' - `exogenous()` / `exo()`: Mark variables as exogenous.
 #'
 #' - `max_lag()`: Forbids edges between variables that are more than `n`
-#'   tiers apart, e.g. `max_lag(3)`. Requires tiers to already be defined.
+#'   tiers apart, e.g. `max_lag(3)`. Set inside `tier()`, alongside its
+#'   formulas: `tier(1 ~ V1, 2 ~ V2, max_lag(3))`.
 #'
 #' - Numeric vector shortcut for `tier()`:
 #'   `tier(c(1, 2, 1))` assigns tiers by index to all existing variables.
@@ -63,7 +64,8 @@
 #'     initialize and freeze the variable set.
 #'   * Zero or more mini-DSL calls:
 #'     `tier()`, `exogenous()`, (shorthand `exo()`), or infix operators `%-->%`, `%!-->%`.
-#'     - `tier()`: One or more two-sided formulas (`tier(1 ~ x + y)`), or a numeric vector.
+#'     - `tier()`: One or more two-sided formulas (`tier(1 ~ x + y)`), or a numeric vector,
+#'       optionally followed by `max_lag(n)`.
 #'     - `exogenous()` / `exo()`: Variable names or tidyselect selectors.
 #'     Arguments are evaluated in order; only these calls are allowed.
 #'
@@ -113,7 +115,43 @@ knowledge <- function(...) {
   }
 
   tier <- function(...) {
-    specs <- rlang::list2(...)
+    exprs <- rlang::enexprs(...)
+
+    is_max_lag_call <- function(e) {
+      is.call(e) && identical(e[[1]], as.name("max_lag"))
+    }
+
+    max_lag_pos <- which(vapply(exprs, is_max_lag_call, logical(1)))
+
+    max_lag_val <- NULL
+    if (length(max_lag_pos)) {
+      if (length(max_lag_pos) > 1L) {
+        stop(
+          "tier() accepts only one `max_lag` specification.",
+          call. = FALSE
+        )
+      }
+
+      ml_expr <- exprs[[max_lag_pos]]
+      if (length(ml_expr) != 2L) {
+        stop(
+          "max_lag() inside tier() takes exactly one argument, ",
+          "e.g. max_lag(1).",
+          call. = FALSE
+        )
+      }
+
+      max_lag_val <- eval(ml_expr[[2L]], envir = parent.frame())
+
+      exprs <- exprs[-max_lag_pos]
+    }
+
+    specs <- lapply(exprs, eval, envir = parent.frame())
+
+    if (!length(specs) && !is.null(max_lag_val)) {
+      kn <<- set_max_lag(kn, max_lag_val)
+      return(kn)
+    }
 
     # ─────────────────────────── numeric-vector shortcut ──────────────────────
     if (
@@ -166,6 +204,9 @@ knowledge <- function(...) {
       }
 
       kn$vars <<- dplyr::mutate(kn$vars, tier = vec_lab)
+      if (!is.null(max_lag_val)) {
+        kn <<- set_max_lag(kn, max_lag_val)
+      }
       return(kn)
     }
 
@@ -291,6 +332,10 @@ knowledge <- function(...) {
       kn <<- add_to_tier(kn, fml)
     }
 
+    if (!is.null(max_lag_val)) {
+      kn <<- set_max_lag(kn, max_lag_val)
+    }
+
     kn
   }
 
@@ -361,12 +406,8 @@ knowledge <- function(...) {
   # synonyms for exogenous
   exo <- exogenous
 
-  max_lag <- function(n) {
-    kn <<- set_max_lag(kn, n)
-  }
-
   # evaluate the call list
-  allowed <- c("tier", "forbidden", "required", "exogenous", "exo", "max_lag")
+  allowed <- c("tier", "forbidden", "required", "exogenous", "exo")
 
   for (expr in dots) {
     if (is.call(expr)) {
@@ -466,7 +507,7 @@ knowledge <- function(...) {
     # Standard function calls
     if (!is.call(expr) || !(as.character(expr[[1]]) %in% allowed)) {
       stop(
-        "Only tier(), exogenous(), max_lag(), ",
+        "Only tier(), exogenous(), ",
         "and infix edge operators (%-->%, %!-->%) are allowed.\n",
         "The expression that triggered this error was: ",
         deparse(expr),

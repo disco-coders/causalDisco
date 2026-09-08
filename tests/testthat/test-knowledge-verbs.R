@@ -155,7 +155,7 @@ test_that("knowledge() errors when required edges are bidirectional", {
 test_that("knowledge() rejects unknown top-level calls", {
   expect_error(
     knowledge(foo(V1)),
-    "Only tier(), exogenous(), max_lag(), and infix edge operators (%-->%, %!-->%) are allowed.",
+    "Only tier(), exogenous(), and infix edge operators (%-->%, %!-->%) are allowed.",
     fixed = TRUE
   )
 })
@@ -523,15 +523,33 @@ test_that("set_max_lag() warns when max_lag has no effect", {
   expect_warning(set_max_lag(kn, 5), "has no effect")
 })
 
-test_that("max_lag() inside knowledge() stores kn$max_lag", {
-  kn <- knowledge(tier(1 ~ V1, 2 ~ V2, 3 ~ V3, 4 ~ V4), max_lag(2))
+test_that("max_lag(n) inside tier() stores kn$max_lag", {
+  kn <- knowledge(tier(1 ~ V1, 2 ~ V2, 3 ~ V3, 4 ~ V4, max_lag(2)))
   expect_identical(kn$max_lag, 2L)
+})
+
+test_that("tier(max_lag(n)) alone sets max_lag on tiers from an earlier tier() call", {
+  kn <- knowledge(tier(1 ~ V1, 2 ~ V2, 3 ~ V3, 4 ~ V4), tier(max_lag(2)))
+  expect_identical(kn$max_lag, 2L)
+})
+
+test_that("tier() errors when given more than one max_lag specification", {
+  expect_error(
+    knowledge(tier(1 ~ V1, 2 ~ V2, max_lag(1), max_lag(2))),
+    "only one `max_lag`"
+  )
+})
+
+test_that("max_lag() inside tier() requires exactly one argument", {
+  expect_error(
+    knowledge(tier(1 ~ V1, 2 ~ V2, max_lag())),
+    "takes exactly one argument"
+  )
 })
 
 test_that("set_max_lag() forbids too-far edges immediately, visible in kn$edges", {
   kn <- knowledge(
-    tier(1 ~ V1, 2 ~ V2, 3 ~ V3, 4 ~ V4),
-    max_lag(1)
+    tier(1 ~ V1, 2 ~ V2, 3 ~ V3, 4 ~ V4, max_lag(1))
   )
 
   edges <- dplyr::filter(kn$edges, status == "forbidden")
@@ -551,7 +569,7 @@ test_that("set_max_lag() forbids too-far edges immediately, visible in kn$edges"
 })
 
 test_that("convert_tiers_to_forbidden() clears max_lag after materializing tier order", {
-  kn <- knowledge(tier(1 ~ V1, 2 ~ V2, 3 ~ V3), max_lag(1))
+  kn <- knowledge(tier(1 ~ V1, 2 ~ V2, 3 ~ V3, max_lag(1)))
   kn2 <- convert_tiers_to_forbidden(kn)
 
   expect_true(any(kn2$edges$from == "V1" & kn2$edges$to == "V3"))
@@ -559,7 +577,7 @@ test_that("convert_tiers_to_forbidden() clears max_lag after materializing tier 
 })
 
 test_that("variables added to a tier after set_max_lag() are not retroactively covered", {
-  kn <- knowledge(tier(1 ~ V1, 2 ~ V2, 3 ~ V3, 4 ~ V4), max_lag(1))
+  kn <- knowledge(tier(1 ~ V1, 2 ~ V2, 3 ~ V3, 4 ~ V4, max_lag(1)))
   kn <- add_to_tier(kn, "1" ~ V5)
 
   edges <- dplyr::filter(kn$edges, status == "forbidden")
