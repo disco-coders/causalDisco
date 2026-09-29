@@ -342,7 +342,7 @@ The same export mechanism also applies to standard `caugi::caugi` objects:
 cg <- caugi::caugi(
   A %-->% B + C
 )
-plot_obj <- caugi::plot(cg, node_style = list(fill = "red"))
+plot_obj <- plot(cg, node_style = list(fill = "red"))
 tikz_caugi_snippet <- make_tikz(plot_obj, scale = 10, full_doc = FALSE)
 cat(tikz_caugi_snippet)
 ```

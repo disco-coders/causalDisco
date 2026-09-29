@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Rscript -e ' *)",
+      "Bash(Rscript -e 'library\\(caugi\\); print\\(args\\(caugi\\)\\); cat\\(\"---\\\\n\"\\); cg <- caugi\\(from=character\\(0\\), edge=character\\(0\\), to=character\\(0\\), class=\"PDAG\", nodes = c\\(\"a\",\"b\",\"c\"\\)\\); print\\(cg\\)')",
+      "Bash(Rscript -e 'cat\\(exists\\(\"nodes\", where=asNamespace\\(\"caugi\"\\)\\), exists\\(\"n_edges\", where=asNamespace\\(\"caugi\"\\)\\), \"\\\\n\"\\)')",
+      "Bash(Rscript -e 'print\\(ls\\(asNamespace\\(\"caugi\"\\)\\)\\)')",
+      "Bash(Rscript -e 'x <- ls\\(asNamespace\\(\"caugi\"\\)\\); print\\(x[grepl\\(\"^\\(nodes|edges|n_\\)\", x, ignore.case = TRUE\\)]\\)')",
+      "Bash(quarto --version)",
+      "Bash(Rscript -e 'quarto::quarto_path\\(\\)')",
+      "Bash(find / -iname \"quarto\" -type f)",
+      "Bash(/usr/lib/rstudio/resources/app/bin/quarto/bin/quarto --version)",
+      "Bash(/usr/lib/rstudio/resources/app/bin/quarto/bin/quarto render *)",
+      "Bash(Rscript -e 'devtools::load_all\\(quiet=TRUE\\); data\\(tpc_example\\); kn <- knowledge\\(tpc_example, tier\\(child ~ starts_with\\(\"child\"\\), youth ~ starts_with\\(\"youth\"\\), old ~ starts_with\\(\"old\"\\)\\)\\); print\\(kn\\); cat\\(\"----\\\\n\"\\); cd_tges <- tpc\\(engine = \"causalDisco\", test = \"fisher_z\"\\); d <- disco\\(data = tpc_example, method = cd_tges, knowledge = kn\\); print\\(d\\)')",
+      "Bash(Rscript -e 'devtools::load_all\\(quiet=TRUE\\); df <- data.frame\\(A=1,B=1,C=1\\); kn <- knowledge\\(df, A %-->% B, B %!-->% C\\); print\\(kn\\)')",
+      "Bash(%.*%)",
+      "Bash(grep -n \"^`%.*%`\\\\|%-->%\\\\|%!-->%\\\\|%..*%.*<-\\\\|infix\" /home/bjarke/GitHub/causalDisco/R/knowledge-helpers.R)",
+      "Bash(Rscript -e 'library\\(caugi\\); ls\\(\"package:caugi\"\\)')",
+      "Bash(Rscript -e 'devtools::test\\(stop_on_failure = FALSE\\)')"
+    ]
+  }
+}
