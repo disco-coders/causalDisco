@@ -575,6 +575,108 @@ remove_tiers <- function(kn, ...) {
   # reset any vars that were in those tiers
   kn$vars$tier[kn$vars$tier %in% to_drop] <- NA_character_
 
+  # a max_lag set relative to the old tier ordering no longer applies
+  if (nrow(kn$tiers) == 0L) {
+    kn$max_lag <- NA_integer_
+  }
+
+  kn
+}
+
+#' @title Set a Maximum Tier Lag on Knowledge
+#'
+#' @description
+#' Forbids every edge between variables that are more than `max_lag` tiers
+#' apart, based on the tiers currently defined on `kn`.
+#'
+#' @param kn A `Knowledge` object that already has tiers defined.
+#' @param max_lag A single positive integer: the maximum allowed tier
+#'  distance between the endpoints of an edge.
+#'
+#' @returns The updated `Knowledge` object, with the new forbidden edges
+#'  added and `max_lag` stored on it.
+#'
+#' @example inst/roxygen-examples/set_max_lag-example.R
+#'
+#' @family knowledge helpers
+#' @concept knowledge-helper
+#' @importFrom rlang .data
+#'
+#' @export
+set_max_lag <- function(kn, max_lag) {
+  .check_if_pkgs_are_installed(
+    pkgs = c(
+      "dplyr",
+      "rlang",
+      "tibble",
+      "tidyr"
+    ),
+    function_name = "set_max_lag"
+  )
+
+  is_knowledge(kn)
+
+  if (nrow(kn$tiers) == 0L) {
+    stop(
+      "set_max_lag() requires tiers to be defined first. ",
+      "Use tier() or add_tier() to create tiers.",
+      call. = FALSE
+    )
+  }
+
+  checkmate::assert_count(max_lag, positive = TRUE)
+
+  n_gaps <- nrow(kn$tiers) - 1L
+  if (max_lag >= n_gaps) {
+    warning(
+      sprintf(
+        "max_lag = %d is >= the number of tier gaps (%d); it has no effect.",
+        max_lag,
+        n_gaps
+      ),
+      call. = FALSE
+    )
+  }
+
+  # build a named vector of tier rank
+  tier_ranks <- rlang::set_names(
+    seq_along(kn$tiers$label),
+    kn$tiers$label
+  )
+
+  # annotate each var with its numeric rank
+  vars <- kn$vars |>
+    dplyr::mutate(rank = tier_ranks[tier])
+
+  # select & rename for "from" vs "to"
+  vf <- vars |> dplyr::select(var_from = "var", rank_from = rank)
+  vt <- vars |> dplyr::select(var_to = "var", rank_to = rank)
+
+  # forward pairs (earlier -> later tier) that skip more than max_lag tiers
+  bad_far <- tidyr::crossing(vf, vt) |>
+    dplyr::filter(
+      !is.na(.data$rank_from),
+      !is.na(.data$rank_to),
+      .data$rank_from < .data$rank_to,
+      (.data$rank_to - .data$rank_from) > max_lag
+    )
+
+  if (nrow(bad_far)) {
+    new_edges <- tibble::tibble(
+      status = "forbidden",
+      from = bad_far$var_from,
+      to = bad_far$var_to,
+      tier_from = kn$vars$tier[match(bad_far$var_from, kn$vars$var)],
+      tier_to = kn$vars$tier[match(bad_far$var_to, kn$vars$var)]
+    )
+
+    # bind to existing, drop duplicates
+    kn$edges <- dplyr::distinct(
+      dplyr::bind_rows(kn$edges, new_edges)
+    )
+  }
+
+  kn$max_lag <- as.integer(max_lag)
   kn
 }
 
@@ -668,9 +770,10 @@ forbid_tier_violations <- function(kn) {
 convert_tiers_to_forbidden <- function(kn) {
   kn <- forbid_tier_violations(kn)
 
-  # drop tiers in the returned object
+  # drop tiers in the returned object; max_lag is tier-relative, so clear it too
   kn$tiers <- tibble::tibble(label = character(0))
   kn$vars <- kn$vars |> dplyr::mutate(tier = NA_character_)
+  kn$max_lag <- NA_integer_
 
   # set tier info in edges to NA
   if ("tier_from" %in% names(kn$edges)) {

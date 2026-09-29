@@ -410,9 +410,9 @@ PcalgSearch <- R6::R6Class(
           # to get the fixed constraints.
           self$knowledge <- private$knowledge_function()
           if (inherits(self$data, "mids")) {
-            labels = colnames(mice::complete(self$data, action = 1))
+            labels <- colnames(mice::complete(self$data, action = 1))
           } else {
-            labels = colnames(self$data)
+            labels <- colnames(self$data)
           }
           result <- self$alg(
             suffStat = self$suff_stat,
@@ -421,9 +421,9 @@ PcalgSearch <- R6::R6Class(
           )
         } else {
           if (inherits(self$data, "mids")) {
-            labels = colnames(mice::complete(self$data, action = 1))
+            labels <- colnames(mice::complete(self$data, action = 1))
           } else {
-            labels = colnames(self$data)
+            labels <- colnames(self$data)
           }
           result <- self$alg(
             suffStat = self$suff_stat,

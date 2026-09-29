@@ -42,6 +42,10 @@
 #'
 #' - `exogenous()` / `exo()`: Mark variables as exogenous.
 #'
+#' - `max_lag()`: Forbids edges between variables that are more than `n`
+#'   tiers apart, e.g. `max_lag(3)`. Set inside `tier()`, alongside its
+#'   formulas: `tier(1 ~ V1, 2 ~ V2, max_lag(3))`.
+#'
 #' - Numeric vector shortcut for `tier()`:
 #'   `tier(c(1, 2, 1))` assigns tiers by index to all existing variables.
 #'
@@ -60,7 +64,8 @@
 #'     initialize and freeze the variable set.
 #'   * Zero or more mini-DSL calls:
 #'     `tier()`, `exogenous()`, (shorthand `exo()`), or infix operators `%-->%`, `%!-->%`.
-#'     - `tier()`: One or more two-sided formulas (`tier(1 ~ x + y)`), or a numeric vector.
+#'     - `tier()`: One or more two-sided formulas (`tier(1 ~ x + y)`), or a numeric vector,
+#'       optionally followed by `max_lag(n)`.
 #'     - `exogenous()` / `exo()`: Variable names or tidyselect selectors.
 #'     Arguments are evaluated in order; only these calls are allowed.
 #'
@@ -110,7 +115,43 @@ knowledge <- function(...) {
   }
 
   tier <- function(...) {
-    specs <- rlang::list2(...)
+    exprs <- rlang::enexprs(...)
+
+    is_max_lag_call <- function(e) {
+      is.call(e) && identical(e[[1]], as.name("max_lag"))
+    }
+
+    max_lag_pos <- which(vapply(exprs, is_max_lag_call, logical(1)))
+
+    max_lag_val <- NULL
+    if (length(max_lag_pos)) {
+      if (length(max_lag_pos) > 1L) {
+        stop(
+          "tier() accepts only one `max_lag` specification.",
+          call. = FALSE
+        )
+      }
+
+      ml_expr <- exprs[[max_lag_pos]]
+      if (length(ml_expr) != 2L) {
+        stop(
+          "max_lag() inside tier() takes exactly one argument, ",
+          "e.g. max_lag(1).",
+          call. = FALSE
+        )
+      }
+
+      max_lag_val <- eval(ml_expr[[2L]], envir = parent.frame())
+
+      exprs <- exprs[-max_lag_pos]
+    }
+
+    specs <- lapply(exprs, eval, envir = parent.frame())
+
+    if (!length(specs) && !is.null(max_lag_val)) {
+      kn <<- set_max_lag(kn, max_lag_val)
+      return(kn)
+    }
 
     # ─────────────────────────── numeric-vector shortcut ──────────────────────
     if (
@@ -163,6 +204,9 @@ knowledge <- function(...) {
       }
 
       kn$vars <<- dplyr::mutate(kn$vars, tier = vec_lab)
+      if (!is.null(max_lag_val)) {
+        kn <<- set_max_lag(kn, max_lag_val)
+      }
       return(kn)
     }
 
@@ -286,6 +330,10 @@ knowledge <- function(...) {
       }
 
       kn <<- add_to_tier(kn, fml)
+    }
+
+    if (!is.null(max_lag_val)) {
+      kn <<- set_max_lag(kn, max_lag_val)
     }
 
     kn
@@ -564,6 +612,9 @@ print.Knowledge <- function(x, ...) {
   if (n_tiers > 0L) {
     parts <- c(parts, paste0(n_tiers, " tier", if (n_tiers != 1L) "s"))
   }
+  if (!is.null(x$max_lag) && !is.na(x$max_lag)) {
+    parts <- c(parts, paste0("max_lag = ", x$max_lag))
+  }
   if (n_vars > 0L) {
     parts <- c(parts, paste0(n_vars, " var", if (n_vars != 1L) "s"))
   }
@@ -646,9 +697,9 @@ print.Knowledge <- function(x, ...) {
 #'
 #' `summary()` for `Knowledge` objects is deprecated. Use `print()` instead.
 #'
-#' @param object A `Disco` object.
+#' @param object A `Knowledge` object.
 #' @param ... Additional arguments (not used).
-#' @exportS3Method summary Disco
+#' @exportS3Method summary Knowledge
 summary.Knowledge <- function(object, ...) {
   lifecycle::deprecate_warn(
     when = "1.2.0",
