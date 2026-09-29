@@ -1,7 +1,7 @@
 # Plot a Knowledge Object
 
 Visualize a `Knowledge` object as a directed graph using
-[`caugi::plot()`](https://caugi.org/reference/plot.html).
+[`caugi::plot()`](https://caugi.org/reference/plot.caugi.html).
 
 ## Usage
 
@@ -28,7 +28,7 @@ plot(x, required_col = "blue", forbidden_col = "red", ...)
 - ...:
 
   Additional arguments passed to
-  [`caugi::plot()`](https://caugi.org/reference/plot.html), e.g.,
+  [`caugi::plot()`](https://caugi.org/reference/plot.caugi.html), e.g.,
   `node_style`, `edge_style`.
 
 ## Value

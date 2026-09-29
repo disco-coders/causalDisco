@@ -429,6 +429,8 @@ Small simulated datasets to illustrate causalDisco workflows.
   : Generate a Bundle of Tier–Variable Formulas
 - [`set_knowledge()`](https://disco-coders.github.io/causalDisco/reference/set_knowledge.md)
   : Set Background Knowledge to Disco Method
+- [`set_max_lag()`](https://disco-coders.github.io/causalDisco/reference/set_max_lag.md)
+  : Set a Maximum Tier Lag on Knowledge
 - [`unfreeze()`](https://disco-coders.github.io/causalDisco/reference/unfreeze.md)
   : Unfreeze a Knowledge Object.
 

@@ -47,6 +47,7 @@ Other knowledge helpers:
 [`require_edge()`](https://disco-coders.github.io/causalDisco/reference/require_edge.md),
 [`seq_tiers()`](https://disco-coders.github.io/causalDisco/reference/seq_tiers.md),
 [`set_knowledge()`](https://disco-coders.github.io/causalDisco/reference/set_knowledge.md),
+[`set_max_lag()`](https://disco-coders.github.io/causalDisco/reference/set_max_lag.md),
 [`unfreeze()`](https://disco-coders.github.io/causalDisco/reference/unfreeze.md)
 
 ## Examples

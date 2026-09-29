@@ -17,7 +17,7 @@ summary(object, ...)
 
 - object:
 
-  A `Disco` object.
+  A `Knowledge` object.
 
 - ...:
 

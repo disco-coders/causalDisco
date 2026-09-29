@@ -27,7 +27,7 @@ plot(x, required_col = "blue", ...)
 - ...:
 
   Additional arguments passed to
-  [`caugi::plot()`](https://caugi.org/reference/plot.html) and
+  [`caugi::plot()`](https://caugi.org/reference/plot.caugi.html) and
   [`plot.Knowledge()`](https://disco-coders.github.io/causalDisco/reference/plot.Knowledge.md).
 
 ## Value
@@ -146,7 +146,6 @@ kn_untiered <- knowledge(
 
 bnlearn_pc <- pc(engine = "bnlearn", test = "fisher_z")
 res_untiered <- disco(data = num_data, method = bnlearn_pc, knowledge = kn_untiered)
-#> The learned graph is not a valid MPDAG because the background knowledge conflicts with the structure learned from the data; it is reported as PDAG instead.
 plot(res_untiered)
 
 

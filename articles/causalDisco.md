@@ -280,11 +280,12 @@ print(kn)
 #>   tier(youth): youth_x3, youth_x4
 #>   tier(oldage): oldage_x5, oldage_x6
 summary(kn)
-#>        Length Class  Mode   
-#> vars   2      tbl_df list   
-#> tiers  1      tbl_df list   
-#> edges  5      tbl_df list   
-#> frozen 1      -none- logical
+#> Warning: `summary()` was deprecated in causalDisco 1.2.0.
+#> ℹ Please use `print()` instead.
+#> <Knowledge: 3 tiers | 6 vars>
+#>   tier(child): child_x1, child_x2
+#>   tier(youth): youth_x3, youth_x4
+#>   tier(oldage): oldage_x5, oldage_x6
 plot(kn, main = "Temporal Knowledge")
 ```
 
@@ -326,8 +327,6 @@ print(tpc_result)
 #>   tier(youth): youth_x3, youth_x4
 #>   tier(oldage): oldage_x5, oldage_x6
 summary(tpc_result)
-#> Warning: `summary()` was deprecated in causalDisco 1.2.0.
-#> ℹ Please use `print()` instead.
 #> <Disco MPDAG: 6 nodes | 6 edges | Knowledge: 3 tiers>
 #> Learned graph:
 #>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5

@@ -80,7 +80,7 @@ evaluate(cg1, cg2)
 #>   adj_npv adj_f1_score adj_g1_score dir_precision dir_recall dir_specificity
 #> 1       0          0.5            0             0          0               0
 #>   dir_false_omission_rate dir_fdr dir_npv dir_f1_score dir_g1_score shd hd
-#> 1                       1       1       0            0            0   3  0
+#> 1                       1       1       0            0            0   3  2
 #>         aid
 #> 1 0.6666667
 evaluate(

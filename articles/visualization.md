@@ -22,7 +22,7 @@ You can visualize causal graphs using the
 [`plot()`](https://disco-coders.github.io/causalDisco/reference/plot.md)
 function, which works for both `Knowledge` and `Disco` objects. The
 function leverages the underlying
-[`caugi::plot()`](https://caugi.org/reference/plot.html) method,
+[`caugi::plot()`](https://caugi.org/reference/plot.caugi.html) method,
 providing flexible options for customizing the appearance of nodes and
 edges.
 
@@ -65,8 +65,8 @@ illustrate this with a simple example below. For a full description of
 available options, see the documentation for
 [`causalDisco::plot()`](https://disco-coders.github.io/causalDisco/reference/plot.md),
 as well as the underlying
-[`caugi::plot()`](https://caugi.org/reference/plot.html) function and
-its visualization vignette
+[`caugi::plot()`](https://caugi.org/reference/plot.caugi.html) function
+and its visualization vignette
 ([`vignette("visualization", "caugi")`](https://caugi.org/articles/visualization.html)).
 
 Here we use the `"fruchterman-reingold"` layout and customize node and
@@ -248,13 +248,13 @@ allowing you to customize layouts, styles, and edges further in your
 LaTeX document. It calls the underlying
 [`causalDisco::plot()`](https://disco-coders.github.io/causalDisco/reference/plot.md)
 method (which calls
-[`caugi::plot()`](https://caugi.org/reference/plot.html)) to generate
-the initial plot object before converting it to TikZ code. Thus, you can
-supply any arguments to
+[`caugi::plot()`](https://caugi.org/reference/plot.caugi.html)) to
+generate the initial plot object before converting it to TikZ code.
+Thus, you can supply any arguments to
 [`make_tikz()`](https://disco-coders.github.io/causalDisco/reference/make_tikz.md)
 that are supported by
 [`causalDisco::plot()`](https://disco-coders.github.io/causalDisco/reference/plot.md)
-and [`caugi::plot()`](https://caugi.org/reference/plot.html).
+and [`caugi::plot()`](https://caugi.org/reference/plot.caugi.html).
 
 ### Exporting Knowledge to TikZ
 
@@ -320,9 +320,10 @@ inside an existing LaTeX document.
 The TikZ export also supports edge bending, which can substantially
 improve readability when edges pass through other nodes, as can easily
 happen in tiered knowledge structures. This feature is not available in
-the standard [`caugi::plot()`](https://caugi.org/reference/plot.html)
-function. Here is an example, where the edge using the standard straight
-style edge overlaps the node `youth_x3`, while the bent edge avoids this
+the standard
+[`caugi::plot()`](https://caugi.org/reference/plot.caugi.html) function.
+Here is an example, where the edge using the standard straight style
+edge overlaps the node `youth_x3`, while the bent edge avoids this
 overlap:
 
 ``` r
@@ -448,7 +449,7 @@ The same export mechanism also applies to standard
 cg <- caugi::caugi(
   A %-->% B + C
 )
-plot_obj <- caugi::plot(cg, node_style = list(fill = "red"))
+plot_obj <- plot(cg, node_style = list(fill = "red"))
 tikz_caugi_snippet <- make_tikz(plot_obj, scale = 10, full_doc = FALSE)
 ```
 

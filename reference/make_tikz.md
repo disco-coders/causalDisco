@@ -31,7 +31,7 @@ make_tikz(
 
   Additional arguments passed to
   [`plot()`](https://disco-coders.github.io/causalDisco/reference/plot.md)
-  and [`caugi::plot()`](https://caugi.org/reference/plot.html).
+  and [`caugi::plot()`](https://caugi.org/reference/plot.caugi.html).
 
 - scale:
 

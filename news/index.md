@@ -2,6 +2,16 @@
 
 ## causalDisco (development version)
 
+### New features
+
+- Added `max_lag()` /
+  [`set_max_lag()`](https://disco-coders.github.io/causalDisco/reference/set_max_lag.md)
+  to
+  [`knowledge()`](https://disco-coders.github.io/causalDisco/reference/knowledge.md),
+  which forbids edges between variables that are more than a given
+  number of tiers apart. `max_lag()` is set inside `tier()`, alongside
+  its formulas: `tier(1 ~ V1, 2 ~ V2, max_lag(1))`.
+
 ### Bug fixes
 
 - `pc(engine = "pcalg")` no longer errors when the estimated graph

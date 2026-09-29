@@ -75,7 +75,8 @@ extended with variable relationships expressed via formulas, selectors, or infix
 <dd><p>Arguments to define the <code>Knowledge</code> object:</p><ul><li><p>Optionally, a single data frame (first argument) whose column names
 initialize and freeze the variable set.</p></li>
 <li><p>Zero or more mini-DSL calls:
-<code>tier()</code>, <code>exogenous()</code>, (shorthand <code>exo()</code>), or infix operators <code>%--&gt;%</code>, <code>%!--&gt;%</code>.</p><ul><li><p><code>tier()</code>: One or more two-sided formulas (<code>tier(1 ~ x + y)</code>), or a numeric vector.</p></li>
+<code>tier()</code>, <code>exogenous()</code>, (shorthand <code>exo()</code>), or infix operators <code>%--&gt;%</code>, <code>%!--&gt;%</code>.</p><ul><li><p><code>tier()</code>: One or more two-sided formulas (<code>tier(1 ~ x + y)</code>), or a numeric vector,
+optionally followed by <code>max_lag(n)</code>.</p></li>
 <li><p><code>exogenous()</code> / <code>exo()</code>: Variable names or tidyselect selectors.
 Arguments are evaluated in order; only these calls are allowed.</p></li>
 </ul></li>
@@ -107,6 +108,9 @@ specifies variables. Variables can also be selected using tidyselect syntax:
 <li><p><code>%--&gt;%</code> and <code>%!--&gt;%</code>: Infix operators to define required and forbidden edges, respectively.
 Both sides of the operator can use tidyselect syntax to select multiple variables.</p></li>
 <li><p><code>exogenous()</code> / <code>exo()</code>: Mark variables as exogenous.</p></li>
+<li><p><code>max_lag()</code>: Forbids edges between variables that are more than <code>n</code>
+tiers apart, e.g. <code>max_lag(3)</code>. Set inside <code>tier()</code>, alongside its
+formulas: <code>tier(1 ~ V1, 2 ~ V2, max_lag(3))</code>.</p></li>
 <li><p>Numeric vector shortcut for <code>tier()</code>:
 <code>tier(c(1, 2, 1))</code> assigns tiers by index to all existing variables.</p></li>
 </ul><p>Multiple calls or operators are additive: each call adds new edges to the <code>Knowledge</code> object.
@@ -139,6 +143,7 @@ For example:</p>
 <code><a href="require_edge.html">require_edge()</a></code>,
 <code><a href="seq_tiers.html">seq_tiers()</a></code>,
 <code><a href="set_knowledge.html">set_knowledge()</a></code>,
+<code><a href="set_max_lag.html">set_max_lag()</a></code>,
 <code><a href="unfreeze.html">unfreeze()</a></code></p></div>
     </div>
 

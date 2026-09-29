@@ -28,7 +28,7 @@ knowledge(...)
     `exo()`), or infix operators `%-->%`, `%!-->%`.
 
     - `tier()`: One or more two-sided formulas (`tier(1 ~ x + y)`), or a
-      numeric vector.
+      numeric vector, optionally followed by `max_lag(n)`.
 
     - `exogenous()` / `exo()`: Variable names or tidyselect selectors.
       Arguments are evaluated in order; only these calls are allowed.
@@ -69,6 +69,10 @@ operators, or
 
 - `exogenous()` / `exo()`: Mark variables as exogenous.
 
+- `max_lag()`: Forbids edges between variables that are more than `n`
+  tiers apart, e.g. `max_lag(3)`. Set inside `tier()`, alongside its
+  formulas: `tier(1 ~ V1, 2 ~ V2, max_lag(3))`.
+
 - Numeric vector shortcut for `tier()`: `tier(c(1, 2, 1))` assigns tiers
   by index to all existing variables.
 
@@ -105,6 +109,7 @@ Other knowledge helpers:
 [`require_edge()`](https://disco-coders.github.io/causalDisco/reference/require_edge.md),
 [`seq_tiers()`](https://disco-coders.github.io/causalDisco/reference/seq_tiers.md),
 [`set_knowledge()`](https://disco-coders.github.io/causalDisco/reference/set_knowledge.md),
+[`set_max_lag()`](https://disco-coders.github.io/causalDisco/reference/set_max_lag.md),
 [`unfreeze()`](https://disco-coders.github.io/causalDisco/reference/unfreeze.md)
 
 ## Examples
