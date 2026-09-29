@@ -25,14 +25,14 @@ custom functions.
 Note that Tetrad-based algorithms do not currently support custom CI tests, so
 this article will only cover the engines bnlearn, causalDisco, and pcalg.
 
-# Custom Tests
+## Custom Tests
 
 The interface for custom tests depends slightly on the engine being used.
 causalDisco and pcalg use the exact same interface, while bnlearn is slightly
 different for now. We plan to unify the interface across engines in a future
 release.
 
-## causalDisco and pcalg engines
+### causalDisco and pcalg engines
 
 A custom test takes the signature
 `function(x, y, conditioning_set, suff_stat, args)`, (`args` is an optional).
@@ -114,7 +114,7 @@ should include an `args` parameter, i.e. be
 arguments can be passed as a list to the `args` parameter when defining the
 method.
 
-## bnlearn
+### bnlearn
 
 For bnlearn the signature should be the same, but you must pass `suff_stat/data`
 directly in the function, since bnlearn does not have a way to precompute
@@ -163,7 +163,7 @@ result <- disco(data = num_data, method = my_pc)
 plot(result)
 ```
 
-# Custom Scores
+## Custom Scores
 
 Not yet implemented, but will be added in a future release. Stay tuned for
 updates on this feature!

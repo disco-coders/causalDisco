@@ -24,7 +24,7 @@ Practice](https://arxiv.org/abs/2305.10032).
 The goal of causal discovery is to infer the causal relationships among a set of
 observed variables using observational data.
 
-# Example of causal discovery
+## Example of causal discovery
 
 Suppose we have this DAG:
 
@@ -149,7 +149,7 @@ plot(pc_result_reverse, layout = layout, main = "PC (pcalg) reversed")
 We learn the same causal structure as before, demonstrating that the direction
 of influence between `X2` and `X3` cannot be determined from the data alone.
 
-# Unobserved confounding
+## Unobserved confounding
 
 In practice, unobserved confounding may be present, violating one of the
 assumptions of the PC algorithm. Suppose we have the following DAG with an
@@ -223,7 +223,7 @@ We see that the PC algorithm does not recover the correct causal structure due
 to the presence of the unobserved confounder. In particular, it found an
 incorrect edge between `X1` and `X2`.
 
-# Next steps
+## Next steps
 
 For more information about how to incorporate knowledge into causal discovery
 methods, see the [knowledge article](knowledge.html).

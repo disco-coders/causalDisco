@@ -303,6 +303,40 @@ test_that(".validate_graph_type downgrades invalid CPDAGs/MPDAGs to PDAG with a 
   expect_equal(res2, "PDAG")
 })
 
+test_that("as_disco.pcAlgo falls back to UNKNOWN with a message on a cyclic PDAG", {
+  # pcalg amat coding: amat[i,j] = 1, amat[j,i] = 0 means j -> i. This encodes
+  # the directed cycle A -> B -> C -> A.
+  nodes <- c("A", "B", "C")
+  amat <- matrix(
+    c(
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+    ),
+    nrow = 3,
+    byrow = TRUE,
+    dimnames = list(nodes, nodes)
+  )
+  mockery::stub(as_disco.pcAlgo, "methods::as", function(object, class) amat)
+
+  expect_message(
+    result <- as_disco.pcAlgo(
+      structure(list(), class = "pcAlgo"),
+      knowledge()
+    ),
+    "Cannot mutate graph to class 'PDAG'. The graph contains a directed cycle.",
+    fixed = TRUE
+  )
+  expect_s3_class(result, "Disco")
+  expect_true(caugi::is_caugi(result$caugi))
+})
+
 test_that(".pcalg_amat_to_edges decodes directed, undirected, and bidirected edges", {
   nodes <- c("A", "B", "C", "D")
   # pcalg cpdag coding:

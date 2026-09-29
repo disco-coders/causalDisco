@@ -21,7 +21,7 @@ tools for causal discovery from observational data. It covers the main features
 of the package, including various causal discovery algorithms, knowledge
 incorporation, and result visualization.
 
-# Running causal discovery algorithms
+## Running causal discovery algorithms
 
 We will for this section use the `num_data` dataset included in the package for
 demonstrating how to run causal discovery algorithms. It contains 5 numerical
@@ -190,7 +190,7 @@ print the object:
 print(pc_result_bnlearn)
 ```
 
-# Incorporating knowledge
+## Incorporating knowledge
 
 We will for this section use the dataset `tpc_example`, which contains
 variables, which are measured at three different life stages: childhood, youth,
@@ -273,7 +273,7 @@ Like before, the tiered knowledge is reflected in the plot layout, with
 variables grouped by life stage. Additionally, you can customize the plot
 appearance further by passing additional arguments to `plot()`.
 
-# Next steps
+## Next steps
 
 For more information about how to incorporate knowledge, see the [knowledge
 article](https://disco-coders.github.io/causalDisco/articles/knowledge.html).

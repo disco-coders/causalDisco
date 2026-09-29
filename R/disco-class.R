@@ -48,6 +48,48 @@ new_disco <- function(cg, kn) {
   )
 }
 
+#' @title Build a caugi Graph, Falling Back to UNKNOWN on an Invalid Claimed Class
+#'
+#' @description
+#' Constraint-based algorithms can, due to statistical errors in finite samples, return edges
+#' that do not form a valid graph of the claimed `class`. Rather than erroring, this builds the
+#' graph as `"UNKNOWN"` instead and messages with a diagnostic naming the actual defect, checked
+#' via [caugi::is_acyclic()] and the presence of `<->` edges.
+#'
+#' @param build A function taking a single `class` argument and returning a [caugi::caugi]
+#' object of that class (e.g. `\(cls) caugi::caugi(..., class = cls)` or
+#' `\(cls) caugi::mutate_caugi(cg, cls)`).
+#' @param class The claimed graph class.
+#' @returns The result of `build(class)` if that succeeds, otherwise `build("UNKNOWN")`.
+#' @keywords internal
+#' @noRd
+.caugi_with_fallback <- function(build, class) {
+  tryCatch(
+    build(class),
+    error = function(e) {
+      cg_unknown <- build("UNKNOWN")
+      detail <- ""
+      if (identical(class, "PDAG")) {
+        acyclic <- tryCatch(caugi::is_acyclic(cg_unknown), error = function(e) {
+          NA
+        })
+        has_bidirected <- any(caugi::edges(cg_unknown)$edge == "<->")
+        detail <- if (isFALSE(acyclic) && has_bidirected) {
+          " The graph contains a directed cycle and bidirected conflict edges."
+        } else if (isFALSE(acyclic)) {
+          " The graph contains a directed cycle."
+        } else if (has_bidirected) {
+          " The graph contains bidirected conflict edges."
+        } else {
+          " The graph is not a valid PDAG."
+        }
+      }
+      message(sprintf("Cannot mutate graph to class '%s'.%s", class, detail))
+      cg_unknown
+    }
+  )
+}
+
 #' @inheritParams as_disco
 #' @export
 as_disco.default <- function(
@@ -88,11 +130,16 @@ as_disco.pcAlgo <- function(
     cg <- caugi::caugi(nodes = nodes, class = class)
   } else {
     cg_class <- if (any(edges$edge == "<->")) "UNKNOWN" else class
-    cg <- caugi::caugi(
-      from = edges$from,
-      edge = edges$edge,
-      to = edges$to,
-      nodes = nodes,
+    cg <- .caugi_with_fallback(
+      build = function(cls) {
+        caugi::caugi(
+          from = edges$from,
+          edge = edges$edge,
+          to = edges$to,
+          nodes = nodes,
+          class = cls
+        )
+      },
       class = cg_class
     )
   }
@@ -250,11 +297,16 @@ as_disco.EssGraph <- function(
       edge = dplyr::if_else(.data$has_fw & .data$has_bw, "---", "-->")
     )
 
-  cg <- caugi::caugi(
-    from = collapsed$from,
-    edge = collapsed$edge,
-    to = collapsed$to,
-    nodes = nodes,
+  cg <- .caugi_with_fallback(
+    build = function(cls) {
+      caugi::caugi(
+        from = collapsed$from,
+        edge = collapsed$edge,
+        to = collapsed$to,
+        nodes = nodes,
+        class = cls
+      )
+    },
     class = class
   )
   new_disco(cg, kn)

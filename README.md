@@ -34,7 +34,10 @@ by methodological class, with the supported engines and output graph
 class for each (function identifiers given in parentheses).
 
 <p align="center">
-<img src="man/figures/README-algorithms-table.svg" alt="Table of causal discovery algorithms available in causalDisco, grouped by methodological class (constraint-based, score-based, hybrid), with the supported engines and output graph class for each." width="380" />
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="man/figures/algorithms-table-dark.svg" />
+<img src="man/figures/algorithms-table-light.svg" alt="Table of causal discovery algorithms available in causalDisco, grouped by methodological class (constraint-based, score-based, hybrid), with the supported engines and output graph class for each." width="380" />
+</picture>
 </p>
 
 ## Installation
