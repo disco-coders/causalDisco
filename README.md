@@ -34,6 +34,7 @@ by methodological class, with the supported engines and output graph
 class for each (function identifiers given in parentheses).
 
 <p align="center">
+
 <picture>
 <source media="(prefers-color-scheme: dark)" srcset="man/figures/algorithms-table-dark.svg" />
 <img src="man/figures/algorithms-table-light.svg" alt="Table of causal discovery algorithms available in causalDisco, grouped by methodological class (constraint-based, score-based, hybrid), with the supported engines and output graph class for each." width="380" />
@@ -78,8 +79,6 @@ automatically for rJava. You can install Java using the
 `rJavaEnv::java_quick_install()` function:
 
 ``` r
-# Use the development version of rJavaEnv from GitHub
-# pak::pak("e-kotov/rJavaEnv")
 rJavaEnv::java_quick_install(version = 25, distribution = "Temurin")
 ```
 
