@@ -28,9 +28,9 @@ test_that("rfci Tetrad algorithm run without error and return correct classes", 
     test = "fisher_z",
     alg_args = list(
       depth = 3,
-      stable_fas = FALSE,
       max_disc_path_length = 2,
-      complete_rule_set_used = FALSE
+      exclude_selection_bias = TRUE,
+      fdr_q = 0.05
     )
   )
 

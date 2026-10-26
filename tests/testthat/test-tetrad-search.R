@@ -568,3 +568,71 @@ test_that("get_dot() and get_amat() cover explicit java_obj + cast_obj branch", 
   expect_true(nzchar(dot_explicit))
   expect_true(nzchar(amat_explicit))
 })
+
+test_that("algorithm setters only set parameters that the Tetrad wrapper uses", {
+  algs <- c(
+    "fges",
+    "fges_mb",
+    "boss",
+    "restricted_boss",
+    "cstar",
+    "sp",
+    "grasp",
+    "pc",
+    "cpc",
+    "pc_max",
+    "fci",
+    "rfci",
+    "cfci",
+    "gfci",
+    "boss_fci",
+    "fcit",
+    "grasp_fci",
+    "sp_fci",
+    "ica_lingam",
+    "ica_lingd",
+    "fask",
+    "ccd",
+    "direct_lingam",
+    "dagma"
+  )
+  # Parameters the wrapper reads but leaves out of `getParameters()`.
+  read_but_unlisted <- list(
+    grasp = "graspUseScore",
+    grasp_fci = "graspUseScore"
+  )
+  # `.jcall()` with an explicit signature avoids reflective `$` calls, which
+  # fail on non-public collection classes such as HashMap's key set.
+  java_strings <- function(collection) {
+    arr <- rJava::.jcall(collection, "[Ljava/lang/Object;", "toArray")
+    vapply(arr, rJava::.jstrVal, "")
+  }
+
+  purrr::walk(algs, \(alg) {
+    ts <- TetradSearch$new()
+    ts$set_test("fisher_z")
+    ts$set_score("sem_bic")
+    before <- java_strings(ts$params$getParametersNames())
+    suppressWarnings(ts$set_alg(alg))
+    set_by_alg <- setdiff(java_strings(ts$params$getParametersNames()), before)
+    used_by_wrapper <- c(
+      java_strings(ts$alg$getParameters()),
+      read_but_unlisted[[alg]]
+    )
+    expect_equal(
+      setdiff(set_by_alg, used_by_wrapper),
+      character(0),
+      info = paste0("Unused Tetrad parameters set by set_alg('", alg, "')")
+    )
+  })
+})
+
+test_that("collider_orientation_style is validated", {
+  ts <- TetradSearch$new()
+  ts$set_test("fisher_z")
+  expect_no_condition(ts$set_alg("pc", collider_orientation_style = "sepsets"))
+  expect_error(
+    ts$set_alg("pc", collider_orientation_style = "majority"),
+    "Unsupported `collider_orientation_style` input"
+  )
+})

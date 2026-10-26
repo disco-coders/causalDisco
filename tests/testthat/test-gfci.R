@@ -41,6 +41,7 @@ test_that("gfci Tetrad algorithm run without error and return correct classes", 
       guarantee_pag = TRUE,
       start_complete = TRUE,
       num_threads = 2,
+      exclude_selection_bias = TRUE,
       verbose = TRUE
     )
   )

@@ -44,11 +44,11 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     engine = "tetrad",
     score = "poisson_prior",
     test = "rank_independence",
-    depth = 3,
     max_disc_path_length = 5,
     use_heuristic = FALSE,
     complete_rule_set_used = FALSE,
     guarantee_pag = TRUE,
+    exclude_selection_bias = FALSE,
     verbose = FALSE
   )
   disco(num_data, sp_fci_tetrad)

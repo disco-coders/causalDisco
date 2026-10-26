@@ -37,6 +37,7 @@ test_that("sp_fci Tetrad algorithm run without error and return correct classes"
       use_heuristic = FALSE,
       complete_rule_set_used = FALSE,
       guarantee_pag = TRUE,
+      exclude_selection_bias = TRUE,
       verbose = FALSE
     )
   )

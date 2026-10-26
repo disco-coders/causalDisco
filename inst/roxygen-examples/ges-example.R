@@ -49,8 +49,8 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     score = "ebic",
     symmetric_first_step = TRUE,
     max_degree = 3,
-    parallelized = TRUE,
-    faithfulness_assumed = TRUE
+    faithfulness_assumed = TRUE,
+    num_threads = 1
   )
   disco(tpc_example, ges_tetrad)
 }

@@ -103,7 +103,10 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     use_bes = FALSE,
     use_heuristic = FALSE,
     complete_rule_set_used = FALSE,
-    guarantee_pag = TRUE
+    guarantee_pag = TRUE,
+    num_starts = 2,
+    num_threads = 1,
+    exclude_selection_bias = FALSE
   )
   disco(tpc_example, boss_fci_tetrad)
 }

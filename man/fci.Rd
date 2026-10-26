@@ -116,7 +116,11 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     max_disc_path_length = 4,
     depth = 10,
     stable_fas = FALSE,
-    guarantee_pag = TRUE
+    guarantee_pag = TRUE,
+    collider_orientation_style = "sepsets",
+    do_possible_dsep = FALSE,
+    exclude_selection_bias = FALSE,
+    fdr_q = 0.05
   )
   disco(tpc_example, fci_tetrad)
 }

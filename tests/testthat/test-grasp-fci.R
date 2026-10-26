@@ -34,16 +34,18 @@ test_that("grasp_fci Tetrad algorithm run without error and return correct class
     test = "rank_independence",
     alg_args = list(
       depth = 3,
-      stable_fas = FALSE,
       max_disc_path_length = 5,
-      covered_depth = 3,
       singular_depth = 2,
       nonsingular_depth = 2,
       ordered_alg = TRUE,
       raskutti_uhler = TRUE,
       use_data_order = FALSE,
       num_starts = 3,
-      guarantee_pag = TRUE
+      guarantee_pag = TRUE,
+      use_score = FALSE,
+      use_heuristic = TRUE,
+      exclude_selection_bias = TRUE,
+      seed = 1405
     )
   )
 

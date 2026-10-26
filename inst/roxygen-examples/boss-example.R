@@ -38,7 +38,9 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     num_starts = 2,
     use_bes = FALSE,
     use_data_order = FALSE,
-    output_cpdag = FALSE
+    output_cpdag = FALSE,
+    num_threads = 1,
+    seed = 1405
   )
   disco(tpc_example, boss_tetrad)
 }

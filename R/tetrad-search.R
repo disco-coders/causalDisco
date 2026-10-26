@@ -714,7 +714,11 @@ TetradSearch <- R6Class(
     #'      \item \code{use_data_order = TRUE} - If TRUE, the data variable
     #'       order should be used for the first initial permutation,
     #'      \item \code{output_cpdag = TRUE} - If TRUE, the DAG output of the
-    #'      algorithm is converted to a CPDAG.
+    #'      algorithm is converted to a CPDAG,
+    #'      \item \code{num_threads = 1} - Number of threads to use for the
+    #'       search,
+    #'      \item \code{seed = -1} - Seed for Tetrad's random number generator.
+    #'       If -1, no seed is set.
     #'    }
     #'  \item \code{"boss_fci"} - BOSS-FCI algorithm.
     #'   \itemize{
@@ -732,14 +736,21 @@ TetradSearch <- R6Class(
     #'     completeness, should be used; TRUE if the (fuller) set due to
     #'     J. Zhang, should be used guaranteeing additional tail completeness,
     #'    \item \code{guarantee_pag = FALSE} - Ensure the output is a legal PAG
-    #'     (where feasible).
+    #'     (where feasible),
+    #'    \item \code{num_starts = 1} - The number of times the algorithm
+    #'     should be started from different initializations,
+    #'    \item \code{num_threads = 1} - Number of threads to use for the
+    #'     search,
+    #'    \item \code{exclude_selection_bias = FALSE} - If TRUE, exclude the
+    #'     possibility of selection bias.
     #'   }
     #    \item \code{"ccd"} - Cyclic Causal Discovery.
     #     \itemize{
-    #       \item \code{depth = -1} - Maximum size of conditioning set,
     #       \item \code{apply_r1 = TRUE} - Set this parameter to FALSE if a
     #        chain of directed edges pointing in the same direction, when only
-    #        the first few such orientations are justified based on the data.
+    #        the first few such orientations are justified based on the data,
+    #       \item \code{fdr_q = 0} - False discovery rate q value. If 0, FDR
+    #        control is not used.
     #     }
     #    \item \code{"cfci"} - Adjusts FCI to use conservative orientation as in
     #     CPC.
@@ -750,22 +761,18 @@ TetradSearch <- R6Class(
     #       \item \code{complete_rule_set_used = TRUE} - FALSE if the (simpler)
     #       final orientation rules set due to P. Spirtes, guaranteeing arrow
     #       completeness, should be used; TRUE if the (fuller) set due to
-    #       J. Zhang, should be used guaranteeing additional tail completeness.
+    #       J. Zhang, should be used guaranteeing additional tail completeness,
+    #       \item \code{do_possible_dsep = TRUE} - If TRUE, the possible d-sep
+    #       search is done.
     #     }
     #    \item \code{"cpc"} - Conservative PC algorithm.
     #     \itemize{
-    #       \item \code{conflict_rule = 1} -
-    #       The value of \code{conflict_rule} determines how collider conflicts are handled. \code{1}
-    #       corresponds to the "overwrite" rule as introduced in the \pkg{pcalg} package, see
-    #       [pcalg::pc()]. \code{2} means that all collider conflicts using bidirected edges
-    #       should be prioritized, while \code{3} means that existing colliders should be prioritized,
-    #       ignoring subsequent conflicting information.
     #       \item \code{depth = -1} - Maximum size of conditioning set,
     #       \item \code{stable_fas = TRUE} - If TRUE, the "stable" version of
     #        the PC adjacency search is used, which for k > 0 fixes the graph
-    #        for depth k + 1 to that of the previous depth k.
-    #       \item \code{guarantee_cpdag = FALSE} - If TRUE, ensure the output is
-    #        a legal CPDAG.
+    #        for depth k + 1 to that of the previous depth k,
+    #       \item \code{allow_bidirected = FALSE} - If TRUE, collider conflicts
+    #        are shown as bidirected edges.
     #     }
     #    \item \code{"cstar"} - CStaR algorithm (Causal Stability Ranking).
     #     \itemize{
@@ -828,7 +835,22 @@ TetradSearch <- R6Class(
     #'       completeness, should be used; TRUE if the (fuller) set due to
     #'       J. Zhang, should be used guaranteeing additional tail completeness.
     #'      \item \code{guarantee_pag = FALSE} - Ensure the output is a legal
-    #'       PAG (where feasible).
+    #'       PAG (where feasible),
+    #'      \item \code{collider_orientation_style = "max_p"} - How unshielded
+    #'       colliders are oriented in the initial step.
+    #'       \code{"sepsets"} orients a collider if Z is not in the separating
+    #'       set of X and Y found during the adjacency search (as in the
+    #'       original FCI). \code{"conservative"} orients a collider only if Z
+    #'       is in none of the separating sets of X and Y, and leaves the
+    #'       triple unoriented if they disagree. \code{"max_p"} orients a
+    #'       collider if Z is not in the separating set with the highest
+    #'       p-value,
+    #'      \item \code{do_possible_dsep = TRUE} - If TRUE, the possible d-sep
+    #'       search is done,
+    #'      \item \code{exclude_selection_bias = FALSE} - If TRUE, exclude the
+    #'       possibility of selection bias,
+    #'      \item \code{fdr_q = 0} - False discovery rate q value. If 0, FDR
+    #'       control is not used.
     #'    }
     #    \item \code{"fcit"} - FCI Targeted Testing (FCIT) algorithm
     #    \itemize{
@@ -841,8 +863,6 @@ TetradSearch <- R6Class(
     #      should be started from different initializations. By default, the
     #      algorithm will be run through at least once using the initialized
     #      parameters,
-    #      \item \code{max_disc_path_length = -1} - Maximum length for any
-    #      discriminating path,
     #      \item \code{start_with = "BOSS"} - What algorithm to run first to get
     #      the initial CPDAG that the rest of the FCIT procedure refines. Available
     #      options are: \code{"BOSS"}, \code{"GRaSP"}, and \code{"SP"}.
@@ -851,8 +871,8 @@ TetradSearch <- R6Class(
     #      completeness, should be used; TRUE if the (fuller) set due to
     #      J. Zhang, should be used guaranteeing additional tail completeness,
     #      \item \code{depth = -1} - Maximum size of conditioning set,
-    #      \item \code{guarantee_pag = FALSE} - Ensure the output is a legal
-    #      PAG (where feasible).
+    #      \item \code{exclude_selection_bias = FALSE} - If TRUE, exclude the
+    #      possibility of selection bias.
     #   }
     #'   \item \code{"ges" ("fges")} - Fast Greedy Equivalence Search (FGES) algorithm.
     #'    \itemize{
@@ -860,11 +880,11 @@ TetradSearch <- R6Class(
     #'       X --> Y and X <-- Y will be calculated and the higher score used.
     #'      \item \code{max_degree = -1} - Maximum degree of any node in the
     #'       graph. Set to -1 for unlimited,
-    #'      \item \code{parallelized = FALSE} - If TRUE, the algorithm should
-    #'       be parallelized,
     #'      \item \code{faithfulness_assumed = FALSE} - If TRUE, assume that if
     #'       \eqn{X \perp\!\!\!\perp Y} (by an independence test) then
-    #'       \eqn{X \perp\!\!\!\perp Y} | Z for nonempty Z.
+    #'       \eqn{X \perp\!\!\!\perp Y} | Z for nonempty Z,
+    #'      \item \code{num_threads = 1} - Number of threads to use for the
+    #'       search.
     #'    }
     #    \item \code{"ges_mb" ("fges_mb")} - Fast Greedy Equivalence Search with Markov
     #    Blanket (FGES-MB) algorithm.
@@ -897,7 +917,11 @@ TetradSearch <- R6Class(
     #'       PAG (where feasible),
     #'      \item \code{use_heuristic = FALSE} - If TRUE, use the max p heuristic.
     #'      \item \code{start_complete = FALSE} - If TRUE, start from a complete
-    #'      graph.
+    #'      graph,
+    #'      \item \code{num_threads = 1} - Number of threads to use for the
+    #'       search,
+    #'      \item \code{exclude_selection_bias = FALSE} - If TRUE, exclude the
+    #'       possibility of selection bias.
     #'    }
     #'   \item \code{"grasp"} - GRaSP (Greedy Relations of Sparsest Permutation)
     #'   algorithm.
@@ -911,30 +935,37 @@ TetradSearch <- R6Class(
     #'      \item \code{ordered_alg = FALSE} - If TRUE, earlier GRaSP stages
     #'       should be performed before later stages,
     #'      \item \code{raskutti_uhler = FALSE} - If TRUE, use Raskutti and
-    #'       Uhler's DAG-building method (test); if FALSE, use Grow-Shrink
-    #'       (score).
+    #'       Uhler's DAG-building method, which uses the independence test.
+    #'       If FALSE, use Grow-Shrink, which uses the score or the test
+    #'       depending on \code{use_score},
     #'      \item \code{use_data_order = TRUE} - If TRUE, the data variable
     #'       order should be used for the first initial permutation,
     #'      \item \code{num_starts = 1} - The number of times the algorithm
     #'       should be started from different initializations. By default, the
     #'       algorithm will be run through at least once using the initialized
-    #'       parameters.
+    #'       parameters,
+    #'      \item \code{use_score = TRUE} - Only used when
+    #'       \code{raskutti_uhler = FALSE}. If TRUE, Grow-Shrink uses the score
+    #'       to find parents; if FALSE, it uses the independence test,
+    #'      \item \code{allow_internal_randomness = TRUE} - If TRUE, the search
+    #'       shuffles variables and parents in random order. This randomness
+    #'       is not controlled by \code{set.seed()} or \code{seed}, so set it
+    #'       to FALSE for reproducible results,
+    #'      \item \code{output_cpdag = TRUE} - If TRUE, the DAG output of the
+    #'       algorithm is converted to a CPDAG,
+    #'      \item \code{seed = -1} - Seed for Tetrad's random number generator.
+    #'       If -1, no seed is set.
     #'    }
     #'   \item \code{"grasp_fci"} - GRaSP-FCI algorithm. Combines GRaSP and FCI.
     #'    \itemize{
     #'      \item \code{depth = -1} - Maximum size of conditioning set.
     #'        Set to -1 for unlimited,
-    #'      \item \code{stable_fas = TRUE} - If TRUE, the "stable" version of
-    #'       the PC adjacency search is used, which for k > 0 fixes the graph
-    #'       for depth k + 1 to that of the previous depth k.
     #'      \item \code{max_disc_path_length = -1} - Maximum length for any
     #'       discriminating path. Set to -1 for unlimited,
     #'      \item \code{complete_rule_set_used = TRUE} - FALSE if the (simpler)
     #'       final orientation rules set due to P. Spirtes, guaranteeing arrow
     #'       completeness, should be used; TRUE if the (fuller) set due to
     #'       J. Zhang, should be used guaranteeing additional tail completeness,
-    #'      \item \code{covered_depth = 4} - The depth of recursion for first
-    #'       search,
     #'      \item \code{singular_depth = 1} - Recursion depth for singular
     #'       tucks,
     #'      \item \code{nonsingular_depth = 1} - Recursion depth for nonsingular
@@ -942,8 +973,9 @@ TetradSearch <- R6Class(
     #'      \item \code{ordered_alg = FALSE} - If TRUE, earlier GRaSP stages
     #'       should be performed before later stages,
     #'      \item \code{raskutti_uhler = FALSE} - If TRUE, use Raskutti and
-    #'       Uhler's DAG-building method (test); if FALSE, use Grow-Shrink
-    #'       (score).
+    #'       Uhler's DAG-building method, which uses the independence test.
+    #'       If FALSE, use Grow-Shrink, which uses the score or the test
+    #'       depending on \code{use_score},
     #'      \item \code{use_data_order = TRUE} - If TRUE, the data variable
     #'       order should be used for the first initial permutation,
     #'      \item \code{num_starts = 1} - The number of times the algorithm
@@ -951,7 +983,16 @@ TetradSearch <- R6Class(
     #'       algorithm will be run through at least once using the initialized
     #'       parameters,
     #'      \item \code{guarantee_pag = FALSE} - If TRUE, ensure the output is a
-    #'       legal PAG (where feasible).
+    #'       legal PAG (where feasible),
+    #'      \item \code{use_score = TRUE} - Only used when
+    #'       \code{raskutti_uhler = FALSE}. If TRUE, Grow-Shrink uses the score
+    #'       to find parents; if FALSE, it uses the independence test,
+    #'      \item \code{use_heuristic = FALSE} - If TRUE, use the max p
+    #'       heuristic,
+    #'      \item \code{exclude_selection_bias = FALSE} - If TRUE, exclude the
+    #'       possibility of selection bias,
+    #'      \item \code{seed = -1} - Seed for Tetrad's random number generator.
+    #'       If -1, no seed is set.
     #'    }
     #     \item \code{"ica_lingam"} - ICA LiNGAM algorithm.
     #     \itemize{
@@ -980,36 +1021,32 @@ TetradSearch <- R6Class(
     #'
     #'   \item \code{"pc"} - Peter-Clark (PC) algorithm
     #'    \itemize{
-    #'      \item \code{conflict_rule = 1} -
-    #'      The value of \code{conflict_rule} determines how collider conflicts are handled. \code{1}
-    #'      corresponds to the "overwrite" rule as introduced in the \pkg{pcalg} package, see
-    #'      [pcalg::pc()]. \code{2} means that all collider conflicts using bidirected edges
-    #'      should be prioritized, while \code{3} means that existing colliders should be prioritized,
-    #'      ignoring subsequent conflicting information.
     #'      \item \code{depth = -1} - Maximum size of conditioning set.
     #'        Set to -1 for unlimited,
     #'      \item \code{stable_fas = TRUE} - If TRUE, the "stable" version of
     #'       the PC adjacency search is used, which for k > 0 fixes the graph
-    #'       for depth k + 1 to that of the previous depth k.
-    #'      \item \code{guarantee_cpdag = FALSE} - If TRUE, ensure the output is
-    #'       a legal CPDAG.
+    #'       for depth k + 1 to that of the previous depth k,
+    #'      \item \code{collider_orientation_style = "max_p"} - How unshielded
+    #'       colliders are oriented. \code{"sepsets"} orients a
+    #'       collider if Z is not in the separating set of X and Y found during
+    #'       the adjacency search (as in the original PC).
+    #'       \code{"conservative"} orients a collider only if Z is in none of
+    #'       the separating sets of X and Y, and leaves the triple unoriented
+    #'       if they disagree. \code{"max_p"} orients a collider if Z is not in
+    #'       the separating set with the highest p-value,
+    #'      \item \code{allow_bidirected = FALSE} - If TRUE, collider conflicts
+    #'       are shown as bidirected edges,
+    #'      \item \code{fdr_q = 0} - False discovery rate q value. If 0, FDR
+    #'       control is not used.
     #'    }
     #   \item \code{"pc_max"} - PCMax algorithm
     #   \itemize{
-    #      \item \code{conflict_rule = 1} -
-    #      The value of \code{conflict_rule} determines how collider conflicts are handled. \code{1}
-    #      corresponds to the "overwrite" rule as introduced in the \pkg{pcalg} package, see
-    #      [pcalg::pc()]. \code{2} means that all collider conflicts using bidirected edges
-    #      should be prioritized, while \code{3} means that existing colliders should be prioritized,
-    #      ignoring subsequent conflicting information.
     #      \item \code{depth = -1} - Maximum size of conditioning set,
-    #      \item \code{use_heuristic = TRUE} - If TRUE, use the max p heuristic
-    #      version
-    #      \item \code{max_disc_path_length = -1} - The maximum path length to
-    #      use for the max p heuristic version. If -1, no limit is used.
     #      \item \code{stable_fas = TRUE} - If TRUE, the "stable" version of
     #      the PC adjacency search is used, which for k > 0 fixes the graph
-    #      for depth k + 1 to that of the previous depth k.
+    #      for depth k + 1 to that of the previous depth k,
+    #      \item \code{allow_bidirected = FALSE} - If TRUE, collider conflicts
+    #      are shown as bidirected edges.
     #  }
     # #'   \item \code{"restricted_boss"} - Restricted BOSS algorithm
     # #'    \itemize{
@@ -1021,30 +1058,26 @@ TetradSearch <- R6Class(
     # #'       should be started from different initializations. By default, the
     # #'       algorithm will be run through at least once using the initialized
     # #'       parameters,
-    # #'      \item \code{allow_internal_randomness = TRUE} -  If TRUE, the
-    # #'       algorithm allow the algorithm to use certain heuristic random
-    # #'       steps. This can improve performance, but may make the algorithm
-    # #'       non-deterministic.
+    # #'      \item \code{trimming_style = "mb_dags"} - The trimming style to use:
+    # #'       \code{"none"}, \code{"adj"}, \code{"mb_dags"}, or
+    # #'       \code{"semdir_paths"}. See \code{"ges_mb"} for details,
+    # #'      \item \code{seed = -1} - Seed for Tetrad's random number
+    # #'       generator. If -1, no seed is set.
     # #'    }
     #'   \item \code{"rfci"} - Restricted FCI algorithm
     #'    \itemize{
     #'      \item \code{depth = -1} - Maximum size of conditioning set. Set
     #'        to -1 for unlimited,
-    #'      \item \code{stable_fas = TRUE} - If TRUE, the "stable" version of
-    #'       the PC adjacency search is used, which for k > 0 fixes the graph
-    #'       for depth k + 1 to that of the previous depth k.
     #'      \item \code{max_disc_path_length = -1} - Maximum length for any
     #'       discriminating path. Set to -1 for unlimited,
-    #'      \item \code{complete_rule_set_used = TRUE} - FALSE if the (simpler)
-    #'       final orientation rules set due to P. Spirtes, guaranteeing arrow
-    #'       completeness, should be used; TRUE if the (fuller) set due to
-    #'       J. Zhang, should be used guaranteeing additional tail completeness.
+    #'      \item \code{exclude_selection_bias = FALSE} - If TRUE, exclude the
+    #'       possibility of selection bias,
+    #'      \item \code{fdr_q = 0} - False discovery rate q value. If 0, FDR
+    #'       control is not used.
     #'    }
     #    \item \code{"sp"} - Sparsest Permutation algorithm. No parameters.
     #'   \item \code{"sp_fci"} - Sparsest Permutation using FCI
     #'    \itemize{
-    #'      \item \code{depth = -1} - Maximum size of conditioning set. Set
-    #'        to -1 for unlimited,
     #'      \item \code{max_disc_path_length = -1} - Maximum length for any
     #'       discriminating path. Set to -1 for unlimited,
     #'      \item \code{complete_rule_set_used = TRUE} - FALSE if the (simpler)
@@ -1053,7 +1086,9 @@ TetradSearch <- R6Class(
     #'       J. Zhang, should be used guaranteeing additional tail completeness,
     #'       \item \code{guarantee_pag = FALSE} - Ensure the output is a legal
     #'       PAG (where feasible),
-    #'       \item \code{use_heuristic = FALSE} - If TRUE, use the max p heuristic version.
+    #'       \item \code{use_heuristic = FALSE} - If TRUE, use the max p heuristic version,
+    #'       \item \code{exclude_selection_bias = FALSE} - If TRUE, exclude the
+    #'       possibility of selection bias.
     #'    }
     #' }
     #' @return Invisibly returns \code{self}.
@@ -2421,19 +2456,19 @@ TetradSearch <- R6Class(
     set_fges_alg = function(
       symmetric_first_step = FALSE,
       max_degree = -1,
-      parallelized = FALSE,
-      faithfulness_assumed = FALSE
+      faithfulness_assumed = FALSE,
+      num_threads = 1
     ) {
       checkmate::assert_logical(symmetric_first_step, len = 1)
       checkmate::assert_number(max_degree, finite = TRUE)
-      checkmate::assert_logical(parallelized, len = 1)
       checkmate::assert_logical(faithfulness_assumed, len = 1)
+      checkmate::assert_int(num_threads, lower = 1)
 
       self$set_params(
         SYMMETRIC_FIRST_STEP = symmetric_first_step,
         MAX_DEGREE = max_degree,
-        PARALLELIZED = parallelized,
-        FAITHFULNESS_ASSUMED = faithfulness_assumed
+        FAITHFULNESS_ASSUMED = faithfulness_assumed,
+        NUM_THREADS = num_threads
       )
       self$alg <- rJava::.jnew(
         "edu/cmu/tetrad/algcomparison/algorithm/oracle/cpdag/Fges",
@@ -2487,18 +2522,24 @@ TetradSearch <- R6Class(
       num_starts = 1,
       use_bes = TRUE,
       use_data_order = TRUE,
-      output_cpdag = TRUE
+      output_cpdag = TRUE,
+      num_threads = 1,
+      seed = -1
     ) {
       checkmate::assert_int(num_starts, lower = 1)
       checkmate::assert_logical(use_bes, len = 1)
       checkmate::assert_logical(use_data_order, len = 1)
       checkmate::assert_logical(output_cpdag, len = 1)
+      checkmate::assert_int(num_threads, lower = 1)
+      checkmate::assert_int(seed)
 
       self$set_params(
         USE_BES = use_bes,
         NUM_STARTS = num_starts,
         USE_DATA_ORDER = use_data_order,
-        OUTPUT_CPDAG = output_cpdag
+        OUTPUT_CPDAG = output_cpdag,
+        NUM_THREADS = num_threads,
+        SEED = seed
       )
 
       self$alg <- rJava::.jnew(
@@ -2511,18 +2552,36 @@ TetradSearch <- R6Class(
       targets = "",
       use_bes = TRUE,
       num_starts = 1,
-      allow_internal_randomness = TRUE
+      trimming_style = "mb_dags",
+      seed = -1
     ) {
       checkmate::assert_character(targets, len = 1)
       checkmate::assert_int(num_starts, lower = 1)
       checkmate::assert_logical(use_bes, len = 1)
-      checkmate::assert_logical(allow_internal_randomness, len = 1)
+      checkmate::assert_character(trimming_style, len = 1)
+      checkmate::assert_int(seed)
+
+      trimming_style_int <- switch(
+        tolower(trimming_style),
+        none = 1L,
+        adj = 2L,
+        mb_dags = 3L,
+        semdir_paths = 4L,
+        stop(
+          "Unsupported `trimming_style` input: ",
+          trimming_style,
+          "\n",
+          "Supported values are: 'none', 'adj', 'mb_dags' or 'semdir_paths'.",
+          call. = FALSE
+        )
+      )
 
       self$set_params(
         TARGETS = targets,
         USE_BES = use_bes,
         NUM_STARTS = num_starts,
-        ALLOW_INTERNAL_RANDOMNESS = allow_internal_randomness
+        TRIMMING_STYLE = trimming_style_int,
+        SEED = seed
       )
 
       self$alg <- rJava::.jnew(
@@ -2609,7 +2668,11 @@ TetradSearch <- R6Class(
       ordered_alg = FALSE,
       raskutti_uhler = FALSE,
       use_data_order = TRUE,
-      num_starts = 1
+      num_starts = 1,
+      use_score = TRUE,
+      allow_internal_randomness = TRUE,
+      output_cpdag = TRUE,
+      seed = -1
     ) {
       checkmate::assert_int(covered_depth)
       checkmate::assert_int(singular_depth)
@@ -2618,8 +2681,12 @@ TetradSearch <- R6Class(
       checkmate::assert_logical(ordered_alg, len = 1)
       checkmate::assert_logical(raskutti_uhler, len = 1)
       checkmate::assert_logical(use_data_order, len = 1)
+      checkmate::assert_logical(use_score, len = 1)
+      checkmate::assert_logical(allow_internal_randomness, len = 1)
+      checkmate::assert_logical(output_cpdag, len = 1)
 
       checkmate::assert_int(num_starts, lower = 1)
+      checkmate::assert_int(seed)
 
       self$set_params(
         GRASP_DEPTH = covered_depth,
@@ -2628,7 +2695,11 @@ TetradSearch <- R6Class(
         GRASP_ORDERED_ALG = ordered_alg,
         GRASP_USE_RASKUTTI_UHLER = raskutti_uhler,
         USE_DATA_ORDER = use_data_order,
-        NUM_STARTS = num_starts
+        NUM_STARTS = num_starts,
+        GRASP_USE_SCORE = use_score,
+        ALLOW_INTERNAL_RANDOMNESS = allow_internal_randomness,
+        OUTPUT_CPDAG = output_cpdag,
+        SEED = seed
       )
 
       self$alg <- rJava::.jnew(
@@ -2639,22 +2710,26 @@ TetradSearch <- R6Class(
       self$alg$setKnowledge(self$knowledge)
     },
     set_pc_alg = function(
-      conflict_rule = 1,
       depth = -1,
       stable_fas = TRUE,
-      guarantee_cpdag = FALSE
+      collider_orientation_style = "max_p",
+      allow_bidirected = FALSE,
+      fdr_q = 0
     ) {
-      checkmate::assert_number(conflict_rule, finite = TRUE)
       checkmate::assert_number(depth, lower = -1, finite = TRUE)
 
       checkmate::assert_logical(stable_fas, len = 1)
-      checkmate::assert_logical(guarantee_cpdag, len = 1)
+      checkmate::assert_logical(allow_bidirected, len = 1)
+      checkmate::assert_number(fdr_q, lower = 0, upper = 1)
 
       self$set_params(
-        CONFLICT_RULE = conflict_rule,
         DEPTH = depth,
         STABLE_FAS = stable_fas,
-        GUARANTEE_CPDAG = guarantee_cpdag
+        COLLIDER_ORIENTATION_STYLE = collider_orientation_style_int(
+          collider_orientation_style
+        ),
+        ALLOW_BIDIRECTED = allow_bidirected,
+        FDR_Q = fdr_q
       )
 
       self$alg <- rJava::.jnew(
@@ -2664,22 +2739,19 @@ TetradSearch <- R6Class(
       self$alg$setKnowledge(self$knowledge)
     },
     set_cpc_alg = function(
-      conflict_rule = 1,
       depth = -1,
       stable_fas = TRUE,
-      guarantee_cpdag = FALSE
+      allow_bidirected = FALSE
     ) {
-      checkmate::assert_number(conflict_rule, finite = TRUE)
       checkmate::assert_number(depth, lower = -1, finite = TRUE)
 
       checkmate::assert_logical(stable_fas, len = 1)
-      checkmate::assert_logical(guarantee_cpdag, len = 1)
+      checkmate::assert_logical(allow_bidirected, len = 1)
 
       self$set_params(
-        CONFLICT_RULE = conflict_rule,
         DEPTH = depth,
         STABLE_FAS = stable_fas,
-        GUARANTEE_CPDAG = guarantee_cpdag
+        ALLOW_BIDIRECTED = allow_bidirected
       )
 
       self$alg <- rJava::.jnew(
@@ -2689,32 +2761,18 @@ TetradSearch <- R6Class(
       self$alg$setKnowledge(self$knowledge)
     },
     set_pc_max_alg = function(
-      conflict_rule = 1,
       depth = -1,
-      use_heuristic = TRUE,
-      max_disc_path_length = -1,
-      stable_fas = TRUE
+      stable_fas = TRUE,
+      allow_bidirected = FALSE
     ) {
-      checkmate::assert_number(conflict_rule, finite = TRUE)
       checkmate::assert_number(depth, lower = -1, finite = TRUE)
-      checkmate::assert_logical(use_heuristic, len = 1)
-
-      checkmate::assert_number(max_disc_path_length, finite = TRUE)
-      if (!(max_disc_path_length >= 0 || max_disc_path_length == -1)) {
-        stop(
-          "`max_disc_path_length` must be >= 0 or equal to -1.",
-          call. = FALSE
-        )
-      }
-
       checkmate::assert_logical(stable_fas, len = 1)
+      checkmate::assert_logical(allow_bidirected, len = 1)
 
       self$set_params(
-        CONFLICT_RULE = conflict_rule,
         DEPTH = depth,
-        USE_MAX_P_ORIENTATION_HEURISTIC = use_heuristic,
-        MaX_PAX_P_ORIENTATION_HEURISTIC_MAX_LENGTH = max_disc_path_length,
-        STABLE_FAS = stable_fas
+        STABLE_FAS = stable_fas,
+        ALLOW_BIDIRECTED = allow_bidirected
       )
 
       self$alg <- rJava::.jnew(
@@ -2728,7 +2786,11 @@ TetradSearch <- R6Class(
       stable_fas = TRUE,
       max_disc_path_length = -1,
       complete_rule_set_used = TRUE,
-      guarantee_pag = FALSE
+      guarantee_pag = FALSE,
+      collider_orientation_style = "max_p",
+      do_possible_dsep = TRUE,
+      exclude_selection_bias = FALSE,
+      fdr_q = 0
     ) {
       checkmate::assert_number(depth, lower = -1, finite = TRUE)
       checkmate::assert_logical(stable_fas, len = 1)
@@ -2743,13 +2805,22 @@ TetradSearch <- R6Class(
 
       checkmate::assert_logical(complete_rule_set_used, len = 1)
       checkmate::assert_logical(guarantee_pag, len = 1)
+      checkmate::assert_logical(do_possible_dsep, len = 1)
+      checkmate::assert_logical(exclude_selection_bias, len = 1)
+      checkmate::assert_number(fdr_q, lower = 0, upper = 1)
 
       self$set_params(
         DEPTH = depth,
         STABLE_FAS = stable_fas,
         MAX_DISCRIMINATING_PATH_LENGTH = max_disc_path_length,
         COMPLETE_RULE_SET_USED = complete_rule_set_used,
-        GUARANTEE_PAG = guarantee_pag
+        GUARANTEE_PAG = guarantee_pag,
+        COLLIDER_ORIENTATION_STYLE = collider_orientation_style_int(
+          collider_orientation_style
+        ),
+        DO_POSSIBLE_DSEP = do_possible_dsep,
+        EXCLUDE_SELECTION_BIAS = exclude_selection_bias,
+        FDR_Q = fdr_q
       )
 
       self$alg <- rJava::.jnew(
@@ -2760,12 +2831,11 @@ TetradSearch <- R6Class(
     },
     set_rfci_alg = function(
       depth = -1,
-      stable_fas = TRUE,
       max_disc_path_length = -1,
-      complete_rule_set_used = TRUE
+      exclude_selection_bias = FALSE,
+      fdr_q = 0
     ) {
       checkmate::assert_number(depth, lower = -1, finite = TRUE)
-      checkmate::assert_logical(stable_fas, len = 1)
 
       checkmate::assert_number(max_disc_path_length, finite = TRUE)
       if (!(max_disc_path_length >= 0 || max_disc_path_length == -1)) {
@@ -2775,13 +2845,14 @@ TetradSearch <- R6Class(
         )
       }
 
-      checkmate::assert_logical(complete_rule_set_used, len = 1)
+      checkmate::assert_logical(exclude_selection_bias, len = 1)
+      checkmate::assert_number(fdr_q, lower = 0, upper = 1)
 
       self$set_params(
         DEPTH = depth,
-        STABLE_FAS = stable_fas,
         MAX_DISCRIMINATING_PATH_LENGTH = max_disc_path_length,
-        COMPLETE_RULE_SET_USED = complete_rule_set_used
+        EXCLUDE_SELECTION_BIAS = exclude_selection_bias,
+        FDR_Q = fdr_q
       )
 
       self$alg <- rJava::.jnew(
@@ -2793,7 +2864,8 @@ TetradSearch <- R6Class(
     set_cfci_alg = function(
       depth = -1,
       max_disc_path_length = -1,
-      complete_rule_set_used = TRUE
+      complete_rule_set_used = TRUE,
+      do_possible_dsep = TRUE
     ) {
       checkmate::assert_number(depth, lower = -1, finite = TRUE)
 
@@ -2806,11 +2878,13 @@ TetradSearch <- R6Class(
       }
 
       checkmate::assert_logical(complete_rule_set_used, len = 1)
+      checkmate::assert_logical(do_possible_dsep, len = 1)
 
       self$set_params(
         DEPTH = depth,
         MAX_DISCRIMINATING_PATH_LENGTH = max_disc_path_length,
-        COMPLETE_RULE_SET_USED = complete_rule_set_used
+        COMPLETE_RULE_SET_USED = complete_rule_set_used,
+        DO_POSSIBLE_DSEP = do_possible_dsep
       )
 
       self$alg <- rJava::.jnew(
@@ -2827,7 +2901,8 @@ TetradSearch <- R6Class(
       guarantee_pag = FALSE,
       use_heuristic = FALSE,
       start_complete = FALSE,
-      num_threads = 1
+      num_threads = 1,
+      exclude_selection_bias = FALSE
     ) {
       checkmate::assert_number(depth, lower = -1, finite = TRUE)
       checkmate::assert_number(max_degree, finite = TRUE)
@@ -2845,6 +2920,7 @@ TetradSearch <- R6Class(
       checkmate::assert_logical(guarantee_pag, len = 1)
       checkmate::assert_logical(use_heuristic, len = 1)
       checkmate::assert_logical(start_complete, len = 1)
+      checkmate::assert_logical(exclude_selection_bias, len = 1)
 
       self$set_params(
         DEPTH = depth,
@@ -2852,9 +2928,10 @@ TetradSearch <- R6Class(
         COMPLETE_RULE_SET_USED = complete_rule_set_used,
         MAX_DISCRIMINATING_PATH_LENGTH = max_disc_path_length,
         GUARANTEE_PAG = guarantee_pag,
-        USE_MAX_P_ORIENTATION_HEURISTIC = use_heuristic,
+        USE_MAX_P_HEURISTIC = use_heuristic,
         START_FROM_COMPLETE_GRAPH = start_complete,
-        NUM_THREADS = num_threads
+        NUM_THREADS = num_threads,
+        EXCLUDE_SELECTION_BIAS = exclude_selection_bias
       )
 
       self$alg <- rJava::.jnew(
@@ -2869,10 +2946,11 @@ TetradSearch <- R6Class(
       max_disc_path_length = -1,
       complete_rule_set_used = TRUE,
       depth = -1,
-      num_threads = 0,
+      num_threads = 1,
       guarantee_pag = FALSE,
       use_heuristic = FALSE,
-      num_starts = 1
+      num_starts = 1,
+      exclude_selection_bias = FALSE
     ) {
       checkmate::assert_int(max_disc_path_length)
       if (!(max_disc_path_length >= 0 || max_disc_path_length == -1)) {
@@ -2884,11 +2962,13 @@ TetradSearch <- R6Class(
 
       checkmate::assert_int(depth, lower = -1)
       checkmate::assert_int(num_starts, lower = 1)
+      checkmate::assert_int(num_threads, lower = 1)
 
       checkmate::assert_logical(use_bes, len = 1)
       checkmate::assert_logical(complete_rule_set_used, len = 1)
       checkmate::assert_logical(guarantee_pag, len = 1)
       checkmate::assert_logical(use_heuristic, len = 1)
+      checkmate::assert_logical(exclude_selection_bias, len = 1)
 
       self$set_params(
         USE_BES = use_bes,
@@ -2897,7 +2977,9 @@ TetradSearch <- R6Class(
         DEPTH = depth,
         GUARANTEE_PAG = guarantee_pag,
         USE_MAX_P_HEURISTIC = use_heuristic,
-        NUM_STARTS = num_starts
+        NUM_STARTS = num_starts,
+        NUM_THREADS = num_threads,
+        EXCLUDE_SELECTION_BIAS = exclude_selection_bias
       )
 
       self$alg <- rJava::.jnew(
@@ -2911,11 +2993,10 @@ TetradSearch <- R6Class(
       use_bes = TRUE,
       use_data_order = TRUE,
       num_starts = 1,
-      max_disc_path_length = -1,
       start_with = "boss",
       complete_rule_set_used = TRUE,
       depth = -1,
-      guarantee_pag = FALSE
+      exclude_selection_bias = FALSE
     ) {
       checkmate::assert_int(num_starts, lower = 1)
       checkmate::assert_int(depth, lower = -1)
@@ -2923,7 +3004,7 @@ TetradSearch <- R6Class(
       checkmate::assert_logical(use_bes, len = 1)
       checkmate::assert_logical(use_data_order, len = 1)
       checkmate::assert_logical(complete_rule_set_used, len = 1)
-      checkmate::assert_logical(guarantee_pag, len = 1)
+      checkmate::assert_logical(exclude_selection_bias, len = 1)
 
       checkmate::assert_character(start_with, len = 1)
 
@@ -2945,10 +3026,9 @@ TetradSearch <- R6Class(
         USE_DATA_ORDER = use_data_order,
         NUM_STARTS = num_starts,
         FCIT_STARTS_WITH = start_with_int,
-        MAX_DISCRIMINATING_PATH_LENGTH = max_disc_path_length,
         COMPLETE_RULE_SET_USED = complete_rule_set_used,
         DEPTH = depth,
-        GUARANTEE_PAG = guarantee_pag
+        EXCLUDE_SELECTION_BIAS = exclude_selection_bias
       )
 
       self$alg <- rJava::.jnew(
@@ -2960,17 +3040,19 @@ TetradSearch <- R6Class(
     },
     set_grasp_fci_alg = function(
       depth = -1,
-      stable_fas = TRUE,
       max_disc_path_length = -1,
       complete_rule_set_used = TRUE,
-      covered_depth = 4,
       singular_depth = 1,
       nonsingular_depth = 1,
       ordered_alg = FALSE,
       raskutti_uhler = FALSE,
       use_data_order = TRUE,
       num_starts = 1,
-      guarantee_pag = FALSE
+      guarantee_pag = FALSE,
+      use_score = TRUE,
+      use_heuristic = FALSE,
+      exclude_selection_bias = FALSE,
+      seed = -1
     ) {
       checkmate::assert_int(depth, lower = -1)
       checkmate::assert_int(max_disc_path_length)
@@ -2980,19 +3062,20 @@ TetradSearch <- R6Class(
           call. = FALSE
         )
       }
-      checkmate::assert_int(covered_depth)
       checkmate::assert_int(singular_depth)
       checkmate::assert_int(nonsingular_depth)
       checkmate::assert_int(num_starts, lower = 1)
+      checkmate::assert_int(seed)
 
-      checkmate::assert_logical(stable_fas, len = 1)
       checkmate::assert_logical(ordered_alg, len = 1)
       checkmate::assert_logical(raskutti_uhler, len = 1)
       checkmate::assert_logical(use_data_order, len = 1)
       checkmate::assert_logical(guarantee_pag, len = 1)
+      checkmate::assert_logical(use_score, len = 1)
+      checkmate::assert_logical(use_heuristic, len = 1)
+      checkmate::assert_logical(exclude_selection_bias, len = 1)
 
       self$set_params(
-        GRASP_DEPTH = covered_depth,
         GRASP_SINGULAR_DEPTH = singular_depth,
         GRASP_NONSINGULAR_DEPTH = nonsingular_depth,
         GRASP_ORDERED_ALG = ordered_alg,
@@ -3001,9 +3084,12 @@ TetradSearch <- R6Class(
         NUM_STARTS = num_starts,
         GUARANTEE_PAG = guarantee_pag,
         DEPTH = depth,
-        STABLE_FAS = stable_fas,
         MAX_DISCRIMINATING_PATH_LENGTH = max_disc_path_length,
-        COMPLETE_RULE_SET_USED = complete_rule_set_used
+        COMPLETE_RULE_SET_USED = complete_rule_set_used,
+        GRASP_USE_SCORE = use_score,
+        USE_MAX_P_HEURISTIC = use_heuristic,
+        EXCLUDE_SELECTION_BIAS = exclude_selection_bias,
+        SEED = seed
       )
 
       self$alg <- rJava::.jnew(
@@ -3014,11 +3100,11 @@ TetradSearch <- R6Class(
       self$alg$setKnowledge(self$knowledge)
     },
     set_sp_fci_alg = function(
-      depth = -1,
       max_disc_path_length = -1,
       complete_rule_set_used = TRUE,
       guarantee_pag = FALSE,
-      use_heuristic = FALSE
+      use_heuristic = FALSE,
+      exclude_selection_bias = FALSE
     ) {
       checkmate::assert_int(max_disc_path_length)
       if (!(max_disc_path_length >= 0 || max_disc_path_length == -1)) {
@@ -3028,18 +3114,17 @@ TetradSearch <- R6Class(
         )
       }
 
-      checkmate::assert_int(depth, lower = -1)
-
       checkmate::assert_logical(complete_rule_set_used, len = 1)
       checkmate::assert_logical(guarantee_pag, len = 1)
       checkmate::assert_logical(use_heuristic, len = 1)
+      checkmate::assert_logical(exclude_selection_bias, len = 1)
 
       self$set_params(
         MAX_DISCRIMINATING_PATH_LENGTH = max_disc_path_length,
         COMPLETE_RULE_SET_USED = complete_rule_set_used,
-        DEPTH = depth,
         GUARANTEE_PAG = guarantee_pag,
-        USE_MAX_P_ORIENTATION_HEURISTIC = use_heuristic
+        USE_MAX_P_HEURISTIC = use_heuristic,
+        EXCLUDE_SELECTION_BIAS = exclude_selection_bias
       )
 
       self$alg <- rJava::.jnew(
@@ -3123,13 +3208,13 @@ TetradSearch <- R6Class(
       )
       self$alg$setKnowledge(self$knowledge)
     },
-    set_ccd_alg = function(depth = -1, apply_r1 = TRUE) {
-      checkmate::assert_int(depth, lower = -1)
+    set_ccd_alg = function(apply_r1 = TRUE, fdr_q = 0) {
       checkmate::assert_logical(apply_r1, len = 1)
+      checkmate::assert_number(fdr_q, lower = 0, upper = 1)
 
       self$set_params(
-        DEPTH = depth,
-        APPLY_R1 = apply_r1
+        APPLY_R1 = apply_r1,
+        FDR_Q = fdr_q
       )
 
       self$alg <- rJava::.jnew(
@@ -3177,4 +3262,27 @@ set_tetrad_test <- function(self, class_name, use_for_mc = FALSE) {
     self$mc_test <- test_obj
   }
   self$test <- test_obj
+}
+
+#' Map a collider orientation style name to Tetrad's integer code
+#' @param style One of \code{"sepsets"}, \code{"conservative"}, or
+#'   \code{"max_p"}.
+#' @return Integer code for \code{Params.COLLIDER_ORIENTATION_STYLE}.
+#' @keywords internal
+#' @noRd
+collider_orientation_style_int <- function(style) {
+  checkmate::assert_character(style, len = 1)
+  switch(
+    tolower(style),
+    sepsets = 1L,
+    conservative = 2L,
+    max_p = 3L,
+    stop(
+      "Unsupported `collider_orientation_style` input: ",
+      style,
+      "\n",
+      "Supported values are: 'sepsets', 'conservative', or 'max_p'.",
+      call. = FALSE
+    )
+  )
 }

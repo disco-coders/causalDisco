@@ -384,8 +384,8 @@ test_that(".pcalg_amat_to_edges returns an empty frame for an empty graph", {
 })
 
 test_that(".validate_graph_type reports UNKNOWN when the graph is not even a valid PDAG", {
-  # A directed cycle is neither a CPDAG/MPDAG nor a PDAG (e.g. Tetrad with
-  # conflict_rule = 2 can emit such graphs).
+  # A directed cycle is neither a CPDAG/MPDAG nor a PDAG (e.g. Tetrad's PC
+  # can emit such graphs when orienting collider conflicts).
   cyclic <- caugi::caugi(
     from = c("A", "B", "C"),
     edge = c("-->", "-->", "-->"),

@@ -20,7 +20,6 @@ test_that("rdata_to_tetrad factor", {
   # Create data frame
   my_df <- data.frame(color, shape)
 
-  my_df
   tetrad_data <- rdata_to_tetrad(my_df)
   expect_equal(class(tetrad_data)[1], "jobjRef")
 })

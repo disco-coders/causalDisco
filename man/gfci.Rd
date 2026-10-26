@@ -106,6 +106,7 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     guarantee_pag = TRUE,
     start_complete = TRUE,
     num_threads = 2,
+    exclude_selection_bias = FALSE,
     verbose = TRUE
   )
   disco(num_data, gfci_tetrad)
