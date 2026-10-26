@@ -7,7 +7,39 @@
   `max_lag()` is set inside `tier()`, alongside its formulas:
   `tier(1 ~ V1, 2 ~ V2, max_lag(1))`.
 
+- Tetrad algorithms now expose more of Tetrad's parameters, all defaulting to
+  Tetrad's own defaults:
+  - `grasp()` gains `use_score`, `allow_internal_randomness`, `output_cpdag`
+    and `seed`. Set `allow_internal_randomness = FALSE` for reproducible
+    results.
+  - `grasp_fci()` gains `use_score`, `use_heuristic`, `exclude_selection_bias`
+    and `seed`.
+  - `pc()` gains `collider_orientation_style`, `allow_bidirected` and `fdr_q`.
+  - `fci()` gains `collider_orientation_style`, `do_possible_dsep`,
+    `exclude_selection_bias` and `fdr_q`.
+  - `rfci()` gains `exclude_selection_bias` and `fdr_q`.
+  - `ges()` gains `num_threads`; `boss()` gains `num_threads` and `seed`.
+  - `boss_fci()`, `gfci()` and `sp_fci()` gain `exclude_selection_bias`.
+
 ## Bug fixes
+
+- Removed Tetrad algorithm arguments that Tetrad ignored, so setting them had
+  no effect:
+  - `pc()`: `conflict_rule`, `guarantee_cpdag`
+  - `ges()`: `parallelized` (use `num_threads`)
+  - `rfci()`: `stable_fas`, `complete_rule_set_used`
+  - `grasp_fci()`: `stable_fas`, `covered_depth`
+  - `sp_fci()`: `depth`
+  - Also in `TetradSearch$set_alg()`: `cpc` and `pc_max` (`conflict_rule`,
+    `guarantee_cpdag`, `use_heuristic`, `max_disc_path_length`), `fcit`
+    (`guarantee_pag`, `max_disc_path_length`), `restricted_boss`
+    (`allow_internal_randomness`) and `ccd` (`depth`).
+
+- `use_heuristic` in `gfci()` and `sp_fci()` had no effect because it set the
+  wrong Tetrad parameter. It now controls the max-p heuristic as documented.
+
+- `boss_fci()`'s `num_threads` was never passed to Tetrad. It is now, and its
+  default changes from 0 to Tetrad's default of 1.
 
 - `pc(engine = "pcalg")` no longer errors when the estimated graph contains a cycle.
 Now emits a message and returns the graph with its class downgraded to `"UNKNOWN"`.

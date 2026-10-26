@@ -53,9 +53,9 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     test = "fisher_z",
     alpha = 0.05,
     depth = 10,
-    stable_fas = FALSE,
     max_disc_path_length = 2,
-    complete_rule_set_used = TRUE
+    exclude_selection_bias = FALSE,
+    fdr_q = 0.05
   )
   disco(tpc_example, rfci_tetrad)
 }

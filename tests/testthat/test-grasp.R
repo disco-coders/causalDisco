@@ -32,7 +32,11 @@ test_that("boss_fci Tetrad algorithm run without error and return correct classe
       ordered_alg = TRUE,
       raskutti_uhler = FALSE,
       use_data_order = FALSE,
-      num_starts = 3
+      num_starts = 3,
+      use_score = FALSE,
+      allow_internal_randomness = FALSE,
+      output_cpdag = TRUE,
+      seed = 42
     ),
     test_args = list(
       poisson_lambda = 2,
@@ -41,4 +45,23 @@ test_that("boss_fci Tetrad algorithm run without error and return correct classe
       penalty_discount = 3
     )
   )
+})
+
+test_that("grasp Tetrad is reproducible without internal randomness", {
+  skip_if_no_tetrad()
+  data(tpc_example)
+
+  fit <- function() {
+    method <- grasp(
+      engine = "tetrad",
+      score = "sem_bic",
+      test = "fisher_z",
+      allow_internal_randomness = FALSE
+    )
+    disco(tpc_example, method)$caugi@edges
+  }
+  first <- fit()
+  for (i in 1:5) {
+    expect_identical(fit(), first)
+  }
 })

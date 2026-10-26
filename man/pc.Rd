@@ -134,10 +134,11 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     engine = "tetrad",
     test = "fisher_z",
     alpha = 0.05,
-    conflict_rule = 2,
     depth = 10,
     stable_fas = FALSE,
-    guarantee_cpdag = TRUE
+    collider_orientation_style = "sepsets",
+    allow_bidirected = TRUE,
+    fdr_q = 0.05
   )
   disco(tpc_example, pc_tetrad)
 }

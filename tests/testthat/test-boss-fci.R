@@ -36,7 +36,10 @@ test_that("boss_fci Tetrad algorithm run without error and return correct classe
       use_bes = FALSE,
       use_heuristic = FALSE,
       complete_rule_set_used = FALSE,
-      guarantee_pag = TRUE
+      guarantee_pag = TRUE,
+      num_starts = 2,
+      num_threads = 2,
+      exclude_selection_bias = TRUE
     )
   )
 

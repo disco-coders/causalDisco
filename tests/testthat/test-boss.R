@@ -30,7 +30,9 @@ test_that("boss Tetrad algorithm run without error and return correct classes", 
       num_starts = 3,
       use_bes = FALSE,
       use_data_order = FALSE,
-      output_cpdag = FALSE
+      output_cpdag = FALSE,
+      num_threads = 2,
+      seed = 1405
     )
   )
 
