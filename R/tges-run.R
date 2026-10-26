@@ -335,9 +335,9 @@ TemporalBIC <- setRefClass(
         knowledge <- knowledge() |> add_vars(nodes)
       }
 
-      causalDisco:::is_knowledge(knowledge)
+      is_knowledge(knowledge)
 
-      .order <<- causalDisco:::.tier_index(knowledge, nodes)
+      .order <<- .tier_index(knowledge, nodes)
 
       callSuper(
         data = data,
@@ -488,9 +488,9 @@ TemporalBDeu <- setRefClass(
         knowledge <- knowledge() |> add_vars(nodes)
       }
 
-      causalDisco:::is_knowledge(knowledge)
+      is_knowledge(knowledge)
 
-      .order <<- causalDisco:::.tier_index(knowledge, nodes)
+      .order <<- .tier_index(knowledge, nodes)
       .iss <<- iss
       debug <<- debug
 

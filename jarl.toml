@@ -1,2 +1,6 @@
 [lint]
-ignore = ["internal_function"]
+
+[lint.undesirable_operator]
+# `<<-` is intended: it updates enclosing state in the knowledge() DSL,
+# assigns fields in Reference Class methods, and records calls in test mocks.
+operators = ["->>", ":::"]

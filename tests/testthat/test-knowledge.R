@@ -154,7 +154,7 @@ test_that("tier generation with negative numeric tiers errors", {
   expect_error(
     knowledge(
       tier(
-        -1 ~ V1 + V2,
+        -1 ~ V1 + V2
       )
     ),
     "`tier` must be a single non-empty label or a non-negative numeric literal.",
@@ -711,7 +711,7 @@ test_that("tier throws error for one variable in two tiers", {
     knowledge(
       tier(
         1 ~ V1 + V2,
-        Two ~ V1,
+        Two ~ V1
       )
     ),
     "Tier specification Two ~ V1 tries to re-assign variable(s) [V1] to a new tier.",

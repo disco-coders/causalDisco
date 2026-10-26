@@ -311,7 +311,7 @@ test_that("tges_run turning phase", {
   X1 <- rnorm(n) + rbinom(n, 1, 0.3)
   X2 <- 0.6 * X1**2 + rnorm(n) + rbinom(n, 1, 0.3)
   X3 <- -0.3 * X1 + rnorm(n) + rbinom(n, 1, 0.3)
-  X4 <- 1.5 * X1 + -0.2 * X2**2 + 0.1 * X3**3 + rnorm(n) + rbinom(n, 1, 0.3)
+  X4 <- 1.5 * X1 - 0.2 * X2**2 + 0.1 * X3**3 + rnorm(n) + rbinom(n, 1, 0.3)
 
   my_df <- data.frame(X1 = X1, X2 = X2, X3 = X3, X4 = X4)
   kn <- knowledge(my_df, tier(1 ~ X1 + X2 + X3 + X4))
