@@ -44,12 +44,48 @@
 <h2 class="pkg-version" data-toc-text="development version" id="causaldisco-development-version">causalDisco (development version)<a class="anchor" aria-label="anchor" href="#causaldisco-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li>Added <code>max_lag()</code> / <code><a href="../reference/set_max_lag.html">set_max_lag()</a></code> to <code><a href="../reference/knowledge.html">knowledge()</a></code>, which forbids edges between variables that are more than a given number of tiers apart. <code>max_lag()</code> is set inside <code>tier()</code>, alongside its formulas: <code>tier(1 ~ V1, 2 ~ V2, max_lag(1))</code>.</li>
+<ul><li><p>Added <code>max_lag()</code> / <code><a href="../reference/set_max_lag.html">set_max_lag()</a></code> to <code><a href="../reference/knowledge.html">knowledge()</a></code>, which forbids edges between variables that are more than a given number of tiers apart. <code>max_lag()</code> is set inside <code>tier()</code>, alongside its formulas: <code>tier(1 ~ V1, 2 ~ V2, max_lag(1))</code>.</p></li>
+<li>
+<p>Tetrad algorithms now expose more of Tetrad’s parameters, all defaulting to Tetrad’s own defaults:</p>
+<ul><li>
+<code><a href="../reference/grasp.html">grasp()</a></code> gains <code>use_score</code>, <code>allow_internal_randomness</code>, <code>output_cpdag</code> and <code>seed</code>. Set <code>allow_internal_randomness = FALSE</code> for reproducible results.</li>
+<li>
+<code><a href="../reference/grasp_fci.html">grasp_fci()</a></code> gains <code>use_score</code>, <code>use_heuristic</code>, <code>exclude_selection_bias</code> and <code>seed</code>.</li>
+<li>
+<code><a href="../reference/pc.html">pc()</a></code> gains <code>collider_orientation_style</code>, <code>allow_bidirected</code> and <code>fdr_q</code>.</li>
+<li>
+<code><a href="../reference/fci.html">fci()</a></code> gains <code>collider_orientation_style</code>, <code>do_possible_dsep</code>, <code>exclude_selection_bias</code> and <code>fdr_q</code>.</li>
+<li>
+<code><a href="../reference/rfci.html">rfci()</a></code> gains <code>exclude_selection_bias</code> and <code>fdr_q</code>.</li>
+<li>
+<code><a href="../reference/ges.html">ges()</a></code> gains <code>num_threads</code>; <code><a href="../reference/boss.html">boss()</a></code> gains <code>num_threads</code> and <code>seed</code>.</li>
+<li>
+<code><a href="../reference/boss_fci.html">boss_fci()</a></code>, <code><a href="../reference/gfci.html">gfci()</a></code> and <code><a href="../reference/sp_fci.html">sp_fci()</a></code> gain <code>exclude_selection_bias</code>.</li>
+</ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>
-<code>pc(engine = "pcalg")</code> no longer errors when the estimated graph contains a cycle. Now emits a message and returns the graph with its class downgraded to <code>"UNKNOWN"</code>.</li>
+<p>Removed Tetrad algorithm arguments that Tetrad ignored, so setting them had no effect:</p>
+<ul><li>
+<code><a href="../reference/pc.html">pc()</a></code>: <code>conflict_rule</code>, <code>guarantee_cpdag</code>
+</li>
+<li>
+<code><a href="../reference/ges.html">ges()</a></code>: <code>parallelized</code> (use <code>num_threads</code>)</li>
+<li>
+<code><a href="../reference/rfci.html">rfci()</a></code>: <code>stable_fas</code>, <code>complete_rule_set_used</code>
+</li>
+<li>
+<code><a href="../reference/grasp_fci.html">grasp_fci()</a></code>: <code>stable_fas</code>, <code>covered_depth</code>
+</li>
+<li>
+<code><a href="../reference/sp_fci.html">sp_fci()</a></code>: <code>depth</code>
+</li>
+<li>Also in <code>TetradSearch$set_alg()</code>: <code>cpc</code> and <code>pc_max</code> (<code>conflict_rule</code>, <code>guarantee_cpdag</code>, <code>use_heuristic</code>, <code>max_disc_path_length</code>), <code>fcit</code> (<code>guarantee_pag</code>, <code>max_disc_path_length</code>), <code>restricted_boss</code> (<code>allow_internal_randomness</code>) and <code>ccd</code> (<code>depth</code>).</li>
+</ul></li>
+<li><p><code>use_heuristic</code> in <code><a href="../reference/gfci.html">gfci()</a></code> and <code><a href="../reference/sp_fci.html">sp_fci()</a></code> had no effect because it set the wrong Tetrad parameter. It now controls the max-p heuristic as documented.</p></li>
+<li><p><code><a href="../reference/boss_fci.html">boss_fci()</a></code>’s <code>num_threads</code> was never passed to Tetrad. It is now, and its default changes from 0 to Tetrad’s default of 1.</p></li>
+<li><p><code>pc(engine = "pcalg")</code> no longer errors when the estimated graph contains a cycle. Now emits a message and returns the graph with its class downgraded to <code>"UNKNOWN"</code>.</p></li>
 </ul></div>
 </div>
     <div class="section level2">

@@ -171,14 +171,14 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     test = "fisher_z",
     alpha = 0.05,
     depth = 10,
-    stable_fas = FALSE,
     max_disc_path_length = 2,
-    complete_rule_set_used = TRUE
+    exclude_selection_bias = FALSE,
+    fdr_q = 0.05
   )
   disco(tpc_example, rfci_tetrad)
 }
 #> <Disco RFCI-PAG: 6 nodes | 6 edges>
 #>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o-oyouth_x4
-#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o->youth_x4
+#>          oldage_x6<->oldage_x5, youth_x3o->oldage_x5, youth_x4<->oldage_x6
 ```

@@ -544,7 +544,11 @@ steps,</p></li>
 <li><p><code>use_data_order = TRUE</code> - If TRUE, the data variable
 order should be used for the first initial permutation,</p></li>
 <li><p><code>output_cpdag = TRUE</code> - If TRUE, the DAG output of the
-algorithm is converted to a CPDAG.</p></li>
+algorithm is converted to a CPDAG,</p></li>
+<li><p><code>num_threads = 1</code> - Number of threads to use for the
+search,</p></li>
+<li><p><code>seed = -1</code> - Seed for Tetrad's random number generator.
+If -1, no seed is set.</p></li>
 </ul></li>
 <li><p><code>"boss_fci"</code> - BOSS-FCI algorithm.</p><ul><li><p><code>depth = -1</code> - Maximum size of conditioning set.
 Set to -1 for unlimited,</p></li>
@@ -560,7 +564,13 @@ final orientation rules set due to P. Spirtes, guaranteeing arrow
 completeness, should be used; TRUE if the (fuller) set due to
 J. Zhang, should be used guaranteeing additional tail completeness,</p></li>
 <li><p><code>guarantee_pag = FALSE</code> - Ensure the output is a legal PAG
-(where feasible).</p></li>
+(where feasible),</p></li>
+<li><p><code>num_starts = 1</code> - The number of times the algorithm
+should be started from different initializations,</p></li>
+<li><p><code>num_threads = 1</code> - Number of threads to use for the
+search,</p></li>
+<li><p><code>exclude_selection_bias = FALSE</code> - If TRUE, exclude the
+possibility of selection bias.</p></li>
 </ul></li>
 <li><p><code>"fci"</code> - FCI algorithm.</p><ul><li><p><code>depth = -1</code> - Maximum size of conditioning set.
 Set to -1 for unlimited,</p></li>
@@ -574,17 +584,32 @@ final orientation rules set due to P. Spirtes, guaranteeing arrow
 completeness, should be used; TRUE if the (fuller) set due to
 J. Zhang, should be used guaranteeing additional tail completeness.</p></li>
 <li><p><code>guarantee_pag = FALSE</code> - Ensure the output is a legal
-PAG (where feasible).</p></li>
+PAG (where feasible),</p></li>
+<li><p><code>collider_orientation_style = "max_p"</code> - How unshielded
+colliders are oriented in the initial step.
+<code>"sepsets"</code> orients a collider if Z is not in the separating
+set of X and Y found during the adjacency search (as in the
+original FCI). <code>"conservative"</code> orients a collider only if Z
+is in none of the separating sets of X and Y, and leaves the
+triple unoriented if they disagree. <code>"max_p"</code> orients a
+collider if Z is not in the separating set with the highest
+p-value,</p></li>
+<li><p><code>do_possible_dsep = TRUE</code> - If TRUE, the possible d-sep
+search is done,</p></li>
+<li><p><code>exclude_selection_bias = FALSE</code> - If TRUE, exclude the
+possibility of selection bias,</p></li>
+<li><p><code>fdr_q = 0</code> - False discovery rate q value. If 0, FDR
+control is not used.</p></li>
 </ul></li>
 <li><p><code>"ges" ("fges")</code> - Fast Greedy Equivalence Search (FGES) algorithm.</p><ul><li><p><code>symmetric_first_step = FALSE</code> - If TRUE, scores for both
 X –&gt; Y and X &lt;– Y will be calculated and the higher score used.</p></li>
 <li><p><code>max_degree = -1</code> - Maximum degree of any node in the
 graph. Set to -1 for unlimited,</p></li>
-<li><p><code>parallelized = FALSE</code> - If TRUE, the algorithm should
-be parallelized,</p></li>
 <li><p><code>faithfulness_assumed = FALSE</code> - If TRUE, assume that if
 \(X \perp\!\!\!\perp Y\) (by an independence test) then
-\(X \perp\!\!\!\perp Y\) | Z for nonempty Z.</p></li>
+\(X \perp\!\!\!\perp Y\) | Z for nonempty Z,</p></li>
+<li><p><code>num_threads = 1</code> - Number of threads to use for the
+search.</p></li>
 </ul></li>
 <li><p><code>"gfci"</code> - GFCI algorithm. Combines FGES and FCI.</p><ul><li><p><code>depth = -1</code> - Maximum size of conditioning set,</p></li>
 <li><p><code>max_degree = -1</code> - Maximum degree of any node in the
@@ -599,7 +624,11 @@ J. Zhang, should be used guaranteeing additional tail completeness,</p></li>
 PAG (where feasible),</p></li>
 <li><p><code>use_heuristic = FALSE</code> - If TRUE, use the max p heuristic.</p></li>
 <li><p><code>start_complete = FALSE</code> - If TRUE, start from a complete
-graph.</p></li>
+graph,</p></li>
+<li><p><code>num_threads = 1</code> - Number of threads to use for the
+search,</p></li>
+<li><p><code>exclude_selection_bias = FALSE</code> - If TRUE, exclude the
+possibility of selection bias.</p></li>
 </ul></li>
 <li><p><code>"grasp"</code> - GRaSP (Greedy Relations of Sparsest Permutation)
 algorithm.</p><ul><li><p><code>covered_depth = 4</code> - The depth of recursion for first
@@ -611,28 +640,35 @@ tucks,</p></li>
 <li><p><code>ordered_alg = FALSE</code> - If TRUE, earlier GRaSP stages
 should be performed before later stages,</p></li>
 <li><p><code>raskutti_uhler = FALSE</code> - If TRUE, use Raskutti and
-Uhler's DAG-building method (test); if FALSE, use Grow-Shrink
-(score).</p></li>
+Uhler's DAG-building method, which uses the independence test.
+If FALSE, use Grow-Shrink, which uses the score or the test
+depending on <code>use_score</code>,</p></li>
 <li><p><code>use_data_order = TRUE</code> - If TRUE, the data variable
 order should be used for the first initial permutation,</p></li>
 <li><p><code>num_starts = 1</code> - The number of times the algorithm
 should be started from different initializations. By default, the
 algorithm will be run through at least once using the initialized
-parameters.</p></li>
+parameters,</p></li>
+<li><p><code>use_score = TRUE</code> - Only used when
+<code>raskutti_uhler = FALSE</code>. If TRUE, Grow-Shrink uses the score
+to find parents; if FALSE, it uses the independence test,</p></li>
+<li><p><code>allow_internal_randomness = TRUE</code> - If TRUE, the search
+shuffles variables and parents in random order. This randomness
+is not controlled by <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> or <code>seed</code>, so set it
+to FALSE for reproducible results,</p></li>
+<li><p><code>output_cpdag = TRUE</code> - If TRUE, the DAG output of the
+algorithm is converted to a CPDAG,</p></li>
+<li><p><code>seed = -1</code> - Seed for Tetrad's random number generator.
+If -1, no seed is set.</p></li>
 </ul></li>
 <li><p><code>"grasp_fci"</code> - GRaSP-FCI algorithm. Combines GRaSP and FCI.</p><ul><li><p><code>depth = -1</code> - Maximum size of conditioning set.
 Set to -1 for unlimited,</p></li>
-<li><p><code>stable_fas = TRUE</code> - If TRUE, the "stable" version of
-the PC adjacency search is used, which for k &gt; 0 fixes the graph
-for depth k + 1 to that of the previous depth k.</p></li>
 <li><p><code>max_disc_path_length = -1</code> - Maximum length for any
 discriminating path. Set to -1 for unlimited,</p></li>
 <li><p><code>complete_rule_set_used = TRUE</code> - FALSE if the (simpler)
 final orientation rules set due to P. Spirtes, guaranteeing arrow
 completeness, should be used; TRUE if the (fuller) set due to
 J. Zhang, should be used guaranteeing additional tail completeness,</p></li>
-<li><p><code>covered_depth = 4</code> - The depth of recursion for first
-search,</p></li>
 <li><p><code>singular_depth = 1</code> - Recursion depth for singular
 tucks,</p></li>
 <li><p><code>nonsingular_depth = 1</code> - Recursion depth for nonsingular
@@ -640,8 +676,9 @@ tucks,</p></li>
 <li><p><code>ordered_alg = FALSE</code> - If TRUE, earlier GRaSP stages
 should be performed before later stages,</p></li>
 <li><p><code>raskutti_uhler = FALSE</code> - If TRUE, use Raskutti and
-Uhler's DAG-building method (test); if FALSE, use Grow-Shrink
-(score).</p></li>
+Uhler's DAG-building method, which uses the independence test.
+If FALSE, use Grow-Shrink, which uses the score or the test
+depending on <code>use_score</code>,</p></li>
 <li><p><code>use_data_order = TRUE</code> - If TRUE, the data variable
 order should be used for the first initial permutation,</p></li>
 <li><p><code>num_starts = 1</code> - The number of times the algorithm
@@ -649,37 +686,45 @@ should be started from different initializations. By default, the
 algorithm will be run through at least once using the initialized
 parameters,</p></li>
 <li><p><code>guarantee_pag = FALSE</code> - If TRUE, ensure the output is a
-legal PAG (where feasible).</p></li>
+legal PAG (where feasible),</p></li>
+<li><p><code>use_score = TRUE</code> - Only used when
+<code>raskutti_uhler = FALSE</code>. If TRUE, Grow-Shrink uses the score
+to find parents; if FALSE, it uses the independence test,</p></li>
+<li><p><code>use_heuristic = FALSE</code> - If TRUE, use the max p
+heuristic,</p></li>
+<li><p><code>exclude_selection_bias = FALSE</code> - If TRUE, exclude the
+possibility of selection bias,</p></li>
+<li><p><code>seed = -1</code> - Seed for Tetrad's random number generator.
+If -1, no seed is set.</p></li>
 </ul></li>
-<li><p><code>"pc"</code> - Peter-Clark (PC) algorithm</p><ul><li><p><code>conflict_rule = 1</code> -
-The value of <code>conflict_rule</code> determines how collider conflicts are handled. <code>1</code>
-corresponds to the "overwrite" rule as introduced in the <span class="pkg">pcalg</span> package, see
-<code><a href="https://rdrr.io/pkg/pcalg/man/pc.html" class="external-link">pcalg::pc()</a></code>. <code>2</code> means that all collider conflicts using bidirected edges
-should be prioritized, while <code>3</code> means that existing colliders should be prioritized,
-ignoring subsequent conflicting information.</p></li>
-<li><p><code>depth = -1</code> - Maximum size of conditioning set.
+<li><p><code>"pc"</code> - Peter-Clark (PC) algorithm</p><ul><li><p><code>depth = -1</code> - Maximum size of conditioning set.
 Set to -1 for unlimited,</p></li>
 <li><p><code>stable_fas = TRUE</code> - If TRUE, the "stable" version of
 the PC adjacency search is used, which for k &gt; 0 fixes the graph
-for depth k + 1 to that of the previous depth k.</p></li>
-<li><p><code>guarantee_cpdag = FALSE</code> - If TRUE, ensure the output is
-a legal CPDAG.</p></li>
+for depth k + 1 to that of the previous depth k,</p></li>
+<li><p><code>collider_orientation_style = "max_p"</code> - How unshielded
+colliders are oriented. <code>"sepsets"</code> orients a
+collider if Z is not in the separating set of X and Y found during
+the adjacency search (as in the original PC).
+<code>"conservative"</code> orients a collider only if Z is in none of
+the separating sets of X and Y, and leaves the triple unoriented
+if they disagree. <code>"max_p"</code> orients a collider if Z is not in
+the separating set with the highest p-value,</p></li>
+<li><p><code>allow_bidirected = FALSE</code> - If TRUE, collider conflicts
+are shown as bidirected edges,</p></li>
+<li><p><code>fdr_q = 0</code> - False discovery rate q value. If 0, FDR
+control is not used.</p></li>
 </ul></li>
 <li><p><code>"rfci"</code> - Restricted FCI algorithm</p><ul><li><p><code>depth = -1</code> - Maximum size of conditioning set. Set
 to -1 for unlimited,</p></li>
-<li><p><code>stable_fas = TRUE</code> - If TRUE, the "stable" version of
-the PC adjacency search is used, which for k &gt; 0 fixes the graph
-for depth k + 1 to that of the previous depth k.</p></li>
 <li><p><code>max_disc_path_length = -1</code> - Maximum length for any
 discriminating path. Set to -1 for unlimited,</p></li>
-<li><p><code>complete_rule_set_used = TRUE</code> - FALSE if the (simpler)
-final orientation rules set due to P. Spirtes, guaranteeing arrow
-completeness, should be used; TRUE if the (fuller) set due to
-J. Zhang, should be used guaranteeing additional tail completeness.</p></li>
+<li><p><code>exclude_selection_bias = FALSE</code> - If TRUE, exclude the
+possibility of selection bias,</p></li>
+<li><p><code>fdr_q = 0</code> - False discovery rate q value. If 0, FDR
+control is not used.</p></li>
 </ul></li>
-<li><p><code>"sp_fci"</code> - Sparsest Permutation using FCI</p><ul><li><p><code>depth = -1</code> - Maximum size of conditioning set. Set
-to -1 for unlimited,</p></li>
-<li><p><code>max_disc_path_length = -1</code> - Maximum length for any
+<li><p><code>"sp_fci"</code> - Sparsest Permutation using FCI</p><ul><li><p><code>max_disc_path_length = -1</code> - Maximum length for any
 discriminating path. Set to -1 for unlimited,</p></li>
 <li><p><code>complete_rule_set_used = TRUE</code> - FALSE if the (simpler)
 final orientation rules set due to P. Spirtes, guaranteeing arrow
@@ -687,7 +732,9 @@ completeness, should be used; TRUE if the (fuller) set due to
 J. Zhang, should be used guaranteeing additional tail completeness,</p></li>
 <li><p><code>guarantee_pag = FALSE</code> - Ensure the output is a legal
 PAG (where feasible),</p></li>
-<li><p><code>use_heuristic = FALSE</code> - If TRUE, use the max p heuristic version.</p></li>
+<li><p><code>use_heuristic = FALSE</code> - If TRUE, use the max p heuristic version,</p></li>
+<li><p><code>exclude_selection_bias = FALSE</code> - If TRUE, exclude the
+possibility of selection bias.</p></li>
 </ul></li>
 </ul></dd>
 

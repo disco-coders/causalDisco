@@ -144,26 +144,27 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
 
 # With all algorithm arguments specified
 if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
-  grasp_tetrad <- grasp_fci(
+  grasp_tetrad <- grasp(
     engine = "tetrad",
     test = "poisson_prior",
     score = "rank_bic",
     alpha = 0.05,
-    depth = 3,
-    stable_fas = FALSE,
-    max_disc_path_length = 5,
     covered_depth = 3,
     singular_depth = 2,
     nonsingular_depth = 2,
     ordered_alg = TRUE,
-    raskutti_uhler = TRUE,
+    raskutti_uhler = FALSE,
     use_data_order = FALSE,
-    num_starts = 3
+    num_starts = 3,
+    use_score = FALSE,
+    allow_internal_randomness = FALSE,
+    output_cpdag = TRUE,
+    seed = 1405
   )
   disco(tpc_example, grasp_tetrad)
 }
-#> <Disco PAG: 6 nodes | 6 edges>
+#> <Disco CPDAG: 6 nodes | 6 edges>
 #>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o-oyouth_x4
-#>          oldage_x5-->oldage_x6, youth_x3o->oldage_x5, youth_x4-->oldage_x6
+#>   edges: child_x2---child_x1, child_x2-->oldage_x5, child_x2---youth_x4
+#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
 ```

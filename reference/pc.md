@@ -219,15 +219,16 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     engine = "tetrad",
     test = "fisher_z",
     alpha = 0.05,
-    conflict_rule = 2,
     depth = 10,
     stable_fas = FALSE,
-    guarantee_cpdag = TRUE
+    collider_orientation_style = "sepsets",
+    allow_bidirected = TRUE,
+    fdr_q = 0.05
   )
   disco(tpc_example, pc_tetrad)
 }
 #> <Disco CPDAG: 6 nodes | 6 edges>
 #>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x2---child_x1, child_x2-->oldage_x5, child_x2---youth_x4
-#>          oldage_x5-->oldage_x6, youth_x3-->oldage_x5, youth_x4-->oldage_x6
+#>   edges: child_x2---child_x1, child_x2-->oldage_x5, child_x2-->youth_x4
+#>          oldage_x6-->oldage_x5, oldage_x6-->youth_x4, youth_x3-->oldage_x5
 ```

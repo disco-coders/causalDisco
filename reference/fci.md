@@ -177,12 +177,16 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     max_disc_path_length = 4,
     depth = 10,
     stable_fas = FALSE,
-    guarantee_pag = TRUE
+    guarantee_pag = TRUE,
+    collider_orientation_style = "sepsets",
+    do_possible_dsep = FALSE,
+    exclude_selection_bias = FALSE,
+    fdr_q = 0.05
   )
   disco(tpc_example, fci_tetrad)
 }
 #> <Disco PAG: 6 nodes | 6 edges>
 #>   nodes: child_x2, child_x1, youth_x4, youth_x3, oldage_x6, oldage_x5
-#>   edges: child_x1o->child_x2, child_x2<->oldage_x5, child_x2<->youth_x4
+#>   edges: child_x2o-ochild_x1, child_x2o->oldage_x5, child_x2o->youth_x4
 #>          oldage_x6<->oldage_x5, youth_x3o->oldage_x5, youth_x4<->oldage_x6
 ```

@@ -151,16 +151,18 @@ if (verify_tetrad()$installed && verify_tetrad()$java_ok) {
     score = "rank_bic",
     alpha = 0.05,
     depth = 3,
-    stable_fas = FALSE,
     max_disc_path_length = 5,
-    covered_depth = 3,
     singular_depth = 2,
     nonsingular_depth = 2,
     ordered_alg = TRUE,
     raskutti_uhler = TRUE,
     use_data_order = FALSE,
     num_starts = 3,
-    guarantee_pag = TRUE
+    guarantee_pag = TRUE,
+    use_score = TRUE,
+    use_heuristic = FALSE,
+    exclude_selection_bias = FALSE,
+    seed = 1405
   )
   disco(tpc_example, grasp_fci_tetrad)
 }

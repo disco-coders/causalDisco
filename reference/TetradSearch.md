@@ -733,7 +733,12 @@ Sets the causal discovery algorithm to use in Tetrad.
       be used for the first initial permutation,
 
     - `output_cpdag = TRUE` - If TRUE, the DAG output of the algorithm
-      is converted to a CPDAG.
+      is converted to a CPDAG,
+
+    - `num_threads = 1` - Number of threads to use for the search,
+
+    - `seed = -1` - Seed for Tetrad's random number generator. If -1, no
+      seed is set.
 
   - `"boss_fci"` - BOSS-FCI algorithm.
 
@@ -755,7 +760,15 @@ Sets the causal discovery algorithm to use in Tetrad.
       Zhang, should be used guaranteeing additional tail completeness,
 
     - `guarantee_pag = FALSE` - Ensure the output is a legal PAG (where
-      feasible).
+      feasible),
+
+    - `num_starts = 1` - The number of times the algorithm should be
+      started from different initializations,
+
+    - `num_threads = 1` - Number of threads to use for the search,
+
+    - `exclude_selection_bias = FALSE` - If TRUE, exclude the
+      possibility of selection bias.
 
   - `"fci"` - FCI algorithm.
 
@@ -775,7 +788,25 @@ Sets the causal discovery algorithm to use in Tetrad.
       Zhang, should be used guaranteeing additional tail completeness.
 
     - `guarantee_pag = FALSE` - Ensure the output is a legal PAG (where
-      feasible).
+      feasible),
+
+    - `collider_orientation_style = "max_p"` - How unshielded colliders
+      are oriented in the initial step. `"sepsets"` orients a collider
+      if Z is not in the separating set of X and Y found during the
+      adjacency search (as in the original FCI). `"conservative"`
+      orients a collider only if Z is in none of the separating sets of
+      X and Y, and leaves the triple unoriented if they disagree.
+      `"max_p"` orients a collider if Z is not in the separating set
+      with the highest p-value,
+
+    - `do_possible_dsep = TRUE` - If TRUE, the possible d-sep search is
+      done,
+
+    - `exclude_selection_bias = FALSE` - If TRUE, exclude the
+      possibility of selection bias,
+
+    - `fdr_q = 0` - False discovery rate q value. If 0, FDR control is
+      not used.
 
   - `"ges" ("fges")` - Fast Greedy Equivalence Search (FGES) algorithm.
 
@@ -785,12 +816,11 @@ Sets the causal discovery algorithm to use in Tetrad.
     - `max_degree = -1` - Maximum degree of any node in the graph. Set
       to -1 for unlimited,
 
-    - `parallelized = FALSE` - If TRUE, the algorithm should be
-      parallelized,
-
     - `faithfulness_assumed = FALSE` - If TRUE, assume that if \\X
       \perp\\\\\\\perp Y\\ (by an independence test) then \\X
-      \perp\\\\\\\perp Y\\ \| Z for nonempty Z.
+      \perp\\\\\\\perp Y\\ \| Z for nonempty Z,
+
+    - `num_threads = 1` - Number of threads to use for the search.
 
   - `"gfci"` - GFCI algorithm. Combines FGES and FCI.
 
@@ -812,7 +842,12 @@ Sets the causal discovery algorithm to use in Tetrad.
 
     - `use_heuristic = FALSE` - If TRUE, use the max p heuristic.
 
-    - `start_complete = FALSE` - If TRUE, start from a complete graph.
+    - `start_complete = FALSE` - If TRUE, start from a complete graph,
+
+    - `num_threads = 1` - Number of threads to use for the search,
+
+    - `exclude_selection_bias = FALSE` - If TRUE, exclude the
+      possibility of selection bias.
 
   - `"grasp"` - GRaSP (Greedy Relations of Sparsest Permutation)
     algorithm.
@@ -827,7 +862,9 @@ Sets the causal discovery algorithm to use in Tetrad.
       performed before later stages,
 
     - `raskutti_uhler = FALSE` - If TRUE, use Raskutti and Uhler's
-      DAG-building method (test); if FALSE, use Grow-Shrink (score).
+      DAG-building method, which uses the independence test. If FALSE,
+      use Grow-Shrink, which uses the score or the test depending on
+      `use_score`,
 
     - `use_data_order = TRUE` - If TRUE, the data variable order should
       be used for the first initial permutation,
@@ -835,16 +872,27 @@ Sets the causal discovery algorithm to use in Tetrad.
     - `num_starts = 1` - The number of times the algorithm should be
       started from different initializations. By default, the algorithm
       will be run through at least once using the initialized
-      parameters.
+      parameters,
+
+    - `use_score = TRUE` - Only used when `raskutti_uhler = FALSE`. If
+      TRUE, Grow-Shrink uses the score to find parents; if FALSE, it
+      uses the independence test,
+
+    - `allow_internal_randomness = TRUE` - If TRUE, the search shuffles
+      variables and parents in random order. This randomness is not
+      controlled by [`set.seed()`](https://rdrr.io/r/base/Random.html)
+      or `seed`, so set it to FALSE for reproducible results,
+
+    - `output_cpdag = TRUE` - If TRUE, the DAG output of the algorithm
+      is converted to a CPDAG,
+
+    - `seed = -1` - Seed for Tetrad's random number generator. If -1, no
+      seed is set.
 
   - `"grasp_fci"` - GRaSP-FCI algorithm. Combines GRaSP and FCI.
 
     - `depth = -1` - Maximum size of conditioning set. Set to -1 for
       unlimited,
-
-    - `stable_fas = TRUE` - If TRUE, the "stable" version of the PC
-      adjacency search is used, which for k \> 0 fixes the graph for
-      depth k + 1 to that of the previous depth k.
 
     - `max_disc_path_length = -1` - Maximum length for any
       discriminating path. Set to -1 for unlimited,
@@ -854,8 +902,6 @@ Sets the causal discovery algorithm to use in Tetrad.
       completeness, should be used; TRUE if the (fuller) set due to J.
       Zhang, should be used guaranteeing additional tail completeness,
 
-    - `covered_depth = 4` - The depth of recursion for first search,
-
     - `singular_depth = 1` - Recursion depth for singular tucks,
 
     - `nonsingular_depth = 1` - Recursion depth for nonsingular tucks,
@@ -864,7 +910,9 @@ Sets the causal discovery algorithm to use in Tetrad.
       performed before later stages,
 
     - `raskutti_uhler = FALSE` - If TRUE, use Raskutti and Uhler's
-      DAG-building method (test); if FALSE, use Grow-Shrink (score).
+      DAG-building method, which uses the independence test. If FALSE,
+      use Grow-Shrink, which uses the score or the test depending on
+      `use_score`,
 
     - `use_data_order = TRUE` - If TRUE, the data variable order should
       be used for the first initial permutation,
@@ -875,49 +923,58 @@ Sets the causal discovery algorithm to use in Tetrad.
       parameters,
 
     - `guarantee_pag = FALSE` - If TRUE, ensure the output is a legal
-      PAG (where feasible).
+      PAG (where feasible),
+
+    - `use_score = TRUE` - Only used when `raskutti_uhler = FALSE`. If
+      TRUE, Grow-Shrink uses the score to find parents; if FALSE, it
+      uses the independence test,
+
+    - `use_heuristic = FALSE` - If TRUE, use the max p heuristic,
+
+    - `exclude_selection_bias = FALSE` - If TRUE, exclude the
+      possibility of selection bias,
+
+    - `seed = -1` - Seed for Tetrad's random number generator. If -1, no
+      seed is set.
 
   - `"pc"` - Peter-Clark (PC) algorithm
-
-    - `conflict_rule = 1` - The value of `conflict_rule` determines how
-      collider conflicts are handled. `1` corresponds to the "overwrite"
-      rule as introduced in the pcalg package, see
-      [`pcalg::pc()`](https://rdrr.io/pkg/pcalg/man/pc.html). `2` means
-      that all collider conflicts using bidirected edges should be
-      prioritized, while `3` means that existing colliders should be
-      prioritized, ignoring subsequent conflicting information.
 
     - `depth = -1` - Maximum size of conditioning set. Set to -1 for
       unlimited,
 
     - `stable_fas = TRUE` - If TRUE, the "stable" version of the PC
       adjacency search is used, which for k \> 0 fixes the graph for
-      depth k + 1 to that of the previous depth k.
+      depth k + 1 to that of the previous depth k,
 
-    - `guarantee_cpdag = FALSE` - If TRUE, ensure the output is a legal
-      CPDAG.
+    - `collider_orientation_style = "max_p"` - How unshielded colliders
+      are oriented. `"sepsets"` orients a collider if Z is not in the
+      separating set of X and Y found during the adjacency search (as in
+      the original PC). `"conservative"` orients a collider only if Z is
+      in none of the separating sets of X and Y, and leaves the triple
+      unoriented if they disagree. `"max_p"` orients a collider if Z is
+      not in the separating set with the highest p-value,
+
+    - `allow_bidirected = FALSE` - If TRUE, collider conflicts are shown
+      as bidirected edges,
+
+    - `fdr_q = 0` - False discovery rate q value. If 0, FDR control is
+      not used.
 
   - `"rfci"` - Restricted FCI algorithm
 
     - `depth = -1` - Maximum size of conditioning set. Set to -1 for
       unlimited,
 
-    - `stable_fas = TRUE` - If TRUE, the "stable" version of the PC
-      adjacency search is used, which for k \> 0 fixes the graph for
-      depth k + 1 to that of the previous depth k.
-
     - `max_disc_path_length = -1` - Maximum length for any
       discriminating path. Set to -1 for unlimited,
 
-    - `complete_rule_set_used = TRUE` - FALSE if the (simpler) final
-      orientation rules set due to P. Spirtes, guaranteeing arrow
-      completeness, should be used; TRUE if the (fuller) set due to J.
-      Zhang, should be used guaranteeing additional tail completeness.
+    - `exclude_selection_bias = FALSE` - If TRUE, exclude the
+      possibility of selection bias,
+
+    - `fdr_q = 0` - False discovery rate q value. If 0, FDR control is
+      not used.
 
   - `"sp_fci"` - Sparsest Permutation using FCI
-
-    - `depth = -1` - Maximum size of conditioning set. Set to -1 for
-      unlimited,
 
     - `max_disc_path_length = -1` - Maximum length for any
       discriminating path. Set to -1 for unlimited,
@@ -931,7 +988,10 @@ Sets the causal discovery algorithm to use in Tetrad.
       feasible),
 
     - `use_heuristic = FALSE` - If TRUE, use the max p heuristic
-      version.
+      version,
+
+    - `exclude_selection_bias = FALSE` - If TRUE, exclude the
+      possibility of selection bias.
 
 #### Returns
 
