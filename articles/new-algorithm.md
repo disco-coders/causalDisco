@@ -336,7 +336,9 @@ data, to show the registration mechanics.
 always_empty_runner <- function(alg, ...) {
   kn <- knowledge()
   list(
-    set_knowledge = function(knowledge) kn <<- knowledge,
+    set_knowledge = function(knowledge) {
+      kn <<- knowledge
+    },
     run = function(data) {
       cg <- caugi::caugi(
         from = character(0),

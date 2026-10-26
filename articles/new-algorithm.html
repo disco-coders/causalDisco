@@ -304,7 +304,9 @@
 <code class="sourceCode R"><span><span class="va">always_empty_runner</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">alg</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">kn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/knowledge.html">knowledge</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    set_knowledge <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">knowledge</span><span class="op">)</span> <span class="va">kn</span> <span class="op">&lt;&lt;-</span> <span class="va">knowledge</span>,</span>
+<span>    set_knowledge <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">knowledge</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">kn</span> <span class="op">&lt;&lt;-</span> <span class="va">knowledge</span></span>
+<span>    <span class="op">}</span>,</span>
 <span>    run <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="va">cg</span> <span class="op">&lt;-</span> <span class="fu">caugi</span><span class="fu">::</span><span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span></span>
 <span>        from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>

@@ -67,8 +67,6 @@ automatically for rJava. You can install Java using the
 
 ``` r
 
-# Use the development version of rJavaEnv from GitHub
-# pak::pak("e-kotov/rJavaEnv")
 rJavaEnv::java_quick_install(version = 25, distribution = "Temurin")
 ```
 

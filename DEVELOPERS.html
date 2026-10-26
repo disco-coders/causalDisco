@@ -78,7 +78,7 @@ Add a new case that maps the score name to the corresponding private method.</p>
 Document and validate any additional parameters accepted by the score.</p></li>
 </ol><p>In the <code>set_score()</code> method, add an entry of the form:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="st">"my_score"</span> <span class="op">=</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="st">"my_score"</span> <span class="op">&lt;-</span> <span class="op">{</span></span>
 <span>  <span class="va">private</span><span class="op">$</span><span class="fu">my_score</span><span class="op">(</span><span class="va">...</span>, use_for_mc <span class="op">=</span> <span class="va">mc</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Then implement the corresponding private method:</p>
