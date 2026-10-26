@@ -3,4 +3,6 @@
 [lint.undesirable_operator]
 # `<<-` is intended: it updates enclosing state in the knowledge() DSL,
 # assigns fields in Reference Class methods, and records calls in test mocks.
-operators = ["->>", ":::"]
+# `:::` is intended: Reference Class methods (e.g. in R/tges-run.R) cannot see
+# unexported package functions without it.
+operators = ["->>"]
