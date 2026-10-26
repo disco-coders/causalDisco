@@ -1,12 +1,17 @@
 repos:
   - repo: https://github.com/jolars/panache-pre-commit
-    rev: v2.46.0
+    rev: v3.17.0
 
     hooks:
       - id: panache-format
       - id: panache-lint
 
   - repo: https://github.com/posit-dev/air-pre-commit
-    rev: 0.9.0
+    rev: 0.12.0
     hooks:
       - id: air-format
+
+  - repo: https://github.com/etiennebacher/jarl-pre-commit
+    rev: aefe7ee88dd627b197ece6056f0e360b87c43e0a  # 0.7.1
+    hooks:
+      - id: jarl-check

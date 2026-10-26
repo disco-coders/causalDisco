@@ -9,9 +9,8 @@
 
 - Tetrad algorithms now expose more of Tetrad's parameters, all defaulting to
   Tetrad's own defaults:
-  - `grasp()` gains `use_score`, `allow_internal_randomness`, `output_cpdag`
-    and `seed`. Set `allow_internal_randomness = FALSE` for reproducible
-    results.
+  - `grasp()` gains `use_score`, `allow_internal_randomness`, `output_cpdag` and
+    `seed`. Set `allow_internal_randomness = FALSE` for reproducible results.
   - `grasp_fci()` gains `use_score`, `use_heuristic`, `exclude_selection_bias`
     and `seed`.
   - `pc()` gains `collider_orientation_style`, `allow_bidirected` and `fdr_q`.
@@ -23,8 +22,8 @@
 
 ## Bug fixes
 
-- Removed Tetrad algorithm arguments that Tetrad ignored, so setting them had
-  no effect:
+- Removed Tetrad algorithm arguments that Tetrad ignored, so setting them had no
+  effect:
   - `pc()`: `conflict_rule`, `guarantee_cpdag`
   - `ges()`: `parallelized` (use `num_threads`)
   - `rfci()`: `stable_fas`, `complete_rule_set_used`
@@ -41,8 +40,9 @@
 - `boss_fci()`'s `num_threads` was never passed to Tetrad. It is now, and its
   default changes from 0 to Tetrad's default of 1.
 
-- `pc(engine = "pcalg")` no longer errors when the estimated graph contains a cycle.
-Now emits a message and returns the graph with its class downgraded to `"UNKNOWN"`.
+- `pc(engine = "pcalg")` no longer errors when the estimated graph contains a
+  cycle. Now emits a message and returns the graph with its class downgraded to
+  `"UNKNOWN"`.
 
 # causalDisco 1.2.1
 

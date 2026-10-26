@@ -13,18 +13,18 @@ knitr:
 library(causalDisco)
 ```
 
-This article demonstrates how to use the `knowledge()` function to incorporate prior
-knowledge into causal discovery algorithms. The supported knowledge types are
-introduced below, along with examples of creating `Knowledge` objects and using them
-with causal discovery methods.
+This article demonstrates how to use the `knowledge()` function to incorporate
+prior knowledge into causal discovery algorithms. The supported knowledge types
+are introduced below, along with examples of creating `Knowledge` objects and
+using them with causal discovery methods.
 
-At its core, all prior knowledge is represented as constraints on directed edges,
-specifying which edges are required or forbidden. Higher-level knowledge types provide
-more convenient ways to express common modeling assumptions, but ultimately translate
-into these edge constraints. All knowledge types can be freely combined: each call or
-operator adds constraints to the same Knowledge object. For example, requiring an edge
-from `A` to `B` and then requiring an edge from `A` to `C` produces a `Knowledge` object
-that requires both edges.
+At its core, all prior knowledge is represented as constraints on directed
+edges, specifying which edges are required or forbidden. Higher-level knowledge
+types provide more convenient ways to express common modeling assumptions, but
+ultimately translate into these edge constraints. All knowledge types can be
+freely combined: each call or operator adds constraints to the same Knowledge
+object. For example, requiring an edge from `A` to `B` and then requiring an
+edge from `A` to `C` produces a `Knowledge` object that requires both edges.
 
 ## Required and forbidden knowledge
 
@@ -382,27 +382,26 @@ algorithm, i.e. the engine you specify to an algorithm such as
 
 Support for background-knowledge constraints differs across engines, as
 summarized in @tbl-backend-knowledge. The asterisks for `causalDisco` and
-`pcalg` indicate that only symmetric forbidden-edge constraints are
-supported, i.e. an edge must be forbidden in both directions. In addition,
-`causalDisco` automatically detects when a set of forbidden edges is
-equivalent to a tiered ordering and, in that case, treats it as tiered
-knowledge.
+`pcalg` indicate that only symmetric forbidden-edge constraints are supported,
+i.e. an edge must be forbidden in both directions. In addition, `causalDisco`
+automatically detects when a set of forbidden edges is equivalent to a tiered
+ordering and, in that case, treats it as tiered knowledge.
 
-| Engine       | Forbidden edges | Required edges | Tiered knowledge |
-|:-------------|:----------------:|:----------------:|:------------------:|
-| `causalDisco` | ✓\*             |                 | ✓                 |
-| `pcalg`       | ✓\*             |                 |                   |
-| `bnlearn`     | ✓               | ✓               | ✓                 |
-| `Tetrad`      | ✓               | ✓               | ✓                 |
+  | Engine         | Forbidden edges    | Required edges     | Tiered knowledge     |
+  | :------------- | :----------------: | :----------------: | :------------------: |
+  | `causalDisco`  |        ✓\*         |                    |          ✓           |
+  | `pcalg`        |        ✓\*         |                    |                      |
+  | `bnlearn`      |         ✓          |         ✓          |          ✓           |
+  | `Tetrad`       |         ✓          |         ✓          |          ✓           |
 
-: Support for background knowledge by engine. {#tbl-backend-knowledge}
+  : Support for background knowledge by engine. {#tbl-backend-knowledge}
 
 ### bnlearn
 
-When required knowledge is provided, bnlearn may emit a warning during
-structure learning. This occurs when the algorithm identifies a candidate
-v-structure (collider) from the data whose orientation conflicts with
-already oriented edges.
+When required knowledge is provided, bnlearn may emit a warning during structure
+learning. This occurs when the algorithm identifies a candidate v-structure
+(collider) from the data whose orientation conflicts with already oriented
+edges.
 
 ```{r}
 #| label: bnlearn
@@ -446,8 +445,8 @@ output <- disco(data = tpc_example, method = pc_pcalg, knowledge = kn)
 
 ### causalDisco
 
-Symmetric forbidden-edge constraints are also supported (as for pcalg above),
-in addition to directed forbidden edges that are equivalent to some tiered
+Symmetric forbidden-edge constraints are also supported (as for pcalg above), in
+addition to directed forbidden edges that are equivalent to some tiered
 knowledge. For example, forbidding `oldage` from pointing to `child` is
 equivalent to placing `child` in the same tier as `youth`:
 

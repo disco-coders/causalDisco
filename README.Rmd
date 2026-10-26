@@ -44,8 +44,8 @@ Time to hit the disco 🪩
 ## Available algorithms
 
 causalDisco provides the following causal discovery algorithms, grouped by
-methodological class, with the supported engines and output graph class for
-each (function identifiers given in parentheses).
+methodological class, with the supported engines and output graph class for each
+(function identifiers given in parentheses).
 
 <p align="center">
 <picture>
@@ -207,7 +207,9 @@ You can visualize the resulting causal graph using the `plot()` function:
 
 ```{r}
 #| label: plot
-#| fig-alt: "A causal graph with the known tiers indicated by vertical positioning of the nodes."
+#| fig-alt: >-
+#|   A causal graph with the known tiers indicated by vertical positioning of
+#|   the nodes.
 
 plot(disco_cd_tpc)
 ```

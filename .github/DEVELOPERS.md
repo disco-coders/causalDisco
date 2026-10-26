@@ -64,7 +64,7 @@ engine-specific R6 class:
 In the `set_score()` method, add an entry of the form:
 
 ```r
-"my_score" = {
+"my_score" <- {
   private$my_score(..., use_for_mc = mc)
 }
 ```
