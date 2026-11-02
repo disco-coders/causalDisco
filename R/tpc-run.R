@@ -28,8 +28,12 @@
 #' @param na_method Handling of missing values, one of \code{"none"} (default;
 #'   error on any \code{NA}), \code{"cc"} (complete-case analysis), or
 #'   \code{"twd"} (test-wise deletion).
-#' @param orientation_method Conflict-handling method when orienting edges.
-#'   Currently only the conservative method is available.
+#' @param orientation_method Method for handling conflicting separating sets
+#'   when orienting v-structures; must be one of \code{"standard"},
+#'   \code{"conservative"} (the default) or \code{"maj_rule"}. The
+#'   conservative and majority-rule methods run additional conditional
+#'   independence tests for each unshielded triple. See [pcalg::pc()] for
+#'   further details.
 #' @param directed_as_undirected `r lifecycle::badge("deprecated")` This
 #'   argument no longer has any effect and will be removed in a future
 #'   release. Directed forbidden edges are now resolved using tier
@@ -87,6 +91,11 @@ tpc_run <- function(
     )
   }
 
+  orientation_method <- .match_orientation_method(
+    orientation_method,
+    "tpc_run"
+  )
+
   prep <- constraint_based_prepare_inputs(
     data = data,
     knowledge = knowledge,
@@ -108,13 +117,6 @@ tpc_run <- function(
   knowledge <- .infer_tiers_from_forbidden(knowledge)
   knowledge <- prepare_knowledge(knowledge) # Precompute variable ranks for efficient access
 
-  # check orientation method
-  if (!(orientation_method %in% c("standard", "conservative", "maj.rule"))) {
-    stop(
-      "Orientation method must be one of standard, conservative or maj.rule."
-    )
-  }
-
   # CI test that forbids conditioning on future tiers
   indep_test_dir <- dir_test(test, vnames, knowledge)
 
@@ -135,9 +137,27 @@ tpc_run <- function(
     numCores = num_cores,
     ...
   )
-  ntests <- sum(skel@n.edgetests)
 
-  res <- tpdag(skel, knowledge = knowledge)
+  # conservative / majority-rule: re-test unshielded triples
+  unfaithful_triples <- NULL
+  if (orientation_method != "standard") {
+    tmpres <- pcalg::pc.cons.intern(
+      skel,
+      suffStat = suff_stat,
+      indepTest = indep_test_dir,
+      alpha = alpha,
+      version.unf = c(1, 1),
+      maj.rule = orientation_method == "maj_rule"
+    )
+    unfaithful_triples <- tmpres$unfTripl
+    skel@sepset <- tmpres$sk@sepset
+  }
+
+  res <- tpdag(
+    skel,
+    knowledge = knowledge,
+    unfaithful_triples = unfaithful_triples
+  )
   # caugi assumes rows are the "from" nodes and columns the "to" nodes, so transpose.
   cg <- caugi::as_caugi(t(res), collapse = TRUE, class = "UNKNOWN")
   as_disco(cg, knowledge)
@@ -229,13 +249,16 @@ tpc_run <- function(
 #'
 #' @param amat Square adjacency matrix (from-to convention).
 #' @param sepsets Separation sets as computed by \pkg{pcalg}.
+#' @param unfaithful_triples Optional numeric vector of ambiguous triples
+#'   (encoded by [pcalg::triple2numb()]) as returned by
+#'   [pcalg::pc.cons.intern()]. These triples are left unoriented.
 #'
 #' @example inst/roxygen-examples/v_orient_temporal-example.R
 #'
 #' @return The updated adjacency matrix with additional arrowheads.
 #' @keywords internal
 #' @noRd
-v_orient_temporal <- function(amat, sepsets) {
+v_orient_temporal <- function(amat, sepsets, unfaithful_triples = NULL) {
   nvar <- nrow(amat)
 
   for (i in 1:nvar) {
@@ -254,8 +277,18 @@ v_orient_temporal <- function(amat, sepsets) {
           j2 <- thisPair[2]
           thisPairAdj <- j2 %in% find_adjacencies(amat, j1)
 
+          # skip triples marked ambiguous by the conservative or
+          # majority-rule check
+          is_ambiguous <- .is_ambiguous_triple(
+            nvar,
+            j1,
+            i,
+            j2,
+            unfaithful_triples
+          )
+
           # if pair is not adjacent (unmarried)
-          if (!thisPairAdj) {
+          if (!thisPairAdj && !is_ambiguous) {
             sepset1 <- sepsets[[j1]][[j2]]
             sepset2 <- sepsets[[j2]][[j1]]
 
@@ -274,6 +307,26 @@ v_orient_temporal <- function(amat, sepsets) {
     }
   }
   amat
+}
+
+#' Check whether an unshielded triple is marked ambiguous
+#'
+#' @param p Number of nodes.
+#' @param x,y,z Node indices of the triple \code{x - y - z}, with \code{y} the
+#'   middle node.
+#' @param unfaithful_triples Numeric vector of ambiguous triples encoded by
+#'   [pcalg::triple2numb()], or \code{NULL}.
+#'
+#' @return \code{TRUE} if the triple (in either direction) is in
+#'   \code{unfaithful_triples}, otherwise \code{FALSE}.
+#' @keywords internal
+#' @noRd
+.is_ambiguous_triple <- function(p, x, y, z, unfaithful_triples) {
+  length(unfaithful_triples) > 0 &&
+    any(
+      c(pcalg::triple2numb(p, x, y, z), pcalg::triple2numb(p, z, y, x)) %in%
+        unfaithful_triples
+    )
 }
 
 #' Find adjacencies of a node in an adjacency matrix
@@ -659,18 +712,21 @@ order_restrict_amat_cpdag <- function(amat, knowledge) {
 #'
 #' @description
 #' Take a learned skeleton and apply tier-based pruning and v-structure
-#' orientation, then delegate to \code{pcalg::addBgKnowledge()} for final
-#' orientation under background knowledge.
+#' orientation, then close the graph under Meek's rules with
+#' `apply_orientation_rules()`.
 #'
 #' @param skel A [pcalg::pcAlgo-class] skeleton result.
 #' @param knowledge A `Knowledge` object with tiers (and optionally edges).
+#' @param unfaithful_triples Optional vector of ambiguous triples from
+#'   [pcalg::pc.cons.intern()]; these are neither oriented as v-structures
+#'   nor used as non-colliders by the orientation rules.
 #'
 #' @example inst/roxygen-examples/tpdag-example.R
 #'
 #' @return A [pcalg::pcAlgo-class] object with an oriented graph.
 #' @keywords internal
 #' @noRd
-tpdag <- function(skel, knowledge) {
+tpdag <- function(skel, knowledge, unfaithful_triples = NULL) {
   .check_if_pkgs_are_installed(
     pkgs = c(
       "pcalg"
@@ -683,10 +739,143 @@ tpdag <- function(skel, knowledge) {
     amat,
     knowledge = knowledge
   )
-  pcalg::addBgKnowledge(
-    v_orient_temporal(skel_amat, skel@sepset),
-    checkInput = FALSE
+  apply_orientation_rules(
+    v_orient_temporal(
+      skel_amat,
+      skel@sepset,
+      unfaithful_triples = unfaithful_triples
+    ),
+    unfaithful_triples = unfaithful_triples
   )
+}
+
+#' Close a PDAG under Meek's orientation rules, respecting ambiguous triples
+#'
+#' @description
+#' Apply Meek's rules R1-R4 (pcalg style) until no further edges can be oriented. Without
+#' ambiguous triples the result is identical to
+#' [pcalg::addBgKnowledge()].
+#'
+#' In the internal from-to matrix \code{g}, \code{g[a, b] == 1} and
+#' \code{g[b, a] == 0} encode \code{a --> b}; both entries equal to 1 encode
+#' \code{a --- b}.
+#'
+#' \itemize{
+#'   \item R1: \code{a --> b --- c}, \code{a} not adjacent to \code{c}:
+#'     orient \code{b --> c}. Needs \code{(a, b, c)} unambiguous.
+#'   \item R2: \code{a --- b}, \code{a --> c --> b}: orient \code{a --> b}.
+#'   \item R3: \code{a --- b}, \code{c1 --> b <-- c2}, \code{a --- c1},
+#'     \code{a --- c2}, \code{c1} not adjacent to \code{c2}: orient
+#'     \code{a --> b}. Needs \code{(c1, a, c2)} unambiguous.
+#'   \item R4: \code{a --- b}, \code{a --- c}, \code{c} not adjacent to
+#'     \code{b}, \code{c --> d --> b}: orient \code{a --> b}. Needs
+#'     \code{(c, a, b)} unambiguous. Unlike Meek's R4, \code{a} need not be
+#'     adjacent to \code{d} (as in \pkg{pcalg}).
+#' }
+#'
+#' @param amat Square adjacency matrix in the \pkg{pcalg} CPDAG convention
+#'   (\code{amat[b, a] == 1} and \code{amat[a, b] == 0} encode
+#'   \code{a --> b}).
+#' @param unfaithful_triples Optional numeric vector of ambiguous triples
+#'   encoded by [pcalg::triple2numb()].
+#'
+#' @return The oriented adjacency matrix, in the same convention as
+#'   \code{amat}.
+#' @keywords internal
+#' @noRd
+apply_orientation_rules <- function(amat, unfaithful_triples = NULL) {
+  g <- t(amat)
+  p <- nrow(g)
+  if (p == 0L) {
+    return(amat)
+  }
+
+  is_ambiguous <- function(x, y, z) {
+    .is_ambiguous_triple(p, x, y, z, unfaithful_triples)
+  }
+  undirected <- function(x) which(g[x, ] == 1 & g[, x] == 1)
+  parents <- function(x) which(g[, x] == 1 & g[x, ] == 0)
+  children <- function(x) which(g[x, ] == 1 & g[, x] == 0)
+  adjacent <- function(x, y) g[x, y] == 1 | g[y, x] == 1
+  # only orient edges that are still undirected
+  orient <- function(from, to) {
+    if (g[from, to] == 1 && g[to, from] == 1) {
+      g[to, from] <<- 0
+    }
+  }
+
+  repeat {
+    old_g <- g
+
+    # R1: a --> b --- c, a not adjacent to c  =>  b --> c
+    directed <- which(g == 1 & t(g) == 0, arr.ind = TRUE)
+    for (i in seq_len(nrow(directed))) {
+      a <- directed[i, 1]
+      b <- directed[i, 2]
+      for (c in undirected(b)) {
+        if (!adjacent(a, c) && !is_ambiguous(a, b, c)) {
+          orient(b, c)
+        }
+      }
+    }
+
+    # R2: a --- b, a --> c --> b  =>  a --> b
+    und <- which(g == 1 & t(g) == 1, arr.ind = TRUE)
+    for (i in seq_len(nrow(und))) {
+      a <- und[i, 1]
+      b <- und[i, 2]
+      if (any(children(a) %in% parents(b))) {
+        orient(a, b)
+      }
+    }
+
+    # R3: a --- b, c1 --> b <-- c2, a --- c1, a --- c2, c1 !~ c2  =>  a --> b
+    und <- which(g == 1 & t(g) == 1, arr.ind = TRUE)
+    for (i in seq_len(nrow(und))) {
+      a <- und[i, 1]
+      b <- und[i, 2]
+      cands <- intersect(undirected(a), parents(b))
+      if (length(cands) < 2L) {
+        next
+      }
+      pairs <- utils::combn(cands, 2)
+      for (j in seq_len(ncol(pairs))) {
+        c1 <- pairs[1, j]
+        c2 <- pairs[2, j]
+        if (!adjacent(c1, c2) && !is_ambiguous(c1, a, c2)) {
+          orient(a, b)
+          break
+        }
+      }
+    }
+
+    # R4: a --- b, a --- c, c !~ b, c --> d --> b  =>  a --> b
+    # Non-standard: Meek's R4 also requires a ~ d. As in pcalg, that check is
+    # omitted; the rule is still sound since b --> a would force a --> c
+    # (non-collider at a on c - a - b), closing the cycle a -> c -> d -> b -> a.
+    und <- which(g == 1 & t(g) == 1, arr.ind = TRUE)
+    for (i in seq_len(nrow(und))) {
+      a <- und[i, 1]
+      b <- und[i, 2]
+      for (c in undirected(a)) {
+        if (
+          c != b &&
+            !adjacent(c, b) &&
+            any(children(c) %in% parents(b)) &&
+            !is_ambiguous(c, a, b)
+        ) {
+          orient(a, b)
+          break
+        }
+      }
+    }
+
+    if (identical(old_g, g)) {
+      break
+    }
+  }
+
+  t(g)
 }
 
 #' Construct sufficient statistics for built-in CI tests

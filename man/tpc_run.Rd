@@ -46,8 +46,12 @@ depends on the chosen \code{test}.}
 error on any \code{NA}), \code{"cc"} (complete-case analysis), or
 \code{"twd"} (test-wise deletion).}
 
-\item{orientation_method}{Conflict-handling method when orienting edges.
-Currently only the conservative method is available.}
+\item{orientation_method}{Method for handling conflicting separating sets
+when orienting v-structures; must be one of \code{"standard"},
+\code{"conservative"} (the default) or \code{"maj_rule"}. The
+conservative and majority-rule methods run additional conditional
+independence tests for each unshielded triple. See \code{\link[pcalg:pc]{pcalg::pc()}} for
+further details.}
 
 \item{directed_as_undirected}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} This
 argument no longer has any effect and will be removed in a future

@@ -20,7 +20,17 @@
   - `ges()` gains `num_threads`; `boss()` gains `num_threads` and `seed`.
   - `boss_fci()`, `gfci()` and `sp_fci()` gain `exclude_selection_bias`.
 
+- `tpc_run()` now supports `orientation_method = "standard"` and `"maj_rule"`.
+
+## Lifecycle changes
+
+- `orientation_method = "maj.rule"` in `tpc_run()` and `tfci_run()` is
+  deprecated in favour of `"maj_rule"`.
+
 ## Bug fixes
+
+- `tpc_run()` now orients conservatively by default, as documented; it
+  previously used standard orientation.
 
 - Removed Tetrad algorithm arguments that Tetrad ignored, so setting them had no
   effect:
