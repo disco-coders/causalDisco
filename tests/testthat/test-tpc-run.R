@@ -18,6 +18,166 @@ test_that("tpc_run input guards fail fast with clear messages", {
   )
 })
 
+test_that("tpc_run rejects unknown orientation_method", {
+  df <- data.frame(a = rnorm(10), b = rnorm(10))
+  kn <- knowledge() |> add_vars(names(df))
+  expect_error(
+    tpc_run(data = df, knowledge = kn, orientation_method = "funky"),
+    "should be one of"
+  )
+})
+
+test_that("tpc_run orientation_method controls ambiguous v-structures", {
+  # x and y are marginally independent and also independent given z, so z is
+  # in some separating sets but not others: the triple x - z - y is ambiguous
+  vn <- c("x", "z", "y")
+  C <- matrix(
+    c(1, 0.3, 0, 0.3, 1, 0.3, 0, 0.3, 1),
+    nrow = 3,
+    dimnames = list(vn, vn)
+  )
+  ss <- list(C = C, n = 100)
+  kn <- knowledge() |> add_vars(vn)
+
+  run <- function(method) {
+    res <- tpc_run(
+      suff_stat = ss,
+      knowledge = kn,
+      test = cor_test,
+      varnames = vn,
+      orientation_method = method
+    )
+    e <- res$caugi@edges
+    e[order(e$from, e$to), c("from", "edge", "to")]
+  }
+
+  standard <- run("standard")
+  expect_identical(standard$from, c("x", "y"))
+  expect_identical(standard$edge, c("-->", "-->"))
+  expect_identical(standard$to, c("z", "z"))
+
+  for (method in c("conservative", "maj_rule")) {
+    out <- run(method)
+    expect_identical(nrow(out), 2L)
+    expect_true(all(out$edge == "---"))
+  }
+
+  # legacy spelling still works, with a soft-deprecation warning
+  lifecycle::expect_deprecated(legacy <- run("maj.rule"))
+  expect_identical(legacy, run("maj_rule"))
+})
+
+test_that("v_orient_temporal skips triples marked as unfaithful", {
+  vn <- c("x", "z", "y")
+  amat <- matrix(
+    c(0, 1, 0, 1, 0, 1, 0, 1, 0),
+    nrow = 3,
+    dimnames = list(vn, vn)
+  )
+  sepsets <- list(list(NULL, NULL, integer(0)), list(), list(integer(0)))
+
+  oriented <- v_orient_temporal(amat, sepsets)
+  # x -> z <- y: z keeps its entries towards x and y, the reverse are removed
+  expect_identical(unname(oriented[2, c(1, 3)]), c(1, 1))
+  expect_identical(unname(oriented[c(1, 3), 2]), c(0, 0))
+
+  unf <- pcalg::triple2numb(3, 1, 2, 3)
+  expect_identical(
+    v_orient_temporal(amat, sepsets, unfaithful_triples = unf),
+    amat
+  )
+})
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Helpers: apply_orientation_rules()
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Build a pcalg-convention amat (amat[to, from] = 1 for from --> to) from
+# directed and undirected edge lists over nodes 1..p
+.build_pdag_amat <- function(p, directed = list(), undirected = list()) {
+  m <- matrix(0, p, p, dimnames = list(paste0("V", 1:p), paste0("V", 1:p)))
+  for (e in directed) {
+    m[e[2], e[1]] <- 1
+  }
+  for (e in undirected) {
+    m[e[1], e[2]] <- 1
+    m[e[2], e[1]] <- 1
+  }
+  m
+}
+.is_directed <- function(m, from, to) m[to, from] == 1 && m[from, to] == 0
+.is_undirected <- function(m, a, b) m[a, b] == 1 && m[b, a] == 1
+
+test_that("apply_orientation_rules R1 skips ambiguous triples", {
+  # 1 --> 2 --- 3, 1 not adjacent to 3
+  m <- .build_pdag_amat(3, directed = list(c(1, 2)), undirected = list(c(2, 3)))
+  expect_true(.is_directed(apply_orientation_rules(m), 2, 3))
+
+  unf <- pcalg::triple2numb(3, 1, 2, 3)
+  expect_identical(apply_orientation_rules(m, unfaithful_triples = unf), m)
+})
+
+test_that("apply_orientation_rules R3 skips ambiguous triples", {
+  # 1 --- 2, 3 --> 2 <-- 4, 1 --- 3, 1 --- 4, 3 not adjacent to 4
+  m <- .build_pdag_amat(
+    4,
+    directed = list(c(3, 2), c(4, 2)),
+    undirected = list(c(1, 2), c(1, 3), c(1, 4))
+  )
+  expect_true(.is_directed(apply_orientation_rules(m), 1, 2))
+
+  unf <- pcalg::triple2numb(4, 3, 1, 4)
+  out <- apply_orientation_rules(m, unfaithful_triples = unf)
+  expect_true(.is_undirected(out, 1, 2))
+})
+
+test_that("apply_orientation_rules R4 skips ambiguous triples", {
+  # 1 --- 2, 1 --- 3, 1 --- 4, 3 not adjacent to 2, 3 --> 4 --> 2
+  m <- .build_pdag_amat(
+    4,
+    directed = list(c(3, 4), c(4, 2)),
+    undirected = list(c(1, 2), c(1, 3), c(1, 4))
+  )
+  expect_true(.is_directed(apply_orientation_rules(m), 1, 2))
+
+  unf <- pcalg::triple2numb(4, 3, 1, 2)
+  out <- apply_orientation_rules(m, unfaithful_triples = unf)
+  expect_true(.is_undirected(out, 1, 2))
+})
+
+test_that("apply_orientation_rules matches pcalg::addBgKnowledge without ambiguous triples", {
+  set.seed(42)
+  for (r in 1:25) {
+    p <- sample(5:10, 1)
+    vn <- paste0("V", seq_len(p))
+    dag <- pcalg::randomDAG(p, prob = 0.35)
+    X <- pcalg::rmvDAG(500, dag)
+    colnames(X) <- vn
+    tiers <- sort(sample(1:3, p, replace = TRUE))
+    kn <- knowledge() |> add_vars(vn)
+    kn$tiers <- tibble::tibble(label = as.character(sort(unique(tiers))))
+    kn$vars$tier <- as.character(tiers)
+    kn <- prepare_knowledge(kn)
+
+    skel <- pcalg::skeleton(
+      list(C = stats::cor(X), n = nrow(X)),
+      dir_test(pcalg::gaussCItest, vn, kn),
+      alpha = 0.05,
+      labels = vn
+    )
+    cg <- caugi::as_caugi(skel@graph, collapse = TRUE, class = "UNKNOWN")
+    amat <- v_orient_temporal(
+      order_restrict_amat_cpdag(caugi::as_adjacency(cg), kn),
+      skel@sepset
+    )
+
+    expect_equal(
+      unname(apply_orientation_rules(amat) * 1),
+      unname(pcalg::addBgKnowledge(amat, checkInput = FALSE) * 1)
+    )
+  }
+})
+
 test_that("tpc_run NA handling: error on NAs with na_method = 'none', cc with zero rows", {
   df1 <- data.frame(a = c(1, NA), b = c(2, NA))
   kn1 <- knowledge() |> add_vars(names(df1))

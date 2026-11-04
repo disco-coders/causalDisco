@@ -24,9 +24,6 @@
 #' @inheritParams tpc_run
 #' @param knowledge A `Knowledge` object describing tiers/periods and optional
 #'   forbidden/required edges.
-#' @param orientation_method Method for handling conflicting separating sets when orienting
-#'   edges; must be one of \code{"standard"}, \code{"conservative"} (the default) or
-#'   \code{"maj.rule"}. See [pcalg::pc()] for further details.
 #'
 #' @inheritSection disco_note Recommendation
 #' @inheritSection disco_algs_return_doc_pag Value
@@ -60,6 +57,11 @@ tfci_run <- function(
     )
   }
 
+  orientation_method <- .match_orientation_method(
+    orientation_method,
+    "tfci_run"
+  )
+
   prep <- constraint_based_prepare_inputs(
     data = data,
     knowledge = knowledge,
@@ -81,13 +83,6 @@ tfci_run <- function(
   knowledge <- .infer_tiers_from_forbidden(knowledge)
   knowledge <- prepare_knowledge(knowledge) # Precompute variable ranks for efficient access
 
-  # check orientation method
-  if (!(orientation_method %in% c("standard", "conservative", "maj.rule"))) {
-    stop(
-      "Orientation method must be one of standard, conservative or maj.rule."
-    )
-  }
-
   # CI test that forbids conditioning on future tiers
   indep_test_dir <- dir_test(test, vnames, knowledge)
 
@@ -108,7 +103,6 @@ tfci_run <- function(
     numCores = num_cores,
     ...
   )
-  ntests <- sum(skel@n.edgetests)
 
   # pdsep step: expand to MAG/PAG skeleton
   nvar <- length(skel@graph@nodes)
@@ -123,14 +117,10 @@ tfci_run <- function(
     alpha = alpha
   )
   nextratests <- fci_skel$n.edgetests
-  ntests <- ntests + nextratests
 
-  # optional conservative / majority-rule orientation info
-  conservative <- identical(orientation_method, "conservative")
-  maj_rule <- identical(orientation_method, "maj.rule")
+  # conservative / majority-rule: re-test unshielded triples
   unfaithful_triples <- NULL
-
-  if (conservative || maj_rule) {
+  if (orientation_method != "standard") {
     tmp <- methods::new(
       "pcAlgo",
       graph = as.graphNEL(t(fci_skel$G)),
@@ -148,7 +138,7 @@ tfci_run <- function(
       indepTest = indep_test_dir,
       alpha = alpha,
       version.unf = c(1, 1),
-      maj.rule = maj_rule
+      maj.rule = orientation_method == "maj_rule"
     )
     unfaithful_triples <- tmpres$unfTripl
     fci_skel$sepset <- tmpres$sk@sepset

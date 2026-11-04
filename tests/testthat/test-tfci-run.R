@@ -130,8 +130,7 @@ test_that("tfci_run input guards fail fast with clear messages", {
 
   expect_error(
     tfci_run(data = my_df, knowledge = kn, orientation_method = "funky"),
-    "Orientation method must be one of standard, conservative or maj.rule.",
-    fixed = TRUE
+    "should be one of"
   )
 })
 

@@ -160,3 +160,35 @@ constraint_based_prepare_inputs <- function(
     internal_test = internal_test
   )
 }
+
+#' Validate the orientation method for constraint-based algorithms
+#' @description
+#' Internal function that matches \code{orientation_method} against the
+#' supported methods. The legacy spelling \code{"maj.rule"} is accepted as a
+#' soft-deprecated alias for \code{"maj_rule"}.
+#'
+#' @param orientation_method The user-supplied orientation method.
+#' @param function_name Name of the calling function (for the deprecation
+#'   message).
+#' @param user_env Environment of the user's call, used by
+#'   [lifecycle::deprecate_soft()] to decide whether to warn.
+#' @return One of \code{"conservative"}, \code{"standard"} or
+#'   \code{"maj_rule"}.
+#' @keywords internal
+#' @noRd
+.match_orientation_method <- function(
+  orientation_method,
+  function_name,
+  user_env = rlang::caller_env(2)
+) {
+  if (identical(orientation_method, "maj.rule")) {
+    lifecycle::deprecate_soft(
+      when = "1.3.0",
+      what = I(paste0(function_name, '(orientation_method = "maj.rule")')),
+      with = I(paste0(function_name, '(orientation_method = "maj_rule")')),
+      user_env = user_env
+    )
+    orientation_method <- "maj_rule"
+  }
+  match.arg(orientation_method, c("conservative", "standard", "maj_rule"))
+}
