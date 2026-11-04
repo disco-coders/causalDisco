@@ -39,7 +39,22 @@
     [`sp_fci()`](https://disco-coders.github.io/causalDisco/reference/sp_fci.md)
     gain `exclude_selection_bias`.
 
+- [`tpc_run()`](https://disco-coders.github.io/causalDisco/reference/tpc_run.md)
+  now supports `orientation_method = "standard"` and `"maj_rule"`.
+
+### Lifecycle changes
+
+- `orientation_method = "maj.rule"` in
+  [`tpc_run()`](https://disco-coders.github.io/causalDisco/reference/tpc_run.md)
+  and
+  [`tfci_run()`](https://disco-coders.github.io/causalDisco/reference/tfci_run.md)
+  is deprecated in favour of `"maj_rule"`.
+
 ### Bug fixes
+
+- [`tpc_run()`](https://disco-coders.github.io/causalDisco/reference/tpc_run.md)
+  now orients conservatively by default, as documented; it previously
+  used standard orientation.
 
 - Removed Tetrad algorithm arguments that Tetrad ignored, so setting
   them had no effect:

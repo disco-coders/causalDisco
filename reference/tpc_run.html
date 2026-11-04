@@ -114,8 +114,12 @@ error on any <code>NA</code>), <code>"cc"</code> (complete-case analysis), or
 
 
 <dt id="arg-orientation-method">orientation_method<a class="anchor" aria-label="anchor" href="#arg-orientation-method"></a></dt>
-<dd><p>Conflict-handling method when orienting edges.
-Currently only the conservative method is available.</p></dd>
+<dd><p>Method for handling conflicting separating sets
+when orienting v-structures; must be one of <code>"standard"</code>,
+<code>"conservative"</code> (the default) or <code>"maj_rule"</code>. The
+conservative and majority-rule methods run additional conditional
+independence tests for each unshielded triple. See <code><a href="https://rdrr.io/pkg/pcalg/man/pc.html" class="external-link">pcalg::pc()</a></code> for
+further details.</p></dd>
 
 
 <dt id="arg-directed-as-undirected">directed_as_undirected<a class="anchor" aria-label="anchor" href="#arg-directed-as-undirected"></a></dt>

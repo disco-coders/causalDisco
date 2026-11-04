@@ -72,8 +72,12 @@ tpc_run(
 
 - orientation_method:
 
-  Conflict-handling method when orienting edges. Currently only the
-  conservative method is available.
+  Method for handling conflicting separating sets when orienting
+  v-structures; must be one of `"standard"`, `"conservative"` (the
+  default) or `"maj_rule"`. The conservative and majority-rule methods
+  run additional conditional independence tests for each unshielded
+  triple. See [`pcalg::pc()`](https://rdrr.io/pkg/pcalg/man/pc.html) for
+  further details.
 
 - directed_as_undirected:
 

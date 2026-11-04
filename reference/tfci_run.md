@@ -71,11 +71,12 @@ tfci_run(
 
 - orientation_method:
 
-  Method for handling conflicting separating sets when orienting edges;
-  must be one of `"standard"`, `"conservative"` (the default) or
-  `"maj.rule"`. See
-  [`pcalg::pc()`](https://rdrr.io/pkg/pcalg/man/pc.html) for further
-  details.
+  Method for handling conflicting separating sets when orienting
+  v-structures; must be one of `"standard"`, `"conservative"` (the
+  default) or `"maj_rule"`. The conservative and majority-rule methods
+  run additional conditional independence tests for each unshielded
+  triple. See [`pcalg::pc()`](https://rdrr.io/pkg/pcalg/man/pc.html) for
+  further details.
 
 - directed_as_undirected:
 

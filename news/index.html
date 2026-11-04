@@ -62,10 +62,17 @@
 <li>
 <code><a href="../reference/boss_fci.html">boss_fci()</a></code>, <code><a href="../reference/gfci.html">gfci()</a></code> and <code><a href="../reference/sp_fci.html">sp_fci()</a></code> gain <code>exclude_selection_bias</code>.</li>
 </ul></li>
+<li><p><code><a href="../reference/tpc_run.html">tpc_run()</a></code> now supports <code>orientation_method = "standard"</code> and <code>"maj_rule"</code>.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="lifecycle-changes-development-version">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-development-version"></a></h3>
+<ul><li>
+<code>orientation_method = "maj.rule"</code> in <code><a href="../reference/tpc_run.html">tpc_run()</a></code> and <code><a href="../reference/tfci_run.html">tfci_run()</a></code> is deprecated in favour of <code>"maj_rule"</code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>
+<ul><li><p><code><a href="../reference/tpc_run.html">tpc_run()</a></code> now orients conservatively by default, as documented; it previously used standard orientation.</p></li>
+<li>
 <p>Removed Tetrad algorithm arguments that Tetrad ignored, so setting them had no effect:</p>
 <ul><li>
 <code><a href="../reference/pc.html">pc()</a></code>: <code>conflict_rule</code>, <code>guarantee_cpdag</code>

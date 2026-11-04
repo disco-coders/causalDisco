@@ -89,6 +89,7 @@ my_tpc <- tpc(
   suff_stat_fun = my_suff_stat
 )
 result <- disco(data = num_data, method = my_tpc)
+#> The learned graph is not a valid CPDAG because of conflicting edge orientations, which can happen due to statistical errors in finite samples, violations of faithfulness, or latent confounding; it is reported as PDAG instead.
 plot(result)
 ```
 
