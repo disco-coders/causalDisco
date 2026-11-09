@@ -52,6 +52,10 @@
 
 ### Bug fixes
 
+- `install_tetrad(version = )` now saves a non-default Tetrad version in
+  its own cache directory instead of the default version’s, and Java
+  loads only the JAR for the configured version.
+
 - [`tpc_run()`](https://disco-coders.github.io/causalDisco/reference/tpc_run.md)
   now orients conservatively by default, as documented; it previously
   used standard orientation.

@@ -29,9 +29,11 @@ install_tetrad(
 - dir:
 
   Character; the directory where the JAR should be installed. If `NULL`
-  (default), the function uses the cache directory defined by
-  `getOption("causalDisco.tetrad_cache")`. The directory will be created
-  if it does not exist.
+  (default), the JAR is installed in the cache directory for `version`,
+  i.e.
+  `tools::R_user_dir("causalDisco/tetrad_v<version>", which = "cache")`,
+  or in `getOption("causalDisco.tetrad_cache")` if that option is set.
+  The directory will be created if it does not exist.
 
 - force:
 
