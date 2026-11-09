@@ -32,7 +32,7 @@ test_that("get_tetrad_dir returns NULL when env var set but directory does not e
   on.exit(options(causalDisco.tetrad_cache = old_opt), add = TRUE)
   options(causalDisco.tetrad_cache = NULL)
 
-  expect_null(get_tetrad_dir())
+  expect_null(get_tetrad_dir("0.0.0-not-installed"))
 })
 
 test_that("get_tetrad_dir returns NULL when neither env var nor cache option is set", {
@@ -44,7 +44,7 @@ test_that("get_tetrad_dir returns NULL when neither env var nor cache option is 
   on.exit(options(causalDisco.tetrad_cache = old_opt), add = TRUE)
   options(causalDisco.tetrad_cache = NULL)
 
-  expect_null(get_tetrad_dir())
+  expect_null(get_tetrad_dir("0.0.0-not-installed"))
 })
 
 test_that("get_java_version returns NA when java executable not found", {
@@ -140,7 +140,7 @@ test_that("Returns message when Java version is too old", {
 # ---- Branch 3: Java OK but TETRAD_DIR is NULL ----
 test_that("Returns message when tetrad directory is missing", {
   mockery::stub(verify_tetrad, "get_java_version", function() "21.0.1")
-  mockery::stub(verify_tetrad, "get_tetrad_dir", function() NULL)
+  mockery::stub(verify_tetrad, "get_tetrad_dir", function(...) NULL)
 
   out <- verify_tetrad("1.0")
   expect_output_list(out)
@@ -155,7 +155,7 @@ test_that("Returns message when tetrad directory is missing", {
 # ---- Branch 4: Java OK, tetrad dir exists, JAR missing ----
 test_that("Returns message when Tetrad JAR does not exist", {
   mockery::stub(verify_tetrad, "get_java_version", function() "21.0.1")
-  mockery::stub(verify_tetrad, "get_tetrad_dir", function() "/fake/path")
+  mockery::stub(verify_tetrad, "get_tetrad_dir", function(...) "/fake/path")
 
   # JAR missing
   mockery::stub(verify_tetrad, "file.exists", function(...) FALSE)
@@ -173,7 +173,7 @@ test_that("Returns message when Tetrad JAR does not exist", {
 # ---- Branch 5: Java OK, tetrad dir exists, JAR exists -> SUCCESS ----
 test_that("Successful detection when Java and Tetrad are OK", {
   mockery::stub(verify_tetrad, "get_java_version", function() "22.1.0")
-  mockery::stub(verify_tetrad, "get_tetrad_dir", function() "/fake/path")
+  mockery::stub(verify_tetrad, "get_tetrad_dir", function(...) "/fake/path")
 
   # JAR exists
   mockery::stub(verify_tetrad, "file.exists", function(...) TRUE)
@@ -293,10 +293,55 @@ test_that("install_tetrad handles all branches", {
   )
   expect_null(res3)
 
-  # Test dir = NULL
+  # Test dir = NULL (installs in the cache dir, here redirected to a temp dir)
+  withr::local_options(causalDisco.tetrad_cache = file.path(td, "cache"))
   res4 <- suppressWarnings(install_tetrad(
     version = version,
     quiet = TRUE
   ))
   expect_null(res4)
+})
+
+test_that("tetrad_cache_dir gives each version its own directory", {
+  withr::local_options(causalDisco.tetrad_cache = NULL)
+
+  dir_a <- tetrad_cache_dir("7.6.10")
+  dir_b <- tetrad_cache_dir("8.0.0")
+  expect_match(dir_a, "tetrad_v7.6.10", fixed = TRUE)
+  expect_match(dir_b, "tetrad_v8.0.0", fixed = TRUE)
+
+  # Follows the version option instead of being fixed at load time.
+  withr::local_options(causalDisco.tetrad.version = "8.0.0")
+  expect_identical(tetrad_cache_dir(), dir_b)
+})
+
+test_that("tetrad_cache_dir uses the causalDisco.tetrad_cache override for all versions", {
+  td <- file.path(tempdir(), "override_cache")
+  withr::local_options(causalDisco.tetrad_cache = td)
+  expect_identical(tetrad_cache_dir("7.6.10"), td)
+  expect_identical(tetrad_cache_dir("8.0.0"), td)
+})
+
+test_that("install_tetrad installs a non-default version in that version's directory", {
+  withr::local_options(causalDisco.tetrad_cache = NULL)
+  cache_root <- file.path(tempdir(), "versioned_cache")
+  withr::defer(unlink(cache_root, recursive = TRUE))
+  mockery::stub(
+    install_tetrad,
+    "tetrad_cache_dir",
+    function(version) file.path(cache_root, paste0("tetrad_v", version))
+  )
+  local_mocked_bindings(
+    download.file = function(url, destfile, mode = "wb", quiet = FALSE) {
+      writeLines("jarcontent", destfile)
+      0
+    },
+    digest = function(file, algo = "sha256") "jarcontent"
+  )
+
+  res <- install_tetrad(version = "9.9.9", quiet = TRUE)
+  expect_identical(
+    normalizePath(dirname(res)),
+    normalizePath(file.path(cache_root, "tetrad_v9.9.9"))
+  )
 })
