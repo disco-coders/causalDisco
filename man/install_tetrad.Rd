@@ -17,9 +17,11 @@ install_tetrad(
 \code{getOption("causalDisco.tetrad.version")}.}
 
 \item{dir}{Character; the directory where the JAR should be installed. If
-\code{NULL} (default), the function uses the cache directory defined by
-\code{getOption("causalDisco.tetrad_cache")}. The directory will be created
-if it does not exist.}
+\code{NULL} (default), the JAR is installed in the cache directory for
+\code{version}, i.e.
+\code{tools::R_user_dir("causalDisco/tetrad_v<version>", which = "cache")}, or
+in \code{getOption("causalDisco.tetrad_cache")} if that option is set. The
+directory will be created if it does not exist.}
 
 \item{force}{Logical; if \code{TRUE}, forces re-download even if the JAR already
 exists. Default is \code{FALSE}.}

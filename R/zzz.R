@@ -28,19 +28,9 @@ file.exists <- NULL
     options(causalDisco.tetrad.version = .default_tetrad_version)
   }
 
-  version <- getOption("causalDisco.tetrad.version")
-
-  # ---------------------------------
-  # Versioned cache directory
-  # ---------------------------------
-  cache_subdir <- paste0("causalDisco/tetrad_v", version)
-
-  causalDisco$cache_dir <- tools::R_user_dir(cache_subdir, which = 'cache')
-  if (!dir.exists(causalDisco$cache_dir)) {
-    dir.create(causalDisco$cache_dir, recursive = TRUE)
-  }
-
-  options(causalDisco.tetrad_cache = causalDisco$cache_dir)
+  # The cache directory is derived from the requested version when needed
+  # (see `tetrad_cache_dir()`), so it follows later changes to
+  # `causalDisco.tetrad.version` and is only created by `install_tetrad()`.
 
   # S7 setup
   S7::methods_register()
