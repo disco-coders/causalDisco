@@ -4,12 +4,17 @@
 \alias{plot.Disco}
 \title{Plot a Disco Object}
 \usage{
-\method{plot}{Disco}(x, required_col = "blue", ...)
+\method{plot}{Disco}(x, required_col = "blue", equal_node_size = TRUE, ...)
 }
 \arguments{
 \item{x}{A \code{Disco} object containing both the causal graph and the associated knowledge.}
 
 \item{required_col}{Character(1). Color for edges marked as "required". Default \code{"blue"}.}
+
+\item{equal_node_size}{Logical(1). If \code{TRUE} (default), all nodes are drawn
+with the same size, namely the size needed for the longest label, so that
+variables with long names are not visually emphasized. If \code{FALSE}, each
+node is sized to fit its own label (the \code{\link[caugi:plot]{caugi::plot()}} default).}
 
 \item{...}{Additional arguments passed to \code{\link[caugi:plot]{caugi::plot()}} and \code{\link[=plot.Knowledge]{plot.Knowledge()}}.}
 }
