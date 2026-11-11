@@ -20,7 +20,7 @@ cat(tikz_kn_snippet)
 tikz_bent <- make_tikz(
   kn,
   full_doc = FALSE,
-  bend_edges = TRUE
+  bend = 25
 )
 cat(tikz_bent)
 
@@ -57,6 +57,38 @@ tikz_classic <- make_tikz(
   full_doc = FALSE
 )
 cat(tikz_classic)
+
+# Edges are bent around nodes in the way: here A --> C bends around B
+cg_line <- caugi::caugi(A %-->% B + C, B %-->% C)
+layout_line <- data.frame(name = c("A", "B", "C"), x = c(0, 1, 2), y = 0)
+tikz_routed <- make_tikz(
+  cg_line,
+  layout = layout_line,
+  style = "classic",
+  full_doc = FALSE
+)
+cat(tikz_routed)
+
+# Draw every edge exactly with the requested bend instead
+tikz_exact <- make_tikz(
+  cg_line,
+  layout = layout_line,
+  style = "classic",
+  edge_style = list(route = FALSE),
+  full_doc = FALSE
+)
+cat(tikz_exact)
+
+# Set the bend of single edges (positive = bend left, negative = bend right);
+# these are always drawn exactly as given
+tikz_bends <- make_tikz(
+  cg_line,
+  layout = layout_line,
+  style = "classic",
+  bend = list(A = list(B = 30, C = 0)),
+  full_doc = FALSE
+)
+cat(tikz_bends)
 
 
 ################# Convert Disco to Tikz ################

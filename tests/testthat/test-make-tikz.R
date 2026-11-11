@@ -36,7 +36,7 @@ test_that("make_tikz produces correct snippet for simple A --> B graph", {
   # ---- Check edge ----
   expect_true(grepl("(A) edge[link, -Latex] (B)", tikz_snippet, fixed = TRUE))
 
-  tikz_snippet_bend <- make_tikz(cg, full_doc = FALSE, bend_edges = TRUE)
+  tikz_snippet_bend <- make_tikz(cg, full_doc = FALSE, bend = 25)
   expect_true(grepl(
     "(A) edge[link, bend left=25, -Latex] (B)",
     tikz_snippet_bend,
@@ -133,24 +133,106 @@ test_that("make_tikz produces bent edges automatically for A --> B, B --> A grap
     y = c(0, 0)
   )
 
-  tikz_snippet <- make_tikz(
-    cg,
-    layout = layout,
-    full_doc = FALSE,
-    bend_angle = 10
-  )
+  # straight edges otherwise: the pair is bent by 25 degrees
+  tikz_snippet <- make_tikz(cg, layout = layout, full_doc = FALSE)
 
   # ---- Check edge ----
   expect_true(grepl(
-    "(A) edge[link, bend left=10, -Latex] (B)",
+    "(A) edge[link, bend left=25, -Latex] (B)",
     tikz_snippet,
+    fixed = TRUE
+  ))
+  expect_true(grepl(
+    "(B) edge[link, bend left=25, -Latex] (A)",
+    tikz_snippet,
+    fixed = TRUE
+  ))
+
+  # with bend > 0 the pair is bent by bend, still to opposite sides
+  tikz_bent <- make_tikz(cg, layout = layout, full_doc = FALSE, bend = 10)
+  expect_true(grepl(
+    "(A) edge[link, bend left=10, -Latex] (B)",
+    tikz_bent,
     fixed = TRUE
   ))
   expect_true(grepl(
     "(B) edge[link, bend left=10, -Latex] (A)",
-    tikz_snippet,
+    tikz_bent,
     fixed = TRUE
   ))
+})
+
+test_that("make_tikz still accepts the deprecated bend_edges and bend_angle", {
+  cg <- caugi::caugi(
+    A %-->% B,
+    B %-->% A,
+    C %-->% A,
+    simple = FALSE,
+    class = "UNKNOWN"
+  )
+  layout <- data.frame(name = c("A", "B", "C"), x = c(1, 0, 3), y = c(0, 0, 3))
+
+  # bend_angle alone sets the angle of the pair; other edges stay straight
+  lifecycle::expect_deprecated(
+    tikz <- make_tikz(cg, layout = layout, full_doc = FALSE, bend_angle = 10)
+  )
+  expect_true(grepl("(A) edge[link, bend left=10, -Latex] (B)", tikz, fixed = TRUE))
+  expect_true(grepl("(C) edge[link, -Latex] (A)", tikz, fixed = TRUE))
+
+  # bend_edges = TRUE is bend = bend_angle
+  lifecycle::expect_deprecated(
+    tikz_old <- make_tikz(
+      cg,
+      layout = layout,
+      full_doc = FALSE,
+      bend_edges = TRUE,
+      bend_angle = 15
+    )
+  )
+  expect_identical(
+    tikz_old,
+    make_tikz(cg, layout = layout, full_doc = FALSE, bend = 15)
+  )
+
+  # bend_edges = FALSE in classic style is bend = 0
+  lifecycle::expect_deprecated(
+    tikz_classic <- make_tikz(
+      cg,
+      layout = layout,
+      style = "classic",
+      full_doc = FALSE,
+      bend_edges = FALSE
+    )
+  )
+  expect_identical(
+    tikz_classic,
+    make_tikz(cg, layout = layout, style = "classic", full_doc = FALSE, bend = 0)
+  )
+
+  expect_error(make_tikz(cg, bend = NA_real_), "single number or a named list")
+  expect_error(make_tikz(cg, bend = c(1, 2)), "single number or a named list")
+})
+
+test_that("a negative bend bends edges the other way, pairs still apart", {
+  cg <- caugi::caugi(
+    A %-->% B,
+    B %-->% A,
+    C %-->% A,
+    simple = FALSE,
+    class = "UNKNOWN"
+  )
+  layout <- data.frame(name = c("A", "B", "C"), x = c(1, 0, 3), y = c(0, 0, 3))
+  edges <- function(...) {
+    tikz <- make_tikz(cg, layout = layout, full_doc = FALSE, ...)
+    regmatches(tikz, gregexpr("bend (left|right)=[0-9]+", tikz))[[1]]
+  }
+  flip <- function(b) {
+    ifelse(grepl("left", b), sub("left", "right", b), sub("right", "left", b))
+  }
+
+  expect_equal(edges(bend = 10), c("bend left=10", "bend left=10", "bend right=10"))
+  expect_equal(edges(bend = -10), flip(edges(bend = 10)))
+  expect_equal(edges(style = "classic", bend = -10), rep("bend left=10", 3))
 })
 
 test_that("make_tikz works on required and forbidden knowledge", {
@@ -164,8 +246,7 @@ test_that("make_tikz works on required and forbidden knowledge", {
     kn,
     required_col = "blue",
     forbidden_col = "green",
-    full_doc = FALSE,
-    bend_angle = 10
+    full_doc = FALSE
   )
 
   # Global color should be blue (2 required)
@@ -514,7 +595,7 @@ test_that("make_tikz bends edges around nodes in the way, like plot()", {
   )
   expect_true(grepl("(A) edge[link, -Latex] (C)", tikz_off, fixed = TRUE))
 
-  # classic style routes too, with at least bend_angle when bending all edges
+  # classic style routes too; the routed bend stays close to bend
   tikz_classic <- make_tikz(cg, layout = layout, style = "classic")
   # A --> B bends right, away from the routed A --> C
   expect_match(tikz_classic, "\\(A\\) edge\\[->, bend right=[0-9]+\\] \\(B\\)")
@@ -532,7 +613,7 @@ test_that("make_tikz bends edges around nodes in the way, like plot()", {
     cg,
     layout = layout,
     style = "classic",
-    bend_edges = FALSE,
+    bend = 0,
     full_doc = FALSE
   )
   expect_true(grepl("(A) edge[->] (B)", tikz_classic_straight, fixed = TRUE))
@@ -540,6 +621,97 @@ test_that("make_tikz bends edges around nodes in the way, like plot()", {
     tikz_classic_straight,
     "\\(A\\) edge\\[->, bend (left|right)=[0-9]+\\] \\(C\\)"
   )
+
+  # route = FALSE also turns off spreading edge ends: every edge gets exactly
+  # the default bend
+  tikz_classic_off <- make_tikz(
+    cg,
+    layout = layout,
+    style = "classic",
+    edge_style = list(route = FALSE),
+    full_doc = FALSE
+  )
+  bends <- regmatches(
+    tikz_classic_off,
+    gregexpr("bend (left|right)=[0-9]+", tikz_classic_off)
+  )[[1]]
+  expect_equal(bends, rep("bend right=10", 3))
+})
+
+test_that("make_tikz draws edges in a bend list exactly as given", {
+  cg <- caugi::caugi(A %-->% B, B %-->% C, A %-->% C)
+  layout <- data.frame(name = c("A", "B", "C"), x = c(0, 0.5, 1), y = 0)
+
+  # A --> C would be routed around B; C = list(B = 15) is the edge B --> C,
+  # so its angle is flipped
+  tikz <- make_tikz(
+    cg,
+    layout = layout,
+    style = "classic",
+    bend = list(A = list(C = 40, B = 0), C = list(B = 15)),
+    full_doc = FALSE
+  )
+  expect_true(grepl("(A) edge[->] (B)", tikz, fixed = TRUE))
+  expect_true(grepl("(A) edge[->, bend left=40] (C)", tikz, fixed = TRUE))
+  expect_true(grepl("(B) edge[->, bend right=15] (C)", tikz, fixed = TRUE))
+
+  # default style too, even through a node
+  tikz_default <- make_tikz(
+    cg,
+    layout = layout,
+    bend = list(A = list(C = 0)),
+    full_doc = FALSE
+  )
+  expect_true(grepl("(A) edge[link, -Latex] (C)", tikz_default, fixed = TRUE))
+  expect_true(grepl("(A) edge[link, -Latex] (B)", tikz_default, fixed = TRUE))
+
+  # `default` sets the bend of the other edges (adjustments off, so the bends
+  # are exactly as given)
+  tikz_mixed <- make_tikz(
+    cg,
+    layout = layout,
+    bend = list(default = 15, A = list(C = 0)),
+    edge_style = list(route = FALSE),
+    full_doc = FALSE
+  )
+  expect_true(grepl("(A) edge[link, -Latex] (C)", tikz_mixed, fixed = TRUE))
+  expect_true(grepl(
+    "(A) edge[link, bend left=15, -Latex] (B)",
+    tikz_mixed,
+    fixed = TRUE
+  ))
+
+  expect_error(
+    make_tikz(cg, layout = layout, bend = list(C = list(D = 10))),
+    "not in the graph: C - D",
+    fixed = TRUE
+  )
+  expect_error(
+    make_tikz(cg, layout = layout, bend = list(default = Inf)),
+    "single number or a named list"
+  )
+  expect_error(
+    make_tikz(cg, layout = layout, bend = list(20)),
+    "single number or a named list"
+  )
+})
+
+test_that("a node called default can still be given a bend", {
+  cg <- caugi::caugi(default %-->% B, B %-->% C)
+  layout <- data.frame(name = c("default", "B", "C"), x = 0:2, y = c(0, 1, 0))
+  # default = 5 is the angle for all edges, default = list(...) is the node
+  tikz <- make_tikz(
+    cg,
+    layout = layout,
+    bend = list(default = 5, default = list(B = 30)),
+    full_doc = FALSE
+  )
+  expect_true(grepl(
+    "(default) edge[link, bend left=30, -Latex] (B)",
+    tikz,
+    fixed = TRUE
+  ))
+  expect_true(grepl("(B) edge[link, bend left=5, -Latex] (C)", tikz, fixed = TRUE))
 })
 
 test_that("make_tikz routes a long edge across tiers around a node", {

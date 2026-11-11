@@ -597,10 +597,8 @@ test_that("tikz_route_one bends away from a node in the way", {
     0,
     data.frame(x = 2, y = -0.05, hw = 0.3, hh = 0.2)
   )
-  expect_equal(above$dir, "bend right")
-  expect_equal(below$dir, "bend left")
-  expect_equal(above$angle, below$angle)
-  expect_gt(above$angle, 0)
+  expect_lt(above, 0)
+  expect_equal(below, -above)
 
   # obstacle far away, no obstacles, or a zero-length edge -> no bend
   far <- data.frame(x = 2, y = 3, hw = 0.3, hh = 0.2)
@@ -609,15 +607,36 @@ test_that("tikz_route_one bends away from a node in the way", {
   expect_null(tikz_route_one(1, 1, 1, 1, far))
 })
 
+test_that("tikz_route_one checks the default bend, not the straight line", {
+  # obstacle below a long edge: the straight line clears it, but the default
+  # bend right runs into it -> the same bend on the other side
+  obstacle <- data.frame(x = 3.5, y = -0.6, hw = 0.25, hh = 0.22)
+  expect_null(tikz_route_one(0, 0, 7, 0, obstacle))
+  expect_equal(tikz_route_one(0, 0, 7, 0, obstacle, default = -10), 10)
+
+  # a default bend that clears is kept (NULL = use the default)
+  expect_null(tikz_route_one(0, 0, 7, 0, obstacle, default = 10))
+})
+
+test_that("tikz_route_one picks the bend closest in size to the default", {
+  # obstacles on both sides: a 10 degree bend hits one of them either way, a
+  # slightly smaller bend clears both
+  two <- data.frame(x = 3.5, y = c(-0.6, 0.6), hw = 0.25, hh = 0.22)
+  res <- tikz_route_one(0, 0, 7, 0, two, default = -10)
+  expect_equal(abs(res), 7)
+
+  # without flip the bend keeps its direction
+  expect_equal(tikz_route_one(0, 0, 7, 0, two, default = -10, flip = FALSE), -7)
+})
+
 test_that("tikz_route_one uses the largest angle when nothing clears", {
   # an obstacle covering the whole area cannot be avoided
   huge <- data.frame(x = 2, y = 0, hw = 50, hh = 50)
   res <- tikz_route_one(0, 0, 4, 0, huge, max_angle = 20)
-  expect_true(res$dir %in% c("bend left", "bend right"))
-  expect_equal(res$angle, 20)
+  expect_equal(abs(res), 20)
 })
 
-test_that("tikz_route_options skips unrouted and bidirected edges", {
+test_that("tikz_route_options applies default bends and routes edges", {
   nodes <- data.frame(
     name = c("A", "B", "C"),
     x = c(0, 2, 4),
@@ -625,33 +644,86 @@ test_that("tikz_route_options skips unrouted and bidirected edges", {
     hw = 0.3,
     hh = 0.2
   )
+  # A --> C runs through B and is bent; A --> B is straight
+  edges <- data.frame(from = c("A", "A"), to = c("C", "B"), route = TRUE)
+  res <- tikz_route_options(edges, nodes)
+  expect_match(res[1], "^bend (left|right)=[0-9]+$")
+  expect_true(is.na(res[2]))
+
+  # default bends that clear are kept
+  expect_equal(
+    tikz_route_options(edges, nodes, default = -45),
+    rep("bend right=45", 2)
+  )
+
+  # rows 1 and 3 form a bidirected pair: routed, but keep their direction;
+  # row 4 has routing turned off and keeps its default unchecked
   edges <- data.frame(
     from = c("A", "A", "C", "A"),
     to = c("C", "B", "A", "C"),
     route = c(TRUE, TRUE, TRUE, FALSE)
   )
-  # rows 1 and 3 form a bidirected pair, row 4 has routing turned off
-  res <- tikz_route_options(edges, nodes, bend_edges = FALSE, bend_angle = 10)
-  expect_equal(res, rep(NA_character_, 4))
-
-  edges <- data.frame(from = c("A", "A"), to = c("C", "B"), route = TRUE)
-  res <- tikz_route_options(edges, nodes, bend_edges = FALSE, bend_angle = 10)
-  expect_match(res[1], "^bend (left|right)=[0-9]+$")
+  res <- tikz_route_options(edges, nodes, default = c(-10, 0, -10, -10))
+  expect_match(res[c(1, 3)], "^bend right=[0-9]+$")
+  expect_gt(tikz_option_angle(res[1]), -60)
+  expect_lt(tikz_option_angle(res[1]), -10)
   expect_true(is.na(res[2]))
+  expect_equal(res[4], "bend right=10")
 
-  # with bend_edges = TRUE the routed angle is at least bend_angle
-  res_bent <- tikz_route_options(
+  expect_equal(tikz_route_options(edges[0, ], nodes), character(0))
+})
+
+test_that("resolve_tikz_bend_by_edge matches edges in either direction", {
+  from <- c("A", "B", "C")
+  to <- c("B", "C", "B")
+  expect_equal(resolve_tikz_bend_by_edge(NULL, from, to), rep(NA_real_, 3))
+
+  # exact direction first; B --> A is not an edge, so it applies to A --> B
+  # with the sign flipped
+  res <- resolve_tikz_bend_by_edge(list(B = list(A = 20, C = 5)), from, to)
+  expect_equal(res, c(-20, 5, NA))
+
+  expect_error(
+    resolve_tikz_bend_by_edge(list(A = list(C = 1)), from, to),
+    "not in the graph: A - C",
+    fixed = TRUE
+  )
+  expect_error(
+    resolve_tikz_bend_by_edge(list(A = list(B = c(1, 2))), from, to),
+    "`bend$A$B` must be a single number.",
+    fixed = TRUE
+  )
+  expect_error(resolve_tikz_bend_by_edge(c(A = 1), from, to), "named list")
+  expect_error(resolve_tikz_bend_by_edge(list(list(B = 1)), from, to), "named list")
+})
+
+test_that("tikz_bend_options keeps given and unrouted bends exactly", {
+  nodes <- data.frame(
+    name = c("A", "B", "C"),
+    x = c(0, 2, 4),
+    y = 0,
+    hw = 0.3,
+    hh = 0.2
+  )
+  # A --> C runs through B and A --> B leaves A in nearly the same direction
+  edges <- data.frame(from = c("A", "A"), to = c("C", "B"), route = TRUE)
+  routed <- tikz_bend_options(edges, nodes, default = -10)
+  expect_false(identical(routed, rep("bend right=10", 2)))
+
+  edges$route <- FALSE
+  expect_equal(
+    tikz_bend_options(edges, nodes, default = -10),
+    rep("bend right=10", 2)
+  )
+
+  edges$route <- TRUE
+  res <- tikz_bend_options(
     edges,
     nodes,
-    bend_edges = TRUE,
-    bend_angle = 45
+    default = -10,
+    bend_by_edge = list(A = list(C = 0))
   )
-  expect_match(res_bent[1], "^bend (left|right)=45$")
-
-  expect_equal(
-    tikz_route_options(edges[0, ], nodes, bend_edges = FALSE, bend_angle = 10),
-    character(0)
-  )
+  expect_true(is.na(res[1]))
 })
 
 test_that("tikz_node_extent ignores LaTeX markup when sizing labels", {

@@ -25,8 +25,9 @@ make_tikz_classic <- function(
   tier_node_map = NULL,
   scale = 10,
   full_doc = TRUE,
-  bend_edges = TRUE,
-  bend_angle = 10,
+  bend = 10,
+  pair_bend = 10,
+  bend_by_edge = NULL,
   tier_label_pos = NULL,
   node_labels = NULL,
   tier_labels = NULL
@@ -103,25 +104,19 @@ make_tikz_classic <- function(
     y = coords$y * units_cm[["y"]],
     tikz_node_extent(labels, shape = "text")
   )
-  bend_options <- tikz_route_options(
+  # Default bend: always `bend right`, which puts edges in both directions on
+  # opposite sides.
+  bidir <- tikz_bidirected(edges$from, edges$to)
+  bend_options <- tikz_bend_options(
     edges,
     nodes_cm,
-    bend_edges = bend_edges,
-    bend_angle = bend_angle
+    default = ifelse(bidir, -pair_bend, -bend),
+    bend_by_edge = bend_by_edge
   )
-  # Routed edges and edges in both directions keep their bend direction; the
-  # rest get the default bend and may be flipped to spread out edge ends.
-  bidir <- tikz_bidirected(edges$from, edges$to)
-  fixed <- !is.na(bend_options) | bidir
-  bend_options[is.na(bend_options) & (bend_edges | bidir)] <- paste0(
-    "bend right=",
-    format_coord(bend_angle)
-  )
-  bend_options <- tikz_fan_out(edges, nodes_cm, bend_options, fixed)
   edge_lines <- classic_edge_lines(
     edges,
     bend_edges = FALSE,
-    bend_angle = bend_angle,
+    bend_angle = 0,
     route_options = bend_options
   )
 
@@ -226,8 +221,9 @@ tikz_edge_records <- function(edge_grob_children, pos) {
 #' @param edges Data frame from `tikz_edge_records()`.
 #' @param bend_edges Logical; bend all edges.
 #' @param bend_angle Numeric bend angle in degrees.
-#' @param route_options Optional character vector of routed bend options (or
-#'   `NA`), one per edge, from `tikz_route_options()`.
+#' @param route_options Optional character vector of bend options (or `NA`
+#'   for straight), one per edge, from `tikz_bend_options()`. If given, it
+#'   decides every bend and `bend_edges` is ignored.
 #' @returns Character vector of `(from) edge[...] (to)` fragments.
 #' @keywords internal
 #' @noRd
@@ -240,11 +236,13 @@ classic_edge_lines <- function(
   if (nrow(edges) == 0) {
     return(character(0))
   }
-  # A pair drawn in both directions (A --> B, B --> A) must always be bent,
-  # otherwise the two edges are drawn on top of each other.
-  bend <- bend_edges | tikz_bidirected(edges$from, edges$to)
   if (is.null(route_options)) {
+    # A pair drawn in both directions (A --> B, B --> A) must always be bent,
+    # otherwise the two edges are drawn on top of each other.
+    bend <- bend_edges | tikz_bidirected(edges$from, edges$to)
     route_options <- rep(NA_character_, nrow(edges))
+  } else {
+    bend <- rep(FALSE, nrow(edges))
   }
 
   vapply(
