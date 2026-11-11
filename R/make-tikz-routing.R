@@ -28,7 +28,7 @@ tikz_node_extent <- function(label, shape = c("text", "circle")) {
 }
 
 
-#' @title Compute Obstacle-Avoiding Bends for TikZ Edges
+#' @title Compute the Obstacle-Avoiding Bend for a Single Edge
 #'
 #' @description
 #' Mirrors the edge routing in `caugi::plot()`: an edge that passes too close
@@ -39,68 +39,24 @@ tikz_node_extent <- function(label, shape = c("text", "circle")) {
 #' `0.3915 * L` from the ends (`L` the edge length), turned `a` degrees to the
 #' left of the straight line.
 #'
-#' Each edge has a default bend (`default`: 0 for a straight edge, or the bend
-#' from `bend_edges`). If the edge drawn with its default bend stays
-#' `clearance` cm away from every other node, it is kept. Otherwise the bend
-#' whose size is closest to the default's size is used, among those (in whole
-#' degrees, up to `max_angle`) that clear all nodes. The direction does not
-#' count, so the first thing tried is the same bend on the other side. Ties
-#' go to the smaller bend, then to the side facing away from the worst
-#' obstacle. A straight edge is thus bent as little as needed. If no bend
-#' clears all nodes, the one that gets closest is used.
+#' If the edge drawn with its default bend stays `clearance` cm away from
+#' every obstacle, it is kept. Otherwise the bend whose size is closest to the
+#' default's size is used, among those (in whole degrees, up to `max_angle`)
+#' that clear all obstacles. The direction does not count, so the first thing
+#' tried is the same bend on the other side. Ties go to the smaller bend, then
+#' to the side facing away from the worst obstacle. A straight edge is thus
+#' bent as little as needed. If no bend clears all obstacles, the one that
+#' gets closest is used.
 #'
-#' @param edges Data frame with columns `from` and `to` (node names).
-#' @param nodes Data frame with columns `name`, `x`, `y` (cm) and `hw`, `hh`
-#'   (half-extents in cm, see `tikz_node_extent()`).
-#' @param route Logical vector, one per edge; edges with `FALSE` keep their
-#'   default bend unchecked.
-#' @param default Numeric vector, one per edge: the signed default bend angle
-#'   (degrees, positive = left, 0 = straight).
-#' @param flip Logical vector, one per edge; with `FALSE` the edge keeps the
-#'   direction of its (non-zero) default bend and only its size may change.
-#' @param clearance Minimum distance (cm) between an edge and other nodes.
-#' @param max_angle Largest bend angle (degrees) to consider.
-#' @returns A list with one entry per edge: `NULL` (keep the default bend) or
-#'   the signed bend angle to use instead.
-#' @keywords internal
-#' @noRd
-tikz_route_edges <- function(
-  edges,
-  nodes,
-  route = rep(TRUE, nrow(edges)),
-  default = rep(0, nrow(edges)),
-  flip = rep(TRUE, nrow(edges)),
-  clearance = 0.1,
-  max_angle = 60
-) {
-  lapply(seq_len(nrow(edges)), function(i) {
-    if (!isTRUE(route[i])) {
-      return(NULL)
-    }
-    from <- match(edges$from[i], nodes$name)
-    to <- match(edges$to[i], nodes$name)
-    obstacles <- nodes[-c(from, to), , drop = FALSE]
-    tikz_route_one(
-      nodes$x[from],
-      nodes$y[from],
-      nodes$x[to],
-      nodes$y[to],
-      obstacles,
-      default = default[i],
-      flip = flip[i],
-      clearance = clearance,
-      max_angle = max_angle
-    )
-  })
-}
-
-
-#' @title Compute the Bend for a Single Edge
-#' @inheritParams tikz_route_edges
 #' @param x0,y0,x1,y1 Edge start and end (cm).
-#' @param obstacles Data frame with `x`, `y`, `hw`, `hh` of the other nodes.
-#' @param default Signed default bend angle (degrees, positive = left).
-#' @param flip Logical; whether the bend may change direction.
+#' @param obstacles Data frame with `x`, `y`, `hw`, `hh` (cm) of the other
+#'   nodes (`hw`, `hh`: half-extents, see `tikz_node_extent()`).
+#' @param default Signed default bend angle (degrees, positive = left,
+#'   0 = straight).
+#' @param flip Logical; whether the bend may change direction. With `FALSE`
+#'   only the size of a non-zero default bend may change.
+#' @param clearance Minimum distance (cm) between the edge and other nodes.
+#' @param max_angle Largest bend angle (degrees) to consider.
 #' @returns `NULL` (keep the default bend) or a signed bend angle.
 #' @keywords internal
 #' @noRd
@@ -354,40 +310,6 @@ tikz_bidirected <- function(from, to) {
 }
 
 
-#' @title Bend Options for a Set of Edges
-#'
-#' @description
-#' Gives every edge its default bend, then runs `tikz_route_edges()` for the
-#' edges that caugi routes, so that no edge runs through another node. Edges
-#' drawn in both directions keep their bend direction (that keeps the pair
-#' apart); only the size of their bend may change.
-#'
-#' @param edges Data frame from `tikz_edge_records()`.
-#' @param nodes Data frame with `name`, `x`, `y`, `hw`, `hh` (cm).
-#' @param default Signed default bend angle (degrees, positive = left),
-#'   recycled to one per edge.
-#' @returns Character vector, one per edge: a bend option or `NA` (straight).
-#' @keywords internal
-#' @noRd
-tikz_route_options <- function(edges, nodes, default = 0) {
-  if (nrow(edges) == 0) {
-    return(character(0))
-  }
-  default <- rep_len(default, nrow(edges))
-  routes <- tikz_route_edges(
-    edges,
-    nodes,
-    route = edges$route,
-    default = default,
-    flip = !tikz_bidirected(edges$from, edges$to)
-  )
-  routed <- !vapply(routes, is.null, logical(1))
-  angle <- default
-  angle[routed] <- unlist(routes[routed])
-  tikz_angle_option(angle)
-}
-
-
 #' @title Resolve User-Given Bend Angles per Edge
 #'
 #' @description
@@ -467,10 +389,11 @@ resolve_tikz_bend_by_edge <- function(bend_by_edge, from, to) {
 #'
 #' @description
 #' Shared by both TikZ styles. Edges with a bend in `bend_by_edge` get exactly
-#' that bend. Edges with `route = FALSE` get exactly their default bend. All
-#' other edges are routed around nodes (`tikz_route_options()`) and then
-#' spread out where they leave a node in nearly the same direction
-#' (`tikz_fan_out()`); edges in both directions keep their bend direction.
+#' that bend, and edges with `route = FALSE` exactly their default bend. All
+#' other edges are routed around nodes (`tikz_route_one()`) and then spread
+#' out where they leave a node in nearly the same direction
+#' (`tikz_fan_out()`). Edges in both directions keep their bend direction,
+#' which keeps the pair apart; only the size of their bend may change.
 #'
 #' @param edges Data frame from `tikz_edge_records()`.
 #' @param nodes Data frame with `name`, `x`, `y`, `hw`, `hh` (cm).
@@ -481,16 +404,32 @@ resolve_tikz_bend_by_edge <- function(bend_by_edge, from, to) {
 #' @keywords internal
 #' @noRd
 tikz_bend_options <- function(edges, nodes, default, bend_by_edge = NULL) {
-  default <- rep_len(default, nrow(edges))
+  if (nrow(edges) == 0) {
+    return(character(0))
+  }
+  angle <- rep_len(default, nrow(edges))
   custom <- resolve_tikz_bend_by_edge(bend_by_edge, edges$from, edges$to)
   given <- !is.na(custom)
-  default[given] <- custom[given]
-  edges$route <- edges$route & !given
-  options <- tikz_route_options(edges, nodes, default = default)
-  tikz_fan_out(
-    edges,
-    nodes,
-    options,
-    fixed = tikz_bidirected(edges$from, edges$to) | !edges$route
-  )
+  angle[given] <- custom[given]
+  route <- edges$route & !given
+  bidir <- tikz_bidirected(edges$from, edges$to)
+
+  from <- match(edges$from, nodes$name)
+  to <- match(edges$to, nodes$name)
+  for (i in which(route)) {
+    routed <- tikz_route_one(
+      nodes$x[from[i]],
+      nodes$y[from[i]],
+      nodes$x[to[i]],
+      nodes$y[to[i]],
+      nodes[-c(from[i], to[i]), , drop = FALSE],
+      default = angle[i],
+      flip = !bidir[i]
+    )
+    if (!is.null(routed)) {
+      angle[i] <- routed
+    }
+  }
+
+  tikz_fan_out(edges, nodes, tikz_angle_option(angle), fixed = bidir | !route)
 }

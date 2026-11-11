@@ -1,8 +1,8 @@
 ########### rcolor_to_tikz Tests #########
 
 test_that("rcolor_to_tikz handles NULL and empty input", {
-  expect_equal(rcolor_to_tikz(NULL), list(tikz = NULL, r_col = NULL))
-  expect_equal(rcolor_to_tikz(character(0)), list(tikz = NULL, r_col = NULL))
+  expect_null(rcolor_to_tikz(NULL))
+  expect_null(rcolor_to_tikz(character(0)))
 })
 
 test_that("rcolor_to_tikz handles default TikZ colors", {
@@ -22,37 +22,31 @@ test_that("rcolor_to_tikz handles default TikZ colors", {
     "red"
   )
   for (col in defaults) {
-    expect_equal(rcolor_to_tikz(col), list(tikz = col, r_col = NULL))
-    expect_equal(rcolor_to_tikz(toupper(col)), list(tikz = col, r_col = NULL))
+    expect_equal(rcolor_to_tikz(col), col)
+    expect_equal(rcolor_to_tikz(toupper(col)), col)
   }
 })
 
 test_that("rcolor_to_tikz maps 'lightgrey' to 'lightgray'", {
-  expect_equal(
-    rcolor_to_tikz("lightgrey"),
-    list(tikz = "lightgray", r_col = NULL)
-  )
-  expect_equal(
-    rcolor_to_tikz("LIGHTGREY"),
-    list(tikz = "lightgray", r_col = NULL)
-  )
+  expect_equal(rcolor_to_tikz("lightgrey"), "lightgray")
+  expect_equal(rcolor_to_tikz("LIGHTGREY"), "lightgray")
 })
 
 test_that("rcolor_to_tikz handles custom colors", {
-  # Example: purple-ish color
-  result <- rcolor_to_tikz("#123456")
-  expect_equal(result$r_col, "#123456")
-  expect_true(grepl("\\{rgb:red,.*;green,.*;blue,.*\\}", result$tikz))
-
-  # Another example using R color name not in defaults
-  result <- rcolor_to_tikz("goldenrod")
-  expect_equal(result$r_col, "goldenrod")
-  expect_true(grepl("\\{rgb:red,.*;green,.*;blue,.*\\}", result$tikz))
+  expect_equal(
+    rcolor_to_tikz("#123456"),
+    "{rgb:red,0.071;green,0.204;blue,0.337}"
+  )
+  # R color name not in the TikZ defaults
+  expect_match(
+    rcolor_to_tikz("goldenrod"),
+    "^\\{rgb:red,.*;green,.*;blue,.*\\}$"
+  )
 })
 
 ######### extract_nodes Tests #########
 
-test_that("extract_nodes returns correct nodes with styles and labels", {
+test_that("extract_nodes returns correct nodes with colors", {
   # Mock grobs
   node_grob_children <- list(
     node.A = list(
@@ -72,35 +66,21 @@ test_that("extract_nodes returns correct nodes with styles and labels", {
     other = list(something = TRUE) # Should be ignored
   )
 
-  scale <- 2
-  result <- extract_nodes(node_grob_children, scale)
+  result <- extract_nodes(node_grob_children, scale = 2)
 
-  # Check correct number of nodes
   expect_equal(length(result), 2)
-
-  # Check names and labels
-  expect_equal(result[[1]]$name, "Node A")
+  expect_equal(
+    unname(result[[1]]),
+    list("Node A", 2, 4, "red", "black")
+  )
   expect_equal(result[[2]]$name, "Node B")
-  expect_equal(result[[1]]$label, "Node A")
-  expect_equal(result[[2]]$label, "Node B")
-
-  # Check coordinates scaling
-  expect_equal(result[[1]]$x, 2) # 1 * 2
-  expect_equal(result[[1]]$y, 4) # 2 * 2
-  expect_equal(result[[2]]$x, 6) # 3 * 2
-  expect_equal(result[[2]]$y, 8) # 4 * 2
-
-  # Check styles
-  expect_equal(result[[1]]$style$fill$tikz, "red")
-  expect_equal(result[[1]]$style$draw$tikz, "black")
-
-  expect_equal(result[[2]]$style$fill$tikz, "blue")
-  expect_null(result[[2]]$style$draw) # col=NULL
+  expect_equal(c(result[[2]]$x, result[[2]]$y), c(6, 8))
+  expect_equal(result[[2]]$fill, "blue")
+  expect_null(result[[2]]$draw) # col = NULL
 })
 
 test_that("extract_nodes handles empty input gracefully", {
-  empty_result <- extract_nodes(list(), 1)
-  expect_equal(empty_result, list())
+  expect_equal(extract_nodes(list(), 1), list())
 })
 
 test_that("extract_nodes works when gp elements are missing", {
@@ -109,7 +89,8 @@ test_that("extract_nodes works when gp elements are missing", {
     label.C = list(label = "Node C")
   )
   result <- extract_nodes(node_grob_children, 1)
-  expect_equal(result[[1]]$style, list()) # No styles applied
+  expect_null(result[[1]]$fill)
+  expect_null(result[[1]]$draw)
   expect_equal(result[[1]]$x, 0)
   expect_equal(result[[1]]$y, 0)
 })
@@ -119,33 +100,27 @@ test_that("extract_nodes works when gp elements are missing", {
 
 test_that("compute_global_color returns most common color", {
   nodes <- list(
-    list(style = list(fill = list(tikz = "red"))),
-    list(style = list(fill = list(tikz = "blue"))),
-    list(style = list(fill = list(tikz = "red"))),
-    list(style = list(fill = list(tikz = "green")))
+    list(fill = "red"),
+    list(fill = "blue"),
+    list(fill = "red"),
+    list(fill = "green")
   )
-
   expect_equal(compute_global_color(nodes, "fill"), "red")
 })
 
-test_that("compute_global_color ignores nodes with missing style or tikz", {
+test_that("compute_global_color ignores nodes without that color", {
   nodes <- list(
-    list(style = list(fill = list(tikz = "red"))),
-    list(style = list(fill = NULL)), # missing fill
-    list(style = list(draw = list(tikz = "blue"))), # no fill
-    list(style = list(fill = list(tikz = "red")))
+    list(fill = "red"),
+    list(fill = NULL),
+    list(draw = "blue"),
+    list(fill = "red")
   )
-
   expect_equal(compute_global_color(nodes, "fill"), "red")
 })
 
 test_that("compute_global_color returns NULL for empty input or no colors", {
   expect_null(compute_global_color(list(), "fill"))
-
-  nodes <- list(
-    list(style = list(draw = list(tikz = "blue"))),
-    list(style = list(draw = list(tikz = "green")))
-  )
+  nodes <- list(list(draw = "blue"), list(draw = "green"))
   expect_null(compute_global_color(nodes, "fill"))
 })
 
@@ -182,90 +157,31 @@ test_that("latex_escape handles empty string", {
 
 ######### build_node_lines Tests #########
 
-test_that("build_node_lines adds style attributes correctly", {
+test_that("build_node_lines leaves global colors to the var style", {
   nodes <- list(
-    list(
-      name = "node1",
-      x = 1,
-      y = 2,
-      label = "A",
-      style = list(
-        fill = list(tikz = "red"),
-        draw = list(tikz = "black"),
-        font = "\\fontsize{12}{14}\\selectfont"
-      )
-    ),
-    list(
-      name = "node2",
-      x = 3,
-      y = 4,
-      label = "B",
-      style = list(
-        fill = list(tikz = "red") # same as global, should be skipped
-      )
-    )
+    list(name = "node1", x = 1, y = 2, fill = "red", draw = "black"),
+    list(name = "node2", x = 3, y = 4, fill = "red")
   )
-
-  global_fill <- "red"
-  global_draw <- "black"
-
-  lines <- build_node_lines(nodes, global_fill, global_draw)
-
-  # Node 1: fill and draw match global, so style_list should include only font
-  expect_true(grepl("font=", lines[1]))
-  expect_false(grepl("fill=red", lines[1]))
-  expect_false(grepl("draw=black", lines[1]))
-  expect_true(grepl("\\(node1\\) at \\(1,2\\) \\{A\\};", lines[1]))
-
-  # Node 2: fill same as global, no draw, no other style
-  expect_false(grepl("fill=", lines[2]))
-  expect_false(grepl("draw=", lines[2]))
-  expect_true(startsWith(lines[2], "\\node[var] (node2)"))
-})
-
-test_that("build_node_lines handles custom styles besides fill/draw", {
-  nodes <- list(
-    list(
-      name = "nodeY",
-      x = 1,
-      y = 1,
-      label = "L",
-      style = list(
-        font = "\\fontsize{10}{12}\\selectfont"
-      )
-    )
+  lines <- build_node_lines(nodes, "red", "black", c(node1 = "A", node2 = "B"))
+  expect_equal(
+    lines,
+    c("\\node[var] (node1) at (1,2) {A};", "\\node[var] (node2) at (3,4) {B};")
   )
-  lines <- build_node_lines(
-    nodes,
-    global_node_fill = NULL,
-    global_node_draw = NULL
-  )
-  expect_true(grepl("font=", lines[1]))
 })
 
 test_that("build_node_lines adds non-global fill/draw correctly", {
-  nodes <- list(
-    list(
-      name = "node1",
-      x = 0,
-      y = 0,
-      label = "A",
-      style = list(
-        fill = list(tikz = "blue"), # different from global
-        draw = list(tikz = "green") # different from global
-      )
-    )
+  nodes <- list(list(
+    name = "node1",
+    x = 0,
+    y = 0,
+    fill = "blue",
+    draw = "green"
+  ))
+  lines <- build_node_lines(nodes, "red", "black", c(node1 = "$X_1$"))
+  expect_equal(
+    lines,
+    "\\node[var, fill=blue, draw=green] (node1) at (0,0) {$X_1$};"
   )
-
-  global_fill <- "red"
-  global_draw <- "black"
-
-  lines <- build_node_lines(nodes, global_fill, global_draw)
-
-  # Both fill and draw differ from globals, so they should appear in style_list
-  expect_true(grepl("fill=blue", lines[1]))
-  expect_true(grepl("draw=green", lines[1]))
-  expect_true(grepl("\\(node1\\) at \\(0,0\\) \\{A\\};", lines[1]))
 })
 
 
@@ -302,13 +218,6 @@ test_that("get_anchor_and_offset respects custom offset", {
   expect_equal(res$dy, 0.5)
   res <- get_anchor_and_offset("left", offset = 1)
   expect_equal(res$dx, -1)
-})
-
-test_that("get_anchor_and_offset errors for invalid position", {
-  expect_error(
-    get_anchor_and_offset("diagonal"),
-    "tier_label_pos must be one of: above, below, left, right"
-  )
 })
 
 
@@ -350,173 +259,63 @@ test_that("build_tikz_styles adds tier styles only when there are tiers", {
 
 ########### extract_edges Tests #########
 
+edge_grob <- function(col = NULL, lwd = NULL, length = NULL, type = "-->") {
+  list(
+    gp = list(col = col, lwd = lwd),
+    arrow = list(length = length),
+    edge_type = type
+  )
+}
+ab <- data.frame(from = "A", to = "B")
+
 test_that("extract_edges computes global arrow length correctly", {
-  nodes <- list(
-    list(label = "A", x = 0, y = 0),
-    list(label = "B", x = 1, y = 0)
+  grobs <- list(
+    edge_grob(length = 0.5),
+    edge_grob(length = 0.5),
+    edge_grob(length = 1)
   )
-
-  edges <- list(
-    list(
-      x0 = 0,
-      y0 = 0,
-      x1 = 1,
-      y1 = 0,
-      gp = list(),
-      arrow = list(length = 0.5),
-      edge_type = "-->"
-    ),
-    list(
-      x0 = 0,
-      y0 = 0,
-      x1 = 1,
-      y1 = 0,
-      gp = list(),
-      arrow = list(length = 0.5),
-      edge_type = "-->"
-    ),
-    list(
-      x0 = 0,
-      y0 = 0,
-      x1 = 1,
-      y1 = 0,
-      gp = list(),
-      arrow = list(length = 1),
-      edge_type = "-->"
-    )
-  )
-
-  result <- extract_edges(
-    edges,
-    nodes,
-    scale = 1,
-    bend_edges = FALSE,
-    bend_angle = 15,
-    global_edge_color = NULL
-  )
-
+  result <- extract_edges(grobs, ab[c(1, 1, 1), ], rep(NA, 3), NULL)
   expect_equal(result$global_arrow_length, 0.5) # most common
+  # only the edge that differs gets its own arrow scale
+  expect_false(grepl("scale", result$edge_lines[1], fixed = TRUE))
+  expect_true(grepl("arrows={[scale=1]}", result$edge_lines[3], fixed = TRUE))
 })
 
 test_that("extract_edges generates correct edge line with styles", {
-  nodes <- list(
-    list(label = "A", x = 0, y = 0),
-    list(label = "B", x = 1, y = 0)
-  )
-
-  edges <- list(
-    list(
-      x0 = 0,
-      y0 = 0,
-      x1 = 1,
-      y1 = 0,
-      gp = list(col = "red", lwd = 1),
-      arrow = list(length = 0.8),
-      edge_type = "-->"
-    )
-  )
-
   res <- extract_edges(
-    edges,
-    nodes,
-    scale = 1,
-    bend_edges = TRUE,
-    bend_angle = 10,
+    list(edge_grob(col = "red", lwd = 1, length = 0.8)),
+    ab,
+    "bend left=10",
     global_edge_color = "blue"
   )
-  line <- res$edge_lines[1]
-
-  # Should contain from/to labels and start with the link style
-  expect_true(grepl("\\(A\\).*\\(B\\)", line))
-  expect_true(startsWith(line, "(A) edge[link, "))
-
-  # Should contain draw=red and line width
-  expect_true(grepl("draw=red", line))
-  expect_true(grepl("line width=1", line))
-
-  # Bend left/right added
-  expect_true(grepl("bend left=10", line))
-
-  # Arrow spec
-  expect_true(grepl("-Latex", line))
-
-  # Global arrow length
+  expect_equal(
+    res$edge_lines,
+    "(A) edge[link, draw=red, line width=1, bend left=10, -Latex] (B)"
+  )
   expect_equal(res$global_arrow_length, 0.8)
+
+  # the global edge color is left to the link style
+  res_blue <- extract_edges(list(edge_grob(col = "blue")), ab, NA, "blue")
+  expect_equal(res_blue$edge_lines, "(A) edge[link, -Latex] (B)")
 })
 
 test_that("extract_edges falls back for unknown edge type with warning", {
-  nodes <- list(
-    list(label = "A", x = 0, y = 0),
-    list(label = "B", x = 1, y = 0)
-  )
-  edges <- list(list(
-    x0 = 0,
-    y0 = 0,
-    x1 = 1,
-    y1 = 0,
-    gp = list(),
-    arrow = list(),
-    edge_type = "???"
-  ))
-
   expect_warning(
-    res <- extract_edges(
-      edges,
-      nodes,
-      scale = 1,
-      bend_edges = FALSE,
-      bend_angle = 15,
-      global_edge_color = NULL
-    ),
+    res <- extract_edges(list(edge_grob(type = "???")), ab, NA, NULL),
     "Unknown edge type"
   )
   expect_true(grepl("-Latex", res$edge_lines[1]))
 })
 
 test_that("extract_edges handles empty edge list", {
-  nodes <- list(list(label = "A", x = 0, y = 0))
-  edges <- list()
-  res <- extract_edges(
-    edges,
-    nodes,
-    scale = 1,
-    bend_edges = FALSE,
-    bend_angle = 15,
-    global_edge_color = NULL
-  )
-  expect_equal(res$edge_lines, list())
+  res <- extract_edges(list(), ab[0, ], character(0), NULL)
+  expect_equal(res$edge_lines, character(0))
   expect_equal(res$global_arrow_length, 1)
 })
 
 test_that("extract_edges ignores missing gp or arrow attributes", {
-  nodes <- list(
-    list(label = "A", x = 0, y = 0),
-    list(label = "B", x = 1, y = 0)
-  )
-  edges <- list(list(
-    x0 = 0,
-    y0 = 0,
-    x1 = 1,
-    y1 = 0,
-    gp = list(),
-    arrow = list(),
-    edge_type = "-->"
-  ))
-
-  res <- extract_edges(
-    edges,
-    nodes,
-    scale = 1,
-    bend_edges = FALSE,
-    bend_angle = 10,
-    global_edge_color = NULL
-  )
-  line <- res$edge_lines[1]
-
-  # Should not contain draw=, line width, or arrows=...
-  expect_false(grepl("draw=", line))
-  expect_false(grepl("line width=", line))
-  expect_false(grepl("arrows=\\{\\[scale=", line))
+  res <- extract_edges(list(edge_grob()), ab, NA, NULL)
+  expect_equal(res$edge_lines, "(A) edge[link, -Latex] (B)")
 })
 
 
@@ -636,7 +435,7 @@ test_that("tikz_route_one uses the largest angle when nothing clears", {
   expect_equal(abs(res), 20)
 })
 
-test_that("tikz_route_options applies default bends and routes edges", {
+test_that("tikz_bend_options applies default bends and routes edges", {
   nodes <- data.frame(
     name = c("A", "B", "C"),
     x = c(0, 2, 4),
@@ -646,15 +445,14 @@ test_that("tikz_route_options applies default bends and routes edges", {
   )
   # A --> C runs through B and is bent; A --> B is straight
   edges <- data.frame(from = c("A", "A"), to = c("C", "B"), route = TRUE)
-  res <- tikz_route_options(edges, nodes)
+  res <- tikz_bend_options(edges, nodes, default = 0)
   expect_match(res[1], "^bend (left|right)=[0-9]+$")
   expect_true(is.na(res[2]))
 
-  # default bends that clear are kept
-  expect_equal(
-    tikz_route_options(edges, nodes, default = -45),
-    rep("bend right=45", 2)
-  )
+  # default bends that clear keep their size; the two ends at A are spread
+  # to opposite sides
+  res <- tikz_bend_options(edges, nodes, default = -45)
+  expect_equal(sort(tikz_option_angle(res)), c(-45, 45))
 
   # rows 1 and 3 form a bidirected pair: routed, but keep their direction;
   # row 4 has routing turned off and keeps its default unchecked
@@ -663,14 +461,14 @@ test_that("tikz_route_options applies default bends and routes edges", {
     to = c("C", "B", "A", "C"),
     route = c(TRUE, TRUE, TRUE, FALSE)
   )
-  res <- tikz_route_options(edges, nodes, default = c(-10, 0, -10, -10))
+  res <- tikz_bend_options(edges, nodes, default = c(-10, 0, -10, -10))
   expect_match(res[c(1, 3)], "^bend right=[0-9]+$")
   expect_gt(tikz_option_angle(res[1]), -60)
   expect_lt(tikz_option_angle(res[1]), -10)
   expect_true(is.na(res[2]))
   expect_equal(res[4], "bend right=10")
 
-  expect_equal(tikz_route_options(edges[0, ], nodes), character(0))
+  expect_equal(tikz_bend_options(edges[0, ], nodes, default = 0), character(0))
 })
 
 test_that("resolve_tikz_bend_by_edge matches edges in either direction", {

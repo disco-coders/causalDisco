@@ -38,14 +38,8 @@ make_tikz_classic <- function(
   node_grob_children <- g$children$node_gtree$children
   edge_grob_children <- g$children[grep("^edge", names(g$children))]
 
-  nodes <- extract_nodes(node_grob_children, scale = 1)
-  node_names <- vapply(nodes, function(n) n$name, character(1))
-  pos <- data.frame(
-    name = node_names,
-    x = vapply(nodes, function(n) n$x, numeric(1)),
-    y = vapply(nodes, function(n) n$y, numeric(1)),
-    stringsAsFactors = FALSE
-  )
+  pos <- tikz_node_table(extract_nodes(node_grob_children, scale = 1))
+  node_names <- pos$name
   edges <- tikz_edge_records(edge_grob_children, pos)
 
   layout <- classic_tier_layout(pos, tier_node_map)
@@ -89,7 +83,7 @@ make_tikz_classic <- function(
     }
   }
 
-  labels <- node_labels[coords$name] %||% latex_escape(coords$name)
+  labels <- unname(node_labels[coords$name])
   node_lines <- sprintf(
     "\\node[var] (%s) at (%s,%s) {%s};",
     coords$name,
@@ -113,12 +107,7 @@ make_tikz_classic <- function(
     default = ifelse(bidir, -pair_bend, -bend),
     bend_by_edge = bend_by_edge
   )
-  edge_lines <- classic_edge_lines(
-    edges,
-    bend_edges = FALSE,
-    bend_angle = 0,
-    route_options = bend_options
-  )
+  edge_lines <- classic_edge_lines(edges, bend_options)
 
   libraries <- c(
     "arrows.meta",
@@ -174,88 +163,21 @@ make_tikz_classic <- function(
 }
 
 
-#' @title Extract Edge Records from Caugi Edge Grobs
-#' @param edge_grob_children A list of edge grobs.
-#' @param pos Data frame with `name`, `x`, `y` (unscaled plot coordinates).
-#' @returns A data frame with columns `from`, `to`, `type`, `col` (TikZ color
-#'   or `NA` for the default), and `route` (whether caugi routes the edge
-#'   around other nodes).
-#' @keywords internal
-#' @noRd
-tikz_edge_records <- function(edge_grob_children, pos) {
-  if (length(edge_grob_children) == 0) {
-    return(data.frame(
-      from = character(0),
-      to = character(0),
-      type = character(0),
-      col = character(0),
-      route = logical(0),
-      stringsAsFactors = FALSE
-    ))
-  }
-  find_node <- function(x, y) {
-    pos$name[which(
-      abs(pos$x - as.numeric(x)) < 1e-9 & abs(pos$y - as.numeric(y)) < 1e-9
-    )[1]]
-  }
-  recs <- lapply(edge_grob_children, function(e) {
-    col <- NA_character_
-    if (!is.null(e$gp$col) && length(e$gp$col) > 0) {
-      tk <- rcolor_to_tikz(e$gp$col)$tikz
-      if (!is.null(tk) && tk != "black") col <- tk
-    }
-    data.frame(
-      from = find_node(e$x0, e$y0),
-      to = find_node(e$x1, e$y1),
-      type = e$edge_type %||% "-->",
-      col = col,
-      route = isTRUE(e$route),
-      stringsAsFactors = FALSE
-    )
-  })
-  do.call(rbind, recs)
-}
-
-
 #' @title Build Classic-Style TikZ Edge Lines
 #' @param edges Data frame from `tikz_edge_records()`.
-#' @param bend_edges Logical; bend all edges.
-#' @param bend_angle Numeric bend angle in degrees.
-#' @param route_options Optional character vector of bend options (or `NA`
-#'   for straight), one per edge, from `tikz_bend_options()`. If given, it
-#'   decides every bend and `bend_edges` is ignored.
+#' @param bend_options Character vector, one per edge, of bend options (e.g.
+#'   `"bend left=23"`) or `NA` (straight), from `tikz_bend_options()`.
 #' @returns Character vector of `(from) edge[...] (to)` fragments.
 #' @keywords internal
 #' @noRd
-classic_edge_lines <- function(
-  edges,
-  bend_edges,
-  bend_angle,
-  route_options = NULL
-) {
-  if (nrow(edges) == 0) {
-    return(character(0))
-  }
-  if (is.null(route_options)) {
-    # A pair drawn in both directions (A --> B, B --> A) must always be bent,
-    # otherwise the two edges are drawn on top of each other.
-    bend <- bend_edges | tikz_bidirected(edges$from, edges$to)
-    route_options <- rep(NA_character_, nrow(edges))
-  } else {
-    bend <- rep(FALSE, nrow(edges))
-  }
-
+classic_edge_lines <- function(edges, bend_options) {
   vapply(
     seq_len(nrow(edges)),
     function(i) {
       opts <- c(
         tikz_edge_arrow(edges$type[i], style = "classic"),
         if (!is.na(edges$col[i])) paste0("draw=", edges$col[i]),
-        if (!is.na(route_options[i])) {
-          route_options[i]
-        } else if (bend[i]) {
-          paste0("bend right=", format_coord(bend_angle))
-        }
+        if (!is.na(bend_options[i])) bend_options[i]
       )
       sprintf(
         "(%s) edge[%s] (%s)",
@@ -360,7 +282,8 @@ classic_tier_layout <- function(pos, tier_node_map) {
 #' @param layout Output of `classic_tier_layout()`.
 #' @param tier_label_pos `NULL` or one of `"above"`, `"below"`, `"left"`,
 #'   `"right"`. Must be compatible with the layout orientation.
-#' @param tier_labels Named character vector of tier labels, or `NULL`.
+#' @param tier_labels Named character vector of tier labels (see
+#'   `resolve_tikz_labels()`).
 #' @returns Character vector of TikZ lines.
 #' @keywords internal
 #' @noRd
@@ -381,7 +304,7 @@ classic_tier_lines <- function(layout, tier_label_pos, tier_labels) {
 
   n_tiers <- length(layout$tiers)
   idx <- seq_len(n_tiers) - 1
-  labels <- tier_labels[layout$tiers] %||% latex_escape(layout$tiers)
+  labels <- tier_labels[layout$tiers]
   band_names <- paste0("tier-", seq_len(n_tiers))
   fc <- format_coord
 
@@ -462,7 +385,8 @@ classic_tier_lines <- function(layout, tier_label_pos, tier_labels) {
 #' @param tier_node_map Named list mapping tier names to node names.
 #' @param intersect_names Node names present in the plot.
 #' @param tier_label_pos One of `"above"`, `"below"`, `"left"`, `"right"`.
-#' @param tier_labels Named character vector of tier labels, or `NULL`.
+#' @param tier_labels Named character vector of tier labels (see
+#'   `resolve_tikz_labels()`).
 #' @returns Character vector of TikZ lines.
 #' @keywords internal
 #' @noRd
@@ -477,7 +401,7 @@ classic_fit_tier_lines <- function(
   })
   tier_node_map <- tier_node_map[lengths(tier_node_map) > 0]
   tier_names <- names(tier_node_map)
-  labels <- tier_labels[tier_names] %||% latex_escape(tier_names)
+  labels <- tier_labels[tier_names]
   pos_info <- get_anchor_and_offset(tier_label_pos, offset = 0.1)
 
   bands <- sprintf(

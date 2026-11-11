@@ -295,21 +295,16 @@ resolve_tikz_bend <- function(
 .make_tikz <- function(
   caugi_plot_obj,
   tier_node_map = NULL,
-  style = c("default", "classic"),
+  style = "default",
   scale = 10,
   full_doc = TRUE,
   bend = 0,
   pair_bend = 25,
   bend_by_edge = NULL,
-  tier_label_pos = c("above", "below", "left", "right"),
+  tier_label_pos = NULL,
   node_labels = NULL,
   tier_labels = NULL
 ) {
-  style <- match.arg(style)
-  if (!is.null(tier_label_pos)) {
-    tier_label_pos <- match.arg(tier_label_pos)
-  }
-
   g <- caugi_plot_obj@grob$children$caugi.graph
   node_names <- vapply(
     extract_nodes(g$children$node_gtree$children, scale = 1),
@@ -383,73 +378,47 @@ resolve_tikz_bend <- function(
   global_node_draw <- compute_global_color(nodes, "draw")
 
   # ---- Global edge color ----
-  edge_dummy_nodes <- lapply(edge_grob_children, function(e) {
-    col <- if (!is.null(e$gp$col) && length(e$gp$col) > 0) {
-      rcolor_to_tikz(e$gp$col)
-    } else {
-      list(tikz = NULL)
-    }
-    list(style = list(draw = col))
-  })
-  global_edge_color <- compute_global_color(edge_dummy_nodes, "draw")
+  global_edge_color <- most_common(vapply(
+    edge_grob_children,
+    function(e) rcolor_to_tikz(e$gp$col) %||% NA_character_,
+    character(1)
+  ))
 
-  # ---- Node and edge lines ----
+  # ---- Node lines ----
   node_lines <- build_node_lines(
     nodes,
     global_node_fill,
     global_node_draw,
     labels = node_labels
   )
-  # ---- Route edges around other nodes (as caugi::plot() does) ----
-  unscaled <- extract_nodes(node_grob_children, scale = 1)
+
+  # ---- Edges, routed around other nodes (as caugi::plot() does) ----
+  pos <- tikz_node_table(nodes)
+  # Edge grobs hold unscaled coordinates.
   edge_records <- tikz_edge_records(
     edge_grob_children,
-    data.frame(
-      name = vapply(unscaled, function(n) n$name, character(1)),
-      x = vapply(unscaled, function(n) n$x, numeric(1)),
-      y = vapply(unscaled, function(n) n$y, numeric(1)),
-      stringsAsFactors = FALSE
-    )
+    tikz_node_table(extract_nodes(node_grob_children, scale = 1))
   )
-  node_names <- vapply(nodes, function(n) n$name, character(1))
-  labels <- if (is.null(node_labels)) {
-    latex_escape(node_names)
-  } else {
-    unname(node_labels[node_names])
-  }
   nodes_cm <- data.frame(
-    name = node_names,
-    x = vapply(nodes, function(n) n$x, numeric(1)),
-    y = vapply(nodes, function(n) n$y, numeric(1)),
-    tikz_node_extent(labels, shape = "circle")
+    pos,
+    tikz_node_extent(unname(node_labels[pos$name]), shape = "circle")
   )
   # Default bend: by the x order of the end nodes. Edges in both directions
   # always bend left, which puts the two on opposite sides.
-  from_x <- nodes_cm$x[match(edge_records$from, nodes_cm$name)]
-  to_x <- nodes_cm$x[match(edge_records$to, nodes_cm$name)]
+  from_x <- pos$x[match(edge_records$from, pos$name)]
+  to_x <- pos$x[match(edge_records$to, pos$name)]
   bidir <- tikz_bidirected(edge_records$from, edge_records$to)
-  default_angle <- ifelse(
-    bidir,
-    pair_bend,
-    ifelse(to_x >= from_x, bend, -bend)
-  )
-  route_options <- tikz_bend_options(
+  bend_options <- tikz_bend_options(
     edge_records,
     nodes_cm,
-    default = default_angle,
+    default = ifelse(bidir, pair_bend, ifelse(to_x >= from_x, bend, -bend)),
     bend_by_edge = bend_by_edge
   )
-
-  # route_options holds every bend (NA = straight), so extract_edges() must
-  # not add its own.
   edge_info <- extract_edges(
     edge_grob_children,
-    nodes,
-    scale,
-    bend_edges = FALSE,
-    bend_angle = 0,
-    global_edge_color,
-    route_options = route_options
+    edge_records,
+    bend_options,
+    global_edge_color
   )
   edge_lines <- edge_info$edge_lines
   global_arrow_length <- edge_info$global_arrow_length
@@ -475,7 +444,7 @@ resolve_tikz_bend <- function(
         pos_info$anchor_point,
         pos_info$dx,
         pos_info$dy,
-        tier_labels[[tier_name]] %||% latex_escape(tier_name)
+        tier_labels[[tier_name]]
       )
     })
   }
