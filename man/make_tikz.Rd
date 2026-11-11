@@ -7,11 +7,15 @@
 make_tikz(
   x,
   ...,
+  style = c("default", "classic"),
   scale = 10,
   full_doc = TRUE,
-  bend_edges = FALSE,
-  bend_angle = 25,
-  tier_label_pos = c("above", "below", "left", "right")
+  bend = NULL,
+  tier_label_pos = c("above", "below", "left", "right"),
+  node_labels = NULL,
+  tier_labels = NULL,
+  bend_edges = lifecycle::deprecated(),
+  bend_angle = lifecycle::deprecated()
 )
 }
 \arguments{
@@ -19,22 +23,46 @@ make_tikz(
 
 \item{...}{Additional arguments passed to \code{\link[=plot]{plot()}} and \code{\link[caugi:plot]{caugi::plot()}}.}
 
+\item{style}{\code{"default"} mirrors \code{plot()}. \code{"classic"} is a minimal look
+with plain-text nodes, gray tier bands, and a time axis. See Details.}
+
 \item{scale}{Numeric scalar. Scaling factor for node coordinates. Default is \code{10}.}
 
 \item{full_doc}{Logical. If \code{TRUE} (default), generates a full standalone
-LaTeX document. If \code{FALSE}, returns only the \code{tikzpicture} environment.}
+LaTeX document. If \code{FALSE}, returns only the \code{tikzpicture} environment;
+load \verb{\\usetikzlibrary\{arrows.meta, bending, backgrounds, fit, calc\}} in
+your preamble.}
 
-\item{bend_edges}{Logical. If \code{TRUE}, edges are drawn with bent edges. Default is \code{FALSE}.
-Edges connecting the same pair of nodes in both directions (\code{A \%-->\% B} and \code{B \%-->\% A})
-are automatically bent left and right to avoid overlap. Bend direction is automatically chosen
-to reduce overlap.}
+\item{bend}{How much edges are bent, in degrees:
+\itemize{
+\item A number bends every edge by that angle; \code{0} draws edges straight, and
+a negative number bends them the other way (see Details). Edges may
+still be bent differently to avoid nodes.
+\item A named list sets the bend of individual edges, in the same nested
+form as \code{edge_style$by_edge}: \code{list(A = list(B = 20, C = -10))} bends
+the edge from \code{A} to \code{B} 20 degrees to the left (\verb{bend left=20}) and the
+edge from \code{A} to \code{C} 10 degrees to the right; \code{0} draws an edge
+straight. Left and right are as seen going from the first to the second
+node, whichever way the edge points. These edges are drawn exactly as
+given. Add \verb{default = <number>} to set the bend of all other edges, e.g.
+\code{list(default = 20, A = list(B = 0))}.
+}
 
-\item{bend_angle}{Numeric scalar. Angle in degrees for bending arrows when
-\code{bend_edges = TRUE}. Default is \code{25}.}
+Default is \code{0} (\code{10} for \code{style = "classic"}).}
 
 \item{tier_label_pos}{Character string specifying the position of tier labels
 relative to the tier rectangles. Must be one of \code{"above"}, \code{"below"}, \code{"left"}, or \code{"right"}.
-Default is \code{"above"}.}
+Default is \code{"above"}. For \code{style = "classic"}, see Details.}
+
+\item{node_labels, tier_labels}{Optional named character vectors of LaTeX
+labels for nodes or tiers, e.g. \code{c(child_x1 = "$X_1$")}. Unlabelled nodes
+and tiers use their name.}
+
+\item{bend_edges}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{bend} instead:
+\code{bend_edges = FALSE} is \code{bend = 0}, and \code{bend_edges = TRUE} is
+\code{bend = bend_angle}.}
+
+\item{bend_angle}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{bend} instead.}
 }
 \value{
 A character string containing LaTeX TikZ code. Depending on
@@ -70,9 +98,39 @@ edges. Supported features include:
 }
 }
 
-The generated TikZ code uses global style settings, and edges are connected
-to nodes by name (as opposed to hard-coded coordinates), making it easy to
-modify the output further if needed.
+The output starts with named styles (\code{var} for nodes, \code{link} for edges,
+\code{tier} and \verb{tier label} for tiers) for easy restyling, and edges are
+connected to nodes by name rather than coordinates.
+\subsection{Bent edges}{
+
+With a positive \code{bend} (or \code{default}), edges bend to the left when they
+point to the right and vice versa, so they bulge upwards; with
+\code{style = "classic"} they always bend to the right. A negative angle bends
+them the other way. Edges in both directions (\verb{A --> B} and \verb{B --> A}) are
+bent to opposite sides, by that angle, or if it is \code{0}, by \code{25} degrees
+(\code{10} for \code{style = "classic"}).
+
+Like \code{plot()}, edges that would pass through another node are bent around
+it. A bent edge that would pass through a node is bent the other way
+instead, or, if that also hits a node, by the angle closest to its bend
+that clears all nodes. Bent edges that leave a node in nearly the
+same direction are spread apart, by bending them the other way or more.
+Node sizes are estimated from the labels, so a bend may need a manual
+tweak.
+
+To draw edges exactly as requested, turn both adjustments off with
+\code{edge_style = list(route = FALSE)}, or for single edges with
+\code{edge_style$by_edge}. Edges given in a \code{bend} list are always drawn exactly
+as given.
+}
+
+\subsection{Classic style}{
+
+Adds a \verb{time axis} style, and the spacing is set by the \code{x} and \code{y} options
+of the \code{tikzpicture}. Tier labels go on the time axis: \code{"below"} (default)
+or \code{"above"} for column tiers, \code{"left"} (default) or \code{"right"} for row
+tiers.
+}
 }
 \examples{
 ################# Convert Knowledge to Tikz ################
@@ -97,7 +155,7 @@ cat(tikz_kn_snippet)
 tikz_bent <- make_tikz(
   kn,
   full_doc = FALSE,
-  bend_edges = TRUE
+  bend = 25
 )
 cat(tikz_bent)
 
@@ -124,6 +182,48 @@ tikz_tiered_kn <- make_tikz(
   full_doc = FALSE
 )
 cat(tikz_tiered_kn)
+
+# Classic style with LaTeX labels
+tikz_classic <- make_tikz(
+  kn_tiered,
+  style = "classic",
+  node_labels = c(child_x1 = "$X_1$", child_x2 = "$X_2$"),
+  tier_labels = c(child = "Childhood", old = "Old age"),
+  full_doc = FALSE
+)
+cat(tikz_classic)
+
+# Edges are bent around nodes in the way: here A --> C bends around B
+cg_line <- caugi::caugi(A \%-->\% B + C, B \%-->\% C)
+layout_line <- data.frame(name = c("A", "B", "C"), x = c(0, 1, 2), y = 0)
+tikz_routed <- make_tikz(
+  cg_line,
+  layout = layout_line,
+  style = "classic",
+  full_doc = FALSE
+)
+cat(tikz_routed)
+
+# Draw every edge exactly with the requested bend instead
+tikz_exact <- make_tikz(
+  cg_line,
+  layout = layout_line,
+  style = "classic",
+  edge_style = list(route = FALSE),
+  full_doc = FALSE
+)
+cat(tikz_exact)
+
+# Set the bend of single edges (positive = bend left, negative = bend right);
+# these are always drawn exactly as given
+tikz_bends <- make_tikz(
+  cg_line,
+  layout = layout_line,
+  style = "classic",
+  bend = list(A = list(B = 30, C = 0)),
+  full_doc = FALSE
+)
+cat(tikz_bends)
 
 
 ################# Convert Disco to Tikz ################
