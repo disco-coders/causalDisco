@@ -176,7 +176,11 @@ test_that("make_tikz still accepts the deprecated bend_edges and bend_angle", {
   lifecycle::expect_deprecated(
     tikz <- make_tikz(cg, layout = layout, full_doc = FALSE, bend_angle = 10)
   )
-  expect_true(grepl("(A) edge[link, bend left=10, -Latex] (B)", tikz, fixed = TRUE))
+  expect_true(grepl(
+    "(A) edge[link, bend left=10, -Latex] (B)",
+    tikz,
+    fixed = TRUE
+  ))
   expect_true(grepl("(C) edge[link, -Latex] (A)", tikz, fixed = TRUE))
 
   # bend_edges = TRUE is bend = bend_angle
@@ -206,7 +210,13 @@ test_that("make_tikz still accepts the deprecated bend_edges and bend_angle", {
   )
   expect_identical(
     tikz_classic,
-    make_tikz(cg, layout = layout, style = "classic", full_doc = FALSE, bend = 0)
+    make_tikz(
+      cg,
+      layout = layout,
+      style = "classic",
+      full_doc = FALSE,
+      bend = 0
+    )
   )
 
   expect_error(make_tikz(cg, bend = NA_real_), "single number or a named list")
@@ -230,7 +240,10 @@ test_that("a negative bend bends edges the other way, pairs still apart", {
     ifelse(grepl("left", b), sub("left", "right", b), sub("right", "left", b))
   }
 
-  expect_equal(edges(bend = 10), c("bend left=10", "bend left=10", "bend right=10"))
+  expect_equal(
+    edges(bend = 10),
+    c("bend left=10", "bend left=10", "bend right=10")
+  )
   expect_equal(edges(bend = -10), flip(edges(bend = 10)))
   expect_equal(edges(style = "classic", bend = -10), rep("bend left=10", 3))
 })
@@ -699,11 +712,12 @@ test_that("make_tikz draws edges in a bend list exactly as given", {
 test_that("a node called default can still be given a bend", {
   cg <- caugi::caugi(default %-->% B, B %-->% C)
   layout <- data.frame(name = c("default", "B", "C"), x = 0:2, y = c(0, 1, 0))
-  # default = 5 is the angle for all edges, default = list(...) is the node
+  # a number named default is the angle for all edges, a list named default is
+  # the node (setNames() as the name appears twice)
   tikz <- make_tikz(
     cg,
     layout = layout,
-    bend = list(default = 5, default = list(B = 30)),
+    bend = stats::setNames(list(5, list(B = 30)), c("default", "default")),
     full_doc = FALSE
   )
   expect_true(grepl(
@@ -711,7 +725,11 @@ test_that("a node called default can still be given a bend", {
     tikz,
     fixed = TRUE
   ))
-  expect_true(grepl("(B) edge[link, bend left=5, -Latex] (C)", tikz, fixed = TRUE))
+  expect_true(grepl(
+    "(B) edge[link, bend left=5, -Latex] (C)",
+    tikz,
+    fixed = TRUE
+  ))
 })
 
 test_that("make_tikz routes a long edge across tiers around a node", {

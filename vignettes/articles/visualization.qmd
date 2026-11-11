@@ -255,8 +255,8 @@ cat(tikz_knowledge_snippet)
 Setting `full_doc = TRUE` generates a complete standalone LaTeX document that
 can be compiled directly. Using `full_doc = FALSE` instead returns only the
 tikzpicture environment, which is convenient for inclusion inside an existing
-LaTeX document; load `\usetikzlibrary{arrows.meta, bending, backgrounds, fit, calc}`
-in its preamble.
+LaTeX document; load
+`\usetikzlibrary{arrows.meta, bending, backgrounds, fit, calc}` in its preamble.
 
 Restyle the figure by editing the named styles at the top of the output (`var`
 for nodes, `link` for edges). Use `node_labels` and `tier_labels` for LaTeX
@@ -329,8 +329,8 @@ cat(tikz_snippet)
 
 ### Classic Style
 
-`style = "classic"` gives a minimal look: plain-text nodes, gray tier bands,
-and a time axis. Here for a PAG from `tfci()`:
+`style = "classic"` gives a minimal look: plain-text nodes, gray tier bands, and
+a time axis. Here for a PAG from `tfci()`:
 
 ```{r}
 #| label: tikz-classic

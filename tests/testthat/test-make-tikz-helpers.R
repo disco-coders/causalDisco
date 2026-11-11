@@ -694,7 +694,10 @@ test_that("resolve_tikz_bend_by_edge matches edges in either direction", {
     fixed = TRUE
   )
   expect_error(resolve_tikz_bend_by_edge(c(A = 1), from, to), "named list")
-  expect_error(resolve_tikz_bend_by_edge(list(list(B = 1)), from, to), "named list")
+  expect_error(
+    resolve_tikz_bend_by_edge(list(list(B = 1)), from, to),
+    "named list"
+  )
 })
 
 test_that("tikz_bend_options keeps given and unrouted bends exactly", {

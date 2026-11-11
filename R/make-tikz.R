@@ -245,8 +245,6 @@ resolve_tikz_bend <- function(
 }
 
 
-
-
 #' @title Generate TikZ Code from a Caugi Plot
 #'
 #' @description
