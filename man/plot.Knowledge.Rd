@@ -4,7 +4,13 @@
 \alias{plot.Knowledge}
 \title{Plot a Knowledge Object}
 \usage{
-\method{plot}{Knowledge}(x, required_col = "blue", forbidden_col = "red", ...)
+\method{plot}{Knowledge}(
+  x,
+  required_col = "blue",
+  forbidden_col = "red",
+  equal_node_size = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{Knowledge} object, created using \code{\link[=knowledge]{knowledge()}}.}
@@ -12,6 +18,11 @@
 \item{required_col}{Character(1). Color for edges marked as "required". Default \code{"blue"}.}
 
 \item{forbidden_col}{Character(1). Color for edges marked as "forbidden". Default \code{"red"}.}
+
+\item{equal_node_size}{Logical(1). If \code{TRUE} (default), all nodes are drawn
+with the same size, namely the size needed for the longest label, so that
+variables with long names are not visually emphasized. If \code{FALSE}, each
+node is sized to fit its own label (the \code{\link[caugi:plot]{caugi::plot()}} default).}
 
 \item{...}{Additional arguments passed to \code{\link[caugi:plot]{caugi::plot()}}, e.g., \code{node_style}, \code{edge_style}.}
 }

@@ -118,6 +118,7 @@
 plot.Disco <- function(
   x,
   required_col = "blue",
+  equal_node_size = TRUE,
   ...
 ) {
   info_object <- combine_knowledge_and_caugi(x$caugi, x$knowledge)
@@ -146,7 +147,13 @@ plot.Disco <- function(
     }
   }
 
-  plot_caugi_common(cg, tiers, auto_edge_styles, ...)
+  plot_caugi_common(
+    cg,
+    tiers,
+    auto_edge_styles,
+    equal_node_size = equal_node_size,
+    ...
+  )
 }
 
 #' Plot a Knowledge Object
@@ -164,6 +171,10 @@ plot.Disco <- function(
 #' @param x A `Knowledge` object, created using [knowledge()].
 #' @param required_col Character(1). Color for edges marked as "required". Default `"blue"`.
 #' @param forbidden_col Character(1). Color for edges marked as "forbidden". Default `"red"`.
+#' @param equal_node_size Logical(1). If `TRUE` (default), all nodes are drawn
+#'   with the same size, namely the size needed for the longest label, so that
+#'   variables with long names are not visually emphasized. If `FALSE`, each
+#'   node is sized to fit its own label (the [caugi::plot()] default).
 #' @param ... Additional arguments passed to [caugi::plot()], e.g., `node_style`, `edge_style`.
 #'
 #' @return Invisibly returns the [caugi::caugi] object used for plotting. The main effect is the plot.
@@ -281,6 +292,7 @@ plot.Knowledge <- function(
   x,
   required_col = "blue",
   forbidden_col = "red",
+  equal_node_size = TRUE,
   ...
 ) {
   info_object <- knowledge_to_caugi(x)
@@ -327,7 +339,13 @@ plot.Knowledge <- function(
     }
   }
 
-  plot_caugi_common(cg, tiers, auto_edge_styles, ...)
+  plot_caugi_common(
+    cg,
+    tiers,
+    auto_edge_styles,
+    equal_node_size = equal_node_size,
+    ...
+  )
 }
 
 
@@ -336,6 +354,7 @@ plot.Knowledge <- function(
 #' @param tiers A list of character vectors representing the tiers for tiered plotting.
 #' @param auto_edge_styles A list specifying automatic edge styles to be applied.
 #' This is typically generated based on required/forbidden edges in knowledge.
+#' @param equal_node_size Logical(1). Whether to draw all nodes with the same size.
 #' @param ... Additional arguments passed to [caugi::plot()], such as `node_style` or `edge_style`.
 #' @keywords internal
 #' @noRd
@@ -343,9 +362,19 @@ plot_caugi_common <- function(
   cg,
   tiers,
   auto_edge_styles = list(by_edge = list()),
+  equal_node_size = TRUE,
   ...
 ) {
+  stopifnot(
+    is.logical(equal_node_size),
+    length(equal_node_size) == 1L,
+    !is.na(equal_node_size)
+  )
   dots <- list(...)
+
+  if (equal_node_size) {
+    dots$node_style <- equalize_node_padding(cg, dots$node_style %||% list())
+  }
 
   # Merge user-supplied edge_style
   user_edge_styles <- dots$edge_style
@@ -395,6 +424,69 @@ plot_caugi_common <- function(
   }
 
   do.call(plot, c(plot_args, dots))
+}
+
+#' Equalize Node Sizes via Per-Node Padding
+#'
+#' [caugi::plot()] draws each node as a circle with radius
+#' `(0.5 * stringWidth(label) + padding) * size`, so longer labels get larger
+#' nodes. This adds a per-node `padding` override (in `by_node`) so that every
+#' node gets the radius of the largest one.
+#'
+#' @param cg A [caugi::caugi] object.
+#' @param node_style The user-supplied `node_style` list (may be empty).
+#' @return The `node_style` list with `by_node` padding set for every node.
+#' @importFrom rlang %||%
+#' @keywords internal
+#' @noRd
+equalize_node_padding <- function(cg, node_style) {
+  labels <- caugi::nodes(cg)[["name"]]
+  if (length(labels) < 2L) {
+    return(node_style)
+  }
+
+  defaults <- caugi::caugi_options()$plot$node_style %||% list()
+  global <- utils::modifyList(
+    defaults,
+    node_style[setdiff(names(node_style), "by_node")]
+  )
+  by_node <- node_style$by_node %||% list()
+
+  # caugi evaluates stringWidth() in the node's own gpar context, so measure
+  # with the same font settings.
+  font_fields <- c("fontsize", "fontface", "fontfamily", "font", "cex")
+  widths_mm <- vapply(
+    labels,
+    function(lbl) {
+      style <- utils::modifyList(global, by_node[[lbl]] %||% list())
+      gp <- do.call(grid::gpar, style[intersect(names(style), font_fields)])
+      tg <- grid::textGrob(lbl, gp = gp)
+      grid::convertWidth(grid::grobWidth(tg), "mm", valueOnly = TRUE)
+    },
+    numeric(1)
+  )
+  paddings <- vapply(
+    labels,
+    function(lbl) {
+      p <- by_node[[lbl]]$padding %||% global$padding %||% 2
+      as.numeric(p)
+    },
+    numeric(1)
+  )
+
+  half_extent <- 0.5 * widths_mm + paddings
+  target <- max(half_extent)
+  new_padding <- target - 0.5 * widths_mm
+
+  for (i in seq_along(labels)) {
+    lbl <- labels[i]
+    by_node[[lbl]] <- utils::modifyList(
+      by_node[[lbl]] %||% list(),
+      list(padding = new_padding[[i]])
+    )
+  }
+  node_style$by_node <- by_node
+  node_style
 }
 
 #' Plot Method for causalDisco Objects

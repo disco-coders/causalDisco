@@ -341,3 +341,46 @@ test_that("Plotting tiered knowledge with custom layout", {
   plot(kn, layout = "kamada-kawai")
   expect_true(TRUE)
 })
+
+test_that("equalize_node_padding gives all nodes the same radius", {
+  cg <- caugi::caugi(A %-->% LongVariableName, LongVariableName %-->% C)
+  ns <- equalize_node_padding(cg, list(padding = 3))
+
+  labels <- c("A", "LongVariableName", "C")
+  widths <- vapply(
+    labels,
+    function(lbl) {
+      grid::convertWidth(grid::stringWidth(lbl), "mm", valueOnly = TRUE)
+    },
+    numeric(1)
+  )
+  pads <- vapply(labels, function(lbl) ns$by_node[[lbl]]$padding, numeric(1))
+  radii <- 0.5 * widths + pads
+
+  expect_equal(unname(radii), rep(max(radii), 3))
+  expect_equal(ns$by_node$LongVariableName$padding, 3)
+  expect_true(ns$by_node$A$padding > 3)
+})
+
+test_that("equalize_node_padding keeps user by_node styles", {
+  cg <- caugi::caugi(A %-->% LongVariableName)
+  ns <- equalize_node_padding(
+    cg,
+    list(by_node = list(A = list(fill = "red")))
+  )
+  expect_identical(ns$by_node$A$fill, "red")
+  expect_true(is.numeric(ns$by_node$A$padding))
+})
+
+test_that("equal_node_size argument works for Knowledge and Disco plots", {
+  data(tpc_example)
+  kn <- knowledge(tpc_example, child_x1 %-->% youth_x3)
+  expect_no_error(plot(kn, equal_node_size = FALSE))
+  expect_no_error(plot(kn, equal_node_size = TRUE))
+  expect_error(plot(kn, equal_node_size = NA))
+
+  cg <- caugi::caugi(A1 %-->% LongName, class = "PDAG")
+  kcg <- as_disco(cg, knowledge())
+  expect_no_error(plot(kcg))
+  expect_no_error(plot(kcg, equal_node_size = FALSE))
+})
