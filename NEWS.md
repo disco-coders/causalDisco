@@ -22,12 +22,23 @@
 
 - `tpc_run()` now supports `orientation_method = "standard"` and `"maj_rule"`.
 
+- `make_tikz()` gains:
+  - `style = "classic"`: plain-text nodes, gray tier bands, and a time axis.
+  - `node_labels` and `tier_labels` for LaTeX labels, e.g. `c(X1 = "$X_1$")`.
+  - Edges that would pass through another node are bent around it, as in
+    `plot()`, and bent edges leaving a node together are spread apart.
+  - The output defines named styles (`var`, `link`, `tier`, `tier label`)
+    instead of `every node`/`every path`, which also styled the tiers.
+
 ## Lifecycle changes
 
 - `orientation_method = "maj.rule"` in `tpc_run()` and `tfci_run()` is
   deprecated in favour of `"maj_rule"`.
 
 ## Bug fixes
+
+- `make_tikz()` now draws PAG edge marks (`o->`, `o-o`, `--o`) instead of
+  warning.
 
 - `install_tetrad(version = )` now saves a non-default Tetrad version in its own
   cache directory instead of the default version's, and Java loads only the JAR

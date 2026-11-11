@@ -128,15 +128,24 @@ latex_escape <- function(x) {
 #' @title Build TikZ Node Lines
 #'
 #' @param nodes A list of node objects with `name`, `x`, `y`, `style`, and `label`.
-#' @param global_node_fill Global fill color for nodes.
-#' @param global_node_draw Global draw color for nodes.
+#' @param global_node_fill Global fill color for nodes (part of the `var` style).
+#' @param global_node_draw Global draw color for nodes (part of the `var` style).
+#' @param labels Optional named character vector of LaTeX node labels, keyed by
+#'   node name. If `NULL`, the escaped node label is used.
 #'
-#' @returns A character vector of TikZ node lines.
+#' @returns A character vector of TikZ node lines. Each node uses the `var`
+#'   style, followed by any fill/draw colors that differ from the global ones
+#'   and any other styles.
 #' @keywords internal
 #' @noRd
-build_node_lines <- function(nodes, global_node_fill, global_node_draw) {
+build_node_lines <- function(
+  nodes,
+  global_node_fill,
+  global_node_draw,
+  labels = NULL
+) {
   unlist(lapply(nodes, function(n) {
-    style_list <- c("circle")
+    style_list <- "var"
     for (sty_name in names(n$style)) {
       if (sty_name %in% c("fill", "draw")) {
         global_val <- if (sty_name == "fill") {
@@ -144,14 +153,9 @@ build_node_lines <- function(nodes, global_node_fill, global_node_draw) {
         } else {
           global_node_draw
         }
-        if (
-          !is.null(n$style[[sty_name]]) &&
-            n$style[[sty_name]]$tikz != global_val
-        ) {
-          style_list <- c(
-            style_list,
-            paste0(sty_name, "=", n$style[[sty_name]]$tikz)
-          )
+        val <- n$style[[sty_name]]$tikz
+        if (!is.null(val) && !identical(val, global_val)) {
+          style_list <- c(style_list, paste0(sty_name, "=", val))
         }
       } else {
         style_list <- c(
@@ -160,16 +164,13 @@ build_node_lines <- function(nodes, global_node_fill, global_node_draw) {
         )
       }
     }
-    if (!"draw" %in% names(n$style) && is.null(global_node_draw)) {
-      style_list <- c("draw", style_list)
-    }
     sprintf(
       "\\node[%s] (%s) at (%s,%s) {%s};",
       paste(style_list, collapse = ", "),
       n$name,
       format_coord(n$x),
       format_coord(n$y),
-      latex_escape(n$label)
+      if (is.null(labels)) latex_escape(n$label) else labels[[n$name]]
     )
   }))
 }
@@ -197,52 +198,56 @@ get_anchor_and_offset <- function(pos, offset = 0.2) {
 }
 
 
-#' @title Build TikZ Global Style Settings
+#' @title Build the Named TikZ Styles of the Default Style
 #'
-#' @param global_node_fill Global fill color for nodes.
-#' @param global_node_draw Global draw color for nodes.
-#' @param global_edge_color Global color for edges.
+#' @description
+#' Defines `var` (nodes), `link` (edges) and, with tiers, `tier` and
+#' `tier label`, so the figure can be restyled in one place.
 #'
-#' @returns A character string with TikZ global style settings.
+#' @param global_node_fill Global fill color for nodes, or `NULL`.
+#' @param global_node_draw Global draw color for nodes, or `NULL`.
+#' @param global_edge_color Global color for edges, or `NULL`.
+#' @param arrow_scale Scale of the arrow tips.
+#' @param tiers Logical; whether to define the tier styles.
+#'
+#' @returns A character string with a `\tikzset{...}` block.
 #' @keywords internal
 #' @noRd
-build_tikz_globals <- function(
+build_tikz_styles <- function(
   global_node_fill,
   global_node_draw,
-  global_edge_color
+  global_edge_color,
+  arrow_scale = 1,
+  tiers = FALSE
 ) {
-  tikz_global <- c()
-  if (!is.null(global_node_fill)) {
-    tikz_global <- c(
-      tikz_global,
-      paste0("every node/.style={fill=", global_node_fill, "}")
-    )
-  }
-  if (!is.null(global_node_draw)) {
-    if (length(tikz_global) > 0) {
-      tikz_global[length(tikz_global)] <- sub(
-        "\\}$",
-        paste0(", draw=", global_node_draw, "}"),
-        tikz_global[length(tikz_global)]
-      )
+  opts <- function(...) paste(c(...), collapse = ", ")
+  var <- opts(
+    if (is.null(global_node_draw)) {
+      "draw"
     } else {
-      tikz_global <- c(
-        tikz_global,
-        paste0("every node/.style={draw=", global_node_draw, "}")
+      paste0("draw=", global_node_draw)
+    },
+    "circle",
+    if (!is.null(global_node_fill)) paste0("fill=", global_node_fill)
+  )
+  link <- opts(
+    if (!is.null(global_edge_color)) paste0("draw=", global_edge_color),
+    if (arrow_scale != 1) paste0("arrows={[scale=", arrow_scale, "]}")
+  )
+  styles <- c(
+    sprintf("  var/.style={%s}", var),
+    sprintf("  link/.style={%s}", link),
+    if (tiers) {
+      c(
+        "  tier/.style={draw, rectangle, fill=blue!20, rounded corners, inner sep=0.5cm}",
+        "  tier label/.style={}"
       )
     }
-  }
-  if (!is.null(global_edge_color)) {
-    tikz_global <- c(
-      tikz_global,
-      paste0("every path/.style={draw=", global_edge_color, "}")
-    )
-  }
-  if (length(tikz_global) > 0) {
-    paste0("\\tikzset{", paste(tikz_global, collapse = ", "), "}")
-  } else {
-    ""
-  }
+  )
+  paste(
+    c("\\tikzset{", paste(styles, collapse = ",\n"), "}"),
+    collapse = "\n"
+  )
 }
 
 #' @title Extract TikZ Edge Lines
@@ -253,12 +258,13 @@ build_tikz_globals <- function(
 #' @param bend_edges Logical. If `TRUE`, edges are drawn with bent arrows.
 #' @param bend_angle Numeric scalar. Angle in degrees for bending arrows.
 #' @param global_edge_color Global color for edges.
+#' @param route_options Optional character vector, one per edge, of routed
+#'   bend options (e.g. `"bend left=23"`) or `NA`. A routed bend replaces the
+#'   bend from `bend_edges`.
 #'
 #' @returns A list with two elements:
-#' * `edge_lines`: A character vector of TikZ edge lines.
+#' * `edge_lines`: TikZ edge lines, each starting with the `link` style.
 #' * `global_arrow_length`: The global arrow length used.
-#' * `col`: The color used for edges.
-#' * `
 #' @keywords internal
 #' @noRd
 extract_edges <- function(
@@ -267,7 +273,8 @@ extract_edges <- function(
   scale,
   bend_edges,
   bend_angle,
-  global_edge_color
+  global_edge_color,
+  route_options = NULL
 ) {
   # ---- Determine global arrow scale (numeric, unit-safe) ----
   edge_lengths <- sapply(edge_grob_children, function(e) {
@@ -289,7 +296,10 @@ extract_edges <- function(
   }
 
   # ---- Build edges ----
-  edge_lines <- sapply(edge_grob_children, function(edge) {
+  edge_lines <- sapply(seq_along(edge_grob_children), function(i) {
+    edge <- edge_grob_children[[i]]
+    route_option <- if (is.null(route_options)) NA else route_options[i]
+
     # Resolve from/to nodes
     from_node <- nodes[[which(sapply(nodes, function(n) {
       n$x == as.numeric(edge$x0) * scale &&
@@ -301,12 +311,14 @@ extract_edges <- function(
         n$y == as.numeric(edge$y1) * scale
     }))]]$label
 
-    style <- c()
+    style <- "link"
 
     # ---- Color ----
     if (!is.null(edge$gp$col) && length(edge$gp$col) > 0) {
       col_tikz <- rcolor_to_tikz(edge$gp$col)
-      if (!is.null(col_tikz$tikz) && col_tikz$tikz != global_edge_color) {
+      if (
+        !is.null(col_tikz$tikz) && !identical(col_tikz$tikz, global_edge_color)
+      ) {
         style <- c(style, paste0("draw=", col_tikz$tikz))
       }
     }
@@ -325,7 +337,9 @@ extract_edges <- function(
     }
 
     # ---- Bend arrows ----
-    if (bend_edges) {
+    if (!is.na(route_option)) {
+      style <- c(style, route_option)
+    } else if (bend_edges) {
       from_x <- nodes[[which(sapply(nodes, function(n) {
         n$label == from_node
       }))]]$x
@@ -335,27 +349,12 @@ extract_edges <- function(
     }
 
     # ---- Edge type -> TikZ arrow spec ----
-    arrow_spec <- switch(
-      edge$edge_type,
-      "-->" = "-Latex",
-      "---" = "-",
-      "<->" = "{Latex}-{Latex}",
-      {
-        warning(paste(
-          "Unknown edge type:",
-          edge$edge_type,
-          "- using '-Latex' as fallback."
-        ))
-        "-Latex"
-      }
-    )
+    arrow_spec <- tikz_edge_arrow(edge$edge_type, style = "default")
 
-    style_str <- paste(style, collapse = ", ")
     sprintf(
-      "(%s) edge[%s, %s] (%s)",
+      "(%s) edge[%s] (%s)",
       from_node,
-      style_str,
-      arrow_spec,
+      paste(c(style, arrow_spec), collapse = ", "),
       to_node
     )
   })
@@ -364,6 +363,92 @@ extract_edges <- function(
     edge_lines = edge_lines,
     global_arrow_length = global_arrow_length
   )
+}
+
+#' @title Map a Caugi Edge Type to a TikZ Arrow Specification
+#'
+#' @param edge_type A caugi edge type, e.g. `"-->"`, `"o->"`.
+#' @param style `"default"` uses explicit `Latex` and `Circle[open]` tips;
+#'   `"classic"` uses the `>` and `o` tips defined in the classic preamble.
+#' @returns A TikZ arrow specification string. Unknown edge types fall back to
+#'   a directed arrow with a warning.
+#' @keywords internal
+#' @noRd
+tikz_edge_arrow <- function(edge_type, style = c("default", "classic")) {
+  style <- match.arg(style)
+  specs <- if (style == "default") {
+    c(
+      "-->" = "-Latex",
+      "---" = "-",
+      "<->" = "{Latex}-{Latex}",
+      "o-o" = "{Circle[open]}-{Circle[open]}",
+      "o->" = "{Circle[open]}-Latex",
+      "--o" = "-{Circle[open]}"
+    )
+  } else {
+    c(
+      "-->" = "->",
+      "---" = "-",
+      "<->" = "<->",
+      "o-o" = "o-o",
+      "o->" = "o->",
+      "--o" = "-o"
+    )
+  }
+  if (!is.null(edge_type) && edge_type %in% names(specs)) {
+    return(unname(specs[edge_type]))
+  }
+  warning(paste(
+    "Unknown edge type:",
+    edge_type,
+    "- using",
+    sprintf("'%s'", specs[["-->"]]),
+    "as fallback."
+  ))
+  unname(specs[["-->"]])
+}
+
+#' @title Resolve User-Supplied TikZ Labels
+#'
+#' @param labels `NULL`, or a named character vector (or named list of
+#'   strings) mapping keys to LaTeX labels. Labels are used verbatim.
+#' @param keys Character vector of valid keys (node or tier names).
+#' @param arg Argument name, used in error messages.
+#' @returns A named character vector with one label per key. Keys without a
+#'   user-supplied label get their LaTeX-escaped name.
+#' @keywords internal
+#' @noRd
+resolve_tikz_labels <- function(labels, keys, arg) {
+  out <- stats::setNames(latex_escape(keys), keys)
+  if (is.null(labels)) {
+    return(out)
+  }
+  if (is.list(labels)) {
+    labels <- unlist(labels)
+  }
+  if (
+    !is.character(labels) ||
+      is.null(names(labels)) ||
+      any(names(labels) == "")
+  ) {
+    stop(
+      sprintf("`%s` must be a named character vector.", arg),
+      call. = FALSE
+    )
+  }
+  unknown <- setdiff(names(labels), keys)
+  if (length(unknown) > 0) {
+    stop(
+      sprintf(
+        "`%s` contains names that are not in the graph: %s",
+        arg,
+        paste(unknown, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+  out[names(labels)] <- labels
+  out
 }
 
 #' @title Format Coordinate for TikZ
@@ -375,6 +460,6 @@ extract_edges <- function(
 #' @keywords internal
 #' @noRd
 format_coord <- function(x) {
-  out <- sprintf("%.3f", x)
+  out <- sprintf("%.3f", x + 0) # + 0 turns -0 into 0
   sub("\\.?0+$", "", out)
 }

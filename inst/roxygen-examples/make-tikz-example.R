@@ -48,6 +48,16 @@ tikz_tiered_kn <- make_tikz(
 )
 cat(tikz_tiered_kn)
 
+# Classic style with LaTeX labels
+tikz_classic <- make_tikz(
+  kn_tiered,
+  style = "classic",
+  node_labels = c(child_x1 = "$X_1$", child_x2 = "$X_2$"),
+  tier_labels = c(child = "Childhood", old = "Old age"),
+  full_doc = FALSE
+)
+cat(tikz_classic)
+
 
 ################# Convert Disco to Tikz ################
 

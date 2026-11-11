@@ -255,14 +255,15 @@ cat(tikz_knowledge_snippet)
 Setting `full_doc = TRUE` generates a complete standalone LaTeX document that
 can be compiled directly. Using `full_doc = FALSE` instead returns only the
 tikzpicture environment, which is convenient for inclusion inside an existing
-LaTeX document.
+LaTeX document; load `\usetikzlibrary{arrows.meta, bending, backgrounds, fit, calc}`
+in its preamble.
 
-The TikZ export also supports edge bending, which can substantially improve
-readability when edges pass through other nodes, as can easily happen in tiered
-knowledge structures. This feature is not available in the standard
-`caugi::plot()` function. Here is an example, where the edge using the standard
-straight style edge overlaps the node `youth_x3`, while the bent edge avoids
-this overlap:
+Restyle the figure by editing the named styles at the top of the output (`var`
+for nodes, `link` for edges). Use `node_labels` and `tier_labels` for LaTeX
+labels, e.g. `node_labels = c(X1 = "$X_1$")`.
+
+Like `plot()`, edges that would pass through another node are bent around it.
+Here `child_x1 --> oldage_x5` bends around `youth_x3`:
 
 ```{r}
 #| label: tikz-bend-edges
@@ -280,17 +281,11 @@ kn_tiered <- knowledge(
 
 plot(kn_tiered)
 
-tikz_bent_tiered <- make_tikz(
-  kn_tiered,
-  scale = 10,
-  full_doc = FALSE,
-  bend_edges = TRUE,
-  bend_angle = 20
-)
-cat(tikz_bent_tiered)
+tikz_tiered <- make_tikz(kn_tiered, scale = 10, full_doc = FALSE)
+cat(tikz_tiered)
 ```
 
-The TikZ plot can be seen here:
+Use `edge_style = list(route = FALSE)` to turn this off. The TikZ plot:
 
 ```{r}
 #| label: tikz-tier-plot
@@ -330,6 +325,45 @@ tikz_snippet <- make_tikz(
   full_doc = FALSE
 )
 cat(tikz_snippet)
+```
+
+### Classic Style
+
+`style = "classic"` gives a minimal look: plain-text nodes, gray tier bands,
+and a time axis. Here for a PAG from `tfci()`:
+
+```{r}
+#| label: tikz-classic
+
+cd_tfci <- tfci(engine = "causalDisco", test = "fisher_z", alpha = 0.05)
+disco_cd_tfci <- disco(
+  data = tpc_example,
+  method = cd_tfci,
+  knowledge = kn_tiered
+)
+
+tikz_classic <- make_tikz(
+  disco_cd_tfci,
+  style = "classic",
+  node_labels = c(
+    child_x1 = "$X_1$",
+    child_x2 = "$X_2$",
+    youth_x3 = "$X_3$",
+    youth_x4 = "$X_4$",
+    oldage_x5 = "$X_5$",
+    oldage_x6 = "$X_6$"
+  ),
+  tier_labels = c(child = "Childhood", youth = "Youth", old = "Old age"),
+  full_doc = FALSE
+)
+cat(tikz_classic)
+```
+
+```{r}
+#| label: tikz-classic-plot
+#| echo: false
+
+knitr::include_graphics("tikz-classic-plot.png")
 ```
 
 ### Exporting Caugi Objects to TikZ

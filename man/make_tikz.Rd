@@ -7,11 +7,14 @@
 make_tikz(
   x,
   ...,
+  style = c("default", "classic"),
   scale = 10,
   full_doc = TRUE,
   bend_edges = FALSE,
   bend_angle = 25,
-  tier_label_pos = c("above", "below", "left", "right")
+  tier_label_pos = c("above", "below", "left", "right"),
+  node_labels = NULL,
+  tier_labels = NULL
 )
 }
 \arguments{
@@ -19,22 +22,30 @@ make_tikz(
 
 \item{...}{Additional arguments passed to \code{\link[=plot]{plot()}} and \code{\link[caugi:plot]{caugi::plot()}}.}
 
+\item{style}{\code{"default"} mirrors \code{plot()}. \code{"classic"} is a minimal look
+with plain-text nodes, gray tier bands, and a time axis. See Details.}
+
 \item{scale}{Numeric scalar. Scaling factor for node coordinates. Default is \code{10}.}
 
 \item{full_doc}{Logical. If \code{TRUE} (default), generates a full standalone
-LaTeX document. If \code{FALSE}, returns only the \code{tikzpicture} environment.}
+LaTeX document. If \code{FALSE}, returns only the \code{tikzpicture} environment;
+load \verb{\\usetikzlibrary\{arrows.meta, bending, backgrounds, fit, calc\}} in
+your preamble.}
 
-\item{bend_edges}{Logical. If \code{TRUE}, edges are drawn with bent edges. Default is \code{FALSE}.
-Edges connecting the same pair of nodes in both directions (\code{A \%-->\% B} and \code{B \%-->\% A})
-are automatically bent left and right to avoid overlap. Bend direction is automatically chosen
-to reduce overlap.}
+\item{bend_edges}{Logical. If \code{TRUE}, all edges are bent by \code{bend_angle}.
+Default is \code{FALSE} (\code{TRUE} for \code{style = "classic"}). Edges through other
+nodes and edges in both directions are always bent.}
 
 \item{bend_angle}{Numeric scalar. Angle in degrees for bending arrows when
-\code{bend_edges = TRUE}. Default is \code{25}.}
+\code{bend_edges = TRUE}. Default is \code{25} (\code{10} for \code{style = "classic"}).}
 
 \item{tier_label_pos}{Character string specifying the position of tier labels
 relative to the tier rectangles. Must be one of \code{"above"}, \code{"below"}, \code{"left"}, or \code{"right"}.
-Default is \code{"above"}.}
+Default is \code{"above"}. For \code{style = "classic"}, see Details.}
+
+\item{node_labels, tier_labels}{Optional named character vectors of LaTeX
+labels for nodes or tiers, e.g. \code{c(child_x1 = "$X_1$")}. Unlabelled nodes
+and tiers use their name.}
 }
 \value{
 A character string containing LaTeX TikZ code. Depending on
@@ -70,9 +81,21 @@ edges. Supported features include:
 }
 }
 
-The generated TikZ code uses global style settings, and edges are connected
-to nodes by name (as opposed to hard-coded coordinates), making it easy to
-modify the output further if needed.
+The output starts with named styles (\code{var} for nodes, \code{link} for edges,
+\code{tier} and \verb{tier label} for tiers) for easy restyling, and edges are
+connected to nodes by name rather than coordinates.
+
+Like \code{plot()}, edges that would pass through another node are bent around
+it. Node sizes are estimated from the labels, so the bend may need a manual
+tweak. Use \code{edge_style = list(route = FALSE)} to turn this off. Bent edges
+that leave a node in nearly the same direction are spread apart.
+\subsection{Classic style}{
+
+Adds a \verb{time axis} style, and the spacing is set by the \code{x} and \code{y} options
+of the \code{tikzpicture}. Tier labels go on the time axis: \code{"below"} (default)
+or \code{"above"} for column tiers, \code{"left"} (default) or \code{"right"} for row
+tiers.
+}
 }
 \examples{
 ################# Convert Knowledge to Tikz ################
@@ -124,6 +147,16 @@ tikz_tiered_kn <- make_tikz(
   full_doc = FALSE
 )
 cat(tikz_tiered_kn)
+
+# Classic style with LaTeX labels
+tikz_classic <- make_tikz(
+  kn_tiered,
+  style = "classic",
+  node_labels = c(child_x1 = "$X_1$", child_x2 = "$X_2$"),
+  tier_labels = c(child = "Childhood", old = "Old age"),
+  full_doc = FALSE
+)
+cat(tikz_classic)
 
 
 ################# Convert Disco to Tikz ################

@@ -220,6 +220,7 @@ test_that("build_node_lines adds style attributes correctly", {
   # Node 2: fill same as global, no draw, no other style
   expect_false(grepl("fill=", lines[2]))
   expect_false(grepl("draw=", lines[2]))
+  expect_true(startsWith(lines[2], "\\node[var] (node2)"))
 })
 
 test_that("build_node_lines handles custom styles besides fill/draw", {
@@ -311,47 +312,39 @@ test_that("get_anchor_and_offset errors for invalid position", {
 })
 
 
-############ build_tikz_globals Tests #########
+############ build_tikz_styles Tests #########
 
-test_that("build_tikz_globals returns empty string if no globals", {
-  expect_equal(build_tikz_globals(NULL, NULL, NULL), "")
-})
-
-test_that("build_tikz_globals sets only node fill", {
-  res <- build_tikz_globals("red", NULL, NULL)
-  expect_equal(res, "\\tikzset{every node/.style={fill=red}}")
-})
-
-test_that("build_tikz_globals sets only node draw", {
-  res <- build_tikz_globals(NULL, "blue", NULL)
-  expect_equal(res, "\\tikzset{every node/.style={draw=blue}}")
-})
-
-test_that("build_tikz_globals sets only edge color", {
-  res <- build_tikz_globals(NULL, NULL, "green")
-  expect_equal(res, "\\tikzset{every path/.style={draw=green}}")
-})
-
-test_that("build_tikz_globals combines node fill and draw correctly", {
-  res <- build_tikz_globals("red", "blue", NULL)
-  # draw should append to fill inside the same node style
-  expect_equal(res, "\\tikzset{every node/.style={fill=red, draw=blue}}")
-})
-
-test_that("build_tikz_globals combines node and edge settings", {
-  res <- build_tikz_globals("red", "blue", "green")
+test_that("build_tikz_styles defines var and link with no global colors", {
   expect_equal(
-    res,
-    "\\tikzset{every node/.style={fill=red, draw=blue}, every path/.style={draw=green}}"
+    build_tikz_styles(NULL, NULL, NULL),
+    "\\tikzset{\n  var/.style={draw, circle},\n  link/.style={}\n}"
   )
 })
 
-test_that("build_tikz_globals combines draw with edge when fill is NULL", {
-  res <- build_tikz_globals(NULL, "blue", "green")
-  expect_equal(
+test_that("build_tikz_styles puts global colors and arrow scale in the styles", {
+  res <- build_tikz_styles("red", "blue", "green", arrow_scale = 3)
+  expect_true(grepl(
+    "var/.style={draw=blue, circle, fill=red}",
     res,
-    "\\tikzset{every node/.style={draw=blue}, every path/.style={draw=green}}"
-  )
+    fixed = TRUE
+  ))
+  expect_true(grepl(
+    "link/.style={draw=green, arrows={[scale=3]}}",
+    res,
+    fixed = TRUE
+  ))
+  expect_false(grepl("tier", res, fixed = TRUE))
+})
+
+test_that("build_tikz_styles adds tier styles only when there are tiers", {
+  res <- build_tikz_styles("red", NULL, NULL, tiers = TRUE)
+  expect_true(grepl("var/.style={draw, circle, fill=red}", res, fixed = TRUE))
+  expect_true(grepl(
+    "tier/.style={draw, rectangle, fill=blue!20, rounded corners, inner sep=0.5cm}",
+    res,
+    fixed = TRUE
+  ))
+  expect_true(grepl("tier label/.style={}", res, fixed = TRUE))
 })
 
 
@@ -433,8 +426,9 @@ test_that("extract_edges generates correct edge line with styles", {
   )
   line <- res$edge_lines[1]
 
-  # Should contain from/to labels
+  # Should contain from/to labels and start with the link style
   expect_true(grepl("\\(A\\).*\\(B\\)", line))
+  expect_true(startsWith(line, "(A) edge[link, "))
 
   # Should contain draw=red and line width
   expect_true(grepl("draw=red", line))
@@ -534,4 +528,185 @@ test_that("format_coord formats coordinates correctly", {
   expect_equal(format_coord(1.11), "1.11")
   expect_equal(format_coord(1.111), "1.111")
   expect_equal(format_coord(1.1111), "1.111")
+})
+
+########### tikz_edge_arrow / resolve_tikz_labels / format_coord #########
+
+test_that("tikz_edge_arrow maps every caugi edge type in both styles", {
+  types <- c("-->", "---", "<->", "o-o", "o->", "--o")
+  expect_equal(
+    vapply(
+      types,
+      tikz_edge_arrow,
+      character(1),
+      style = "classic",
+      USE.NAMES = FALSE
+    ),
+    c("->", "-", "<->", "o-o", "o->", "-o")
+  )
+  expect_equal(
+    vapply(
+      types,
+      tikz_edge_arrow,
+      character(1),
+      style = "default",
+      USE.NAMES = FALSE
+    ),
+    c(
+      "-Latex",
+      "-",
+      "{Latex}-{Latex}",
+      "{Circle[open]}-{Circle[open]}",
+      "{Circle[open]}-Latex",
+      "-{Circle[open]}"
+    )
+  )
+  expect_warning(
+    res <- tikz_edge_arrow("???", style = "classic"),
+    "Unknown edge type"
+  )
+  expect_equal(res, "->")
+})
+
+test_that("resolve_tikz_labels escapes defaults and keeps user labels verbatim", {
+  res <- resolve_tikz_labels(c(a_1 = "$a_1$"), c("a_1", "b_1"), "node_labels")
+  expect_equal(res, c(a_1 = "$a_1$", b_1 = "b\\_1"))
+  expect_equal(resolve_tikz_labels(NULL, "x", "node_labels"), c(x = "x"))
+})
+
+test_that("format_coord never returns negative zero", {
+  expect_equal(format_coord(-0), "0")
+  expect_equal(format_coord(c(-0.15, 2, 1.5)), c("-0.15", "2", "1.5"))
+})
+
+########### Edge routing helpers #########
+
+test_that("tikz_route_one bends away from a node in the way", {
+  # obstacle just above the line -> bend right (below), and vice versa
+  above <- tikz_route_one(
+    0,
+    0,
+    4,
+    0,
+    data.frame(x = 2, y = 0.05, hw = 0.3, hh = 0.2)
+  )
+  below <- tikz_route_one(
+    0,
+    0,
+    4,
+    0,
+    data.frame(x = 2, y = -0.05, hw = 0.3, hh = 0.2)
+  )
+  expect_equal(above$dir, "bend right")
+  expect_equal(below$dir, "bend left")
+  expect_equal(above$angle, below$angle)
+  expect_gt(above$angle, 0)
+
+  # obstacle far away, no obstacles, or a zero-length edge -> no bend
+  far <- data.frame(x = 2, y = 3, hw = 0.3, hh = 0.2)
+  expect_null(tikz_route_one(0, 0, 4, 0, far))
+  expect_null(tikz_route_one(0, 0, 4, 0, far[0, ]))
+  expect_null(tikz_route_one(1, 1, 1, 1, far))
+})
+
+test_that("tikz_route_one uses the largest angle when nothing clears", {
+  # an obstacle covering the whole area cannot be avoided
+  huge <- data.frame(x = 2, y = 0, hw = 50, hh = 50)
+  res <- tikz_route_one(0, 0, 4, 0, huge, max_angle = 20)
+  expect_true(res$dir %in% c("bend left", "bend right"))
+  expect_equal(res$angle, 20)
+})
+
+test_that("tikz_route_options skips unrouted and bidirected edges", {
+  nodes <- data.frame(
+    name = c("A", "B", "C"),
+    x = c(0, 2, 4),
+    y = 0,
+    hw = 0.3,
+    hh = 0.2
+  )
+  edges <- data.frame(
+    from = c("A", "A", "C", "A"),
+    to = c("C", "B", "A", "C"),
+    route = c(TRUE, TRUE, TRUE, FALSE)
+  )
+  # rows 1 and 3 form a bidirected pair, row 4 has routing turned off
+  res <- tikz_route_options(edges, nodes, bend_edges = FALSE, bend_angle = 10)
+  expect_equal(res, rep(NA_character_, 4))
+
+  edges <- data.frame(from = c("A", "A"), to = c("C", "B"), route = TRUE)
+  res <- tikz_route_options(edges, nodes, bend_edges = FALSE, bend_angle = 10)
+  expect_match(res[1], "^bend (left|right)=[0-9]+$")
+  expect_true(is.na(res[2]))
+
+  # with bend_edges = TRUE the routed angle is at least bend_angle
+  res_bent <- tikz_route_options(
+    edges,
+    nodes,
+    bend_edges = TRUE,
+    bend_angle = 45
+  )
+  expect_match(res_bent[1], "^bend (left|right)=45$")
+
+  expect_equal(
+    tikz_route_options(edges[0, ], nodes, bend_edges = FALSE, bend_angle = 10),
+    character(0)
+  )
+})
+
+test_that("tikz_node_extent ignores LaTeX markup when sizing labels", {
+  ext <- tikz_node_extent(c("$X_1$", "X1", "child\\_x1"), shape = "text")
+  expect_equal(ext$hw[1], ext$hw[2])
+  expect_gt(ext$hw[3], ext$hw[1])
+  expect_true(all(ext$hh == ext$hh[1]))
+
+  circ <- tikz_node_extent("X1", shape = "circle")
+  expect_equal(circ$hw, circ$hh)
+})
+
+test_that("tikz_bidirected finds edges drawn in both directions", {
+  expect_equal(
+    tikz_bidirected(c("A", "B", "A"), c("B", "A", "C")),
+    c(TRUE, TRUE, FALSE)
+  )
+})
+
+test_that("tikz_option_angle and tikz_angle_option convert both ways", {
+  opts <- c("bend left=10", "bend right=25", NA)
+  expect_equal(tikz_option_angle(opts), c(10, -25, 0))
+  expect_equal(tikz_angle_option(c(10, -25, 0)), opts)
+})
+
+test_that("tikz_fan_out spreads edge ends that leave a node together", {
+  # B and C are almost in the same direction from A
+  nodes <- data.frame(
+    name = c("A", "B", "C"),
+    x = c(0, 4, 4),
+    y = c(0, 0, 0.5),
+    hw = 0.2,
+    hh = 0.2
+  )
+  edges <- data.frame(from = c("A", "A"), to = c("B", "C"))
+  start <- function(opts) {
+    base <- atan2(nodes$y[2:3], nodes$x[2:3]) * 180 / pi
+    base + tikz_option_angle(opts)
+  }
+  opts <- rep("bend right=10", 2)
+  expect_lt(abs(diff(start(opts))), 30)
+
+  res <- tikz_fan_out(edges, nodes, opts, fixed = c(FALSE, FALSE))
+  expect_false(identical(res, opts))
+  expect_gte(abs(diff(start(res))), 30)
+
+  # fixed and straight edges are never changed
+  expect_equal(tikz_fan_out(edges, nodes, opts, fixed = c(TRUE, TRUE)), opts)
+  straight <- c(NA_character_, NA_character_)
+  expect_equal(
+    tikz_fan_out(edges, nodes, straight, fixed = c(FALSE, FALSE)),
+    straight
+  )
+
+  # well separated ends are left alone
+  nodes$y[3] <- 4
+  expect_equal(tikz_fan_out(edges, nodes, opts, fixed = c(FALSE, FALSE)), opts)
 })
