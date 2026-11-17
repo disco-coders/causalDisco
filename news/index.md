@@ -39,6 +39,11 @@
     [`sp_fci()`](https://disco-coders.github.io/causalDisco/reference/sp_fci.md)
     gain `exclude_selection_bias`.
 
+- [`plot()`](https://disco-coders.github.io/causalDisco/reference/plot.md)
+  gains `equal_node_size`. By default, all nodes are now drawn the same
+  size, fitted to the longest label. Use `equal_node_size = FALSE` for
+  the previous behaviour, where each node is sized to its own label.
+
 - [`tpc_run()`](https://disco-coders.github.io/causalDisco/reference/tpc_run.md)
   now supports `orientation_method = "standard"` and `"maj_rule"`.
 

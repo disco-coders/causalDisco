@@ -10,7 +10,7 @@ knowledge.
 
 ``` r
 # S3 method for class 'Disco'
-plot(x, required_col = "blue", ...)
+plot(x, required_col = "blue", equal_node_size = TRUE, ...)
 ```
 
 ## Arguments
@@ -23,6 +23,15 @@ plot(x, required_col = "blue", ...)
 - required_col:
 
   Character(1). Color for edges marked as "required". Default `"blue"`.
+
+- equal_node_size:
+
+  Logical(1). If `TRUE` (default), all nodes are drawn with the same
+  size, namely the size needed for the longest label, so that variables
+  with long names are not visually emphasized. If `FALSE`, each node is
+  sized to fit its own label (the
+  [`caugi::plot()`](https://caugi.org/reference/plot.caugi.html)
+  default).
 
 - ...:
 

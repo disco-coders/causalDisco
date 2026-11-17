@@ -48,7 +48,13 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'Knowledge'</span></span>
-<span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span><span class="va">x</span>, required_col <span class="op">=</span> <span class="st">"blue"</span>, forbidden_col <span class="op">=</span> <span class="st">"red"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="plot.html">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  required_col <span class="op">=</span> <span class="st">"blue"</span>,</span>
+<span>  forbidden_col <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  equal_node_size <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -65,6 +71,13 @@
 
 <dt id="arg-forbidden-col">forbidden_col<a class="anchor" aria-label="anchor" href="#arg-forbidden-col"></a></dt>
 <dd><p>Character(1). Color for edges marked as "forbidden". Default <code>"red"</code>.</p></dd>
+
+
+<dt id="arg-equal-node-size">equal_node_size<a class="anchor" aria-label="anchor" href="#arg-equal-node-size"></a></dt>
+<dd><p>Logical(1). If <code>TRUE</code> (default), all nodes are drawn
+with the same size, namely the size needed for the longest label, so that
+variables with long names are not visually emphasized. If <code>FALSE</code>, each
+node is sized to fit its own label (the <code><a href="https://caugi.org/reference/plot.caugi.html" class="external-link">caugi::plot()</a></code> default).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
