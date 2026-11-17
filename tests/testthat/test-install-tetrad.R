@@ -1,48 +1,25 @@
-test_that("get_tetrad_dir returns TETRAD_DIR env var when set and exists", {
-  old_env <- Sys.getenv("TETRAD_DIR", unset = NA)
-  on.exit(Sys.setenv(TETRAD_DIR = old_env), add = TRUE)
+test_that("get_tetrad_dir returns the cache directory", {
+  cache <- withr::local_tempdir()
+  withr::local_options(causalDisco.tetrad_cache = cache)
 
-  temp_dir <- tempdir()
-  Sys.setenv(TETRAD_DIR = temp_dir)
-
-  expect_equal(get_tetrad_dir(), temp_dir)
+  expect_equal(get_tetrad_dir(), cache)
 })
 
-test_that("get_tetrad_dir returns package cache when env var is not set", {
-  old_env <- Sys.getenv("TETRAD_DIR", unset = NA)
-  on.exit(Sys.setenv(TETRAD_DIR = old_env), add = TRUE)
-  Sys.unsetenv("TETRAD_DIR")
+test_that("get_tetrad_dir ignores the TETRAD_DIR environment variable", {
+  # Regression: older versions of install_tetrad() wrote TETRAD_DIR to
+  # ~/.Renviron, and a stale value shadowed the cache, so verify_tetrad()
+  # reported Tetrad as not installed.
+  env_dir <- withr::local_tempdir()
+  file.create(file.path(env_dir, "tetrad-gui-1.0-launch.jar"))
+  cache <- withr::local_tempdir()
+  withr::local_envvar(TETRAD_DIR = env_dir)
+  withr::local_options(causalDisco.tetrad_cache = cache)
 
-  # simulate cache option
-  temp_cache <- file.path(tempdir(), "cache_test")
-  dir.create(temp_cache, recursive = TRUE, showWarnings = FALSE)
-  old_opt <- getOption("causalDisco.tetrad_cache")
-  on.exit(options(causalDisco.tetrad_cache = old_opt), add = TRUE)
-  options(causalDisco.tetrad_cache = temp_cache)
-
-  expect_equal(get_tetrad_dir(), temp_cache)
+  expect_equal(get_tetrad_dir("1.0"), cache)
 })
 
-test_that("get_tetrad_dir returns NULL when env var set but directory does not exist", {
-  old_env <- Sys.getenv("TETRAD_DIR", unset = NA)
-  on.exit(Sys.setenv(TETRAD_DIR = old_env), add = TRUE)
-  Sys.setenv(TETRAD_DIR = "/path/does/not/exist")
-
-  old_opt <- getOption("causalDisco.tetrad_cache")
-  on.exit(options(causalDisco.tetrad_cache = old_opt), add = TRUE)
-  options(causalDisco.tetrad_cache = NULL)
-
-  expect_null(get_tetrad_dir("0.0.0-not-installed"))
-})
-
-test_that("get_tetrad_dir returns NULL when neither env var nor cache option is set", {
-  old_env <- Sys.getenv("TETRAD_DIR", unset = NA)
-  on.exit(Sys.setenv(TETRAD_DIR = old_env), add = TRUE)
-  Sys.unsetenv("TETRAD_DIR")
-
-  old_opt <- getOption("causalDisco.tetrad_cache")
-  on.exit(options(causalDisco.tetrad_cache = old_opt), add = TRUE)
-  options(causalDisco.tetrad_cache = NULL)
+test_that("get_tetrad_dir returns NULL when the cache directory does not exist", {
+  withr::local_options(causalDisco.tetrad_cache = NULL)
 
   expect_null(get_tetrad_dir("0.0.0-not-installed"))
 })
@@ -137,7 +114,7 @@ test_that("Returns message when Java version is too old", {
 })
 
 
-# ---- Branch 3: Java OK but TETRAD_DIR is NULL ----
+# ---- Branch 3: Java OK but no Tetrad directory ----
 test_that("Returns message when tetrad directory is missing", {
   mockery::stub(verify_tetrad, "get_java_version", function() "21.0.1")
   mockery::stub(verify_tetrad, "get_tetrad_dir", function(...) NULL)
@@ -155,10 +132,8 @@ test_that("Returns message when tetrad directory is missing", {
 # ---- Branch 4: Java OK, tetrad dir exists, JAR missing ----
 test_that("Returns message when Tetrad JAR does not exist", {
   mockery::stub(verify_tetrad, "get_java_version", function() "21.0.1")
-  mockery::stub(verify_tetrad, "get_tetrad_dir", function(...) "/fake/path")
-
-  # JAR missing
-  mockery::stub(verify_tetrad, "file.exists", function(...) FALSE)
+  td <- withr::local_tempdir()
+  mockery::stub(verify_tetrad, "get_tetrad_dir", function(...) td)
 
   out <- verify_tetrad("1.0")
   expect_output_list(out)
@@ -170,13 +145,27 @@ test_that("Returns message when Tetrad JAR does not exist", {
 })
 
 
-# ---- Branch 5: Java OK, tetrad dir exists, JAR exists -> SUCCESS ----
+# ---- Branch 5: Java OK, several JARs but none for the version ----
+test_that("Returns message when the Tetrad JAR is ambiguous", {
+  mockery::stub(verify_tetrad, "get_java_version", function() "21.0.1")
+  td <- withr::local_tempdir()
+  file.create(file.path(td, c("tetrad-a.jar", "tetrad-b.jar")))
+  mockery::stub(verify_tetrad, "get_tetrad_dir", function(...) td)
+
+  out <- verify_tetrad("1.0")
+  expect_output_list(out)
+
+  expect_false(out$installed)
+  expect_match(out$message, "Found several Tetrad JARs")
+})
+
+
+# ---- Branch 6: Java OK, tetrad dir exists, JAR exists -> SUCCESS ----
 test_that("Successful detection when Java and Tetrad are OK", {
   mockery::stub(verify_tetrad, "get_java_version", function() "22.1.0")
-  mockery::stub(verify_tetrad, "get_tetrad_dir", function(...) "/fake/path")
-
-  # JAR exists
-  mockery::stub(verify_tetrad, "file.exists", function(...) TRUE)
+  td <- withr::local_tempdir()
+  file.create(file.path(td, "tetrad-gui-2.0-launch.jar"))
+  mockery::stub(verify_tetrad, "get_tetrad_dir", function(...) td)
 
   out <- verify_tetrad("2.0")
   expect_output_list(out)
@@ -189,6 +178,29 @@ test_that("Successful detection when Java and Tetrad are OK", {
     out$message,
     "Tetrad version 2.0 is installed and ready to use."
   )
+})
+
+
+test_that("verify_tetrad accepts a single differently named JAR", {
+  # Matches init_java(), which loads such a JAR.
+  mockery::stub(verify_tetrad, "get_java_version", function() "21.0.1")
+  td <- withr::local_tempdir()
+  file.create(file.path(td, "tetrad-gui-7.6.5-launch.jar"))
+  withr::local_options(causalDisco.tetrad_cache = td)
+
+  expect_true(verify_tetrad("7.6.10")$installed)
+})
+
+
+test_that("verify_tetrad finds a JAR installed by install_tetrad despite TETRAD_DIR", {
+  mockery::stub(verify_tetrad, "get_java_version", function() "21.0.1")
+  env_dir <- withr::local_tempdir()
+  cache <- withr::local_tempdir()
+  file.create(file.path(cache, "tetrad-gui-1.0-launch.jar"))
+  withr::local_envvar(TETRAD_DIR = env_dir)
+  withr::local_options(causalDisco.tetrad_cache = cache)
+
+  expect_true(verify_tetrad("1.0")$installed)
 })
 
 

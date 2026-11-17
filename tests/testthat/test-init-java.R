@@ -36,7 +36,6 @@ test_that("init_java loads only the JAR for the configured version", {
     causalDisco.tetrad_cache = td,
     causalDisco.tetrad.version = "8.0.0"
   )
-  withr::local_envvar(TETRAD_DIR = "")
 
   with_mock_rjava({
     init_java(heap = "2g")
@@ -59,7 +58,6 @@ test_that("init_java errors on several JARs when none matches the version", {
     causalDisco.tetrad_cache = td,
     causalDisco.tetrad.version = "8.0.0"
   )
-  withr::local_envvar(TETRAD_DIR = "")
 
   with_mock_rjava({
     expect_error(init_java(heap = "2g"), "Found several Tetrad JARs")
