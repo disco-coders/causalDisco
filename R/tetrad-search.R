@@ -1478,17 +1478,9 @@ TetradSearch <- R6Class(
         self$bootstrap_graphs <- self$alg$getBootstrapGraphs()
       }
 
-      # todo: make a better solution, probably in caugi
-
-      # Always call with class = "PAG"?
-      # Old code:
-      # out <- tryCatch(as_disco(self$result),
-      #   error = function(e) {
-      #      as_disco(self$result, class = "PAG")
-      #   }
-      # )
-      # But gives incorrect edges for PC algorithm?
-      as_disco(self$result, class = "PAG")
+      # Build as UNKNOWN: disco() assigns the claimed class afterwards, and a
+      # strict class here would make caugi validate finite-sample output.
+      as_disco(self$result, class = "UNKNOWN")
     },
     #' @description Configures bootstrapping parameters for the Tetrad search.
     #' @param number_resampling (integer) Number of bootstrap samples.

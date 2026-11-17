@@ -207,14 +207,13 @@ as_disco.pcAlgo <- function(
 as_disco.fciAlgo <- function(
   graph,
   kn = knowledge(),
-  class = "PAG"
+  class = "UNKNOWN"
 ) {
   if (!is_knowledge(kn)) {
     stop("`kn` must be a Knowledge object.", call. = FALSE)
   }
   amat <- methods::as(graph, "matrix")
-  cg <- caugi::as_caugi(amat, class = class)
-  new_disco(cg, kn)
+  new_disco(.pag_amat_to_caugi(amat, class), kn)
 }
 
 #' @inheritParams as_disco
@@ -222,13 +221,76 @@ as_disco.fciAlgo <- function(
 as_disco.tetrad_graph <- function(
   graph,
   kn = knowledge(),
-  class = "PDAG"
+  class = "UNKNOWN"
 ) {
   if (!is_knowledge(kn)) {
     stop("`kn` must be a Knowledge object.", call. = FALSE)
   }
-  cg <- caugi::as_caugi(graph$amat, collapse = TRUE, class)
-  new_disco(cg, kn)
+  new_disco(.pag_amat_to_caugi(graph$amat, class), kn)
+}
+
+#' @title Build a caugi Graph from a \pkg{pcalg} `amat.pag` Matrix
+#'
+#' @description
+#' Decodes an adjacency matrix in \pkg{pcalg}'s `amat.pag` mark coding
+#' (`amat[i, j]` is the mark at `j` on the edge between `i` and `j`: 0 no edge,
+#' 1 circle, 2 arrowhead, 3 tail) into edges, and builds a [caugi::caugi] of the
+#' given `class`. Used for FCI-type output (\pkg{pcalg}, Tetrad, TFCI).
+#'
+#' The marks are decoded here rather than by [caugi::as_caugi()], because caugi
+#' only reads a matrix of 0s and 1s (e.g. a graph of only `o-o` edges) as mark
+#' coded when `class = "PAG"`, and a `"PAG"` class is validated as a Markov
+#' equivalence class, which finite-sample output need not be. The default
+#' `class = "UNKNOWN"` therefore keeps every mark without validation.
+#'
+#' @param amat A square matrix in `amat.pag` coding with node names as
+#'   column names.
+#' @param class The graph class to build.
+#' @returns A [caugi::caugi] object.
+#' @keywords internal
+#' @noRd
+.pag_amat_to_caugi <- function(amat, class = "UNKNOWN") {
+  amat <- as.matrix(amat)
+  nodes <- colnames(amat)
+  if (is.null(nodes)) {
+    nodes <- rownames(amat)
+  }
+  if (is.null(nodes)) {
+    nodes <- paste0("V", seq_len(ncol(amat)))
+  }
+  if (!all(amat %in% 0:3)) {
+    stop("`amat` must use the amat.pag mark codes 0-3.", call. = FALSE)
+  }
+
+  # Mark rank orders the endpoints so each edge uses a glyph caugi has built in
+  # (`-->`, `o->`, `--o`, `---`, `o-o`, `<->`): tail < circle < arrowhead.
+  rank <- c(`3` = 1L, `1` = 2L, `2` = 3L)
+  left <- c(`3` = "-", `1` = "o", `2` = "<")
+  right <- c(`3` = "-", `1` = "o", `2` = ">")
+
+  idx <- which(upper.tri(amat) & (amat != 0 | t(amat) != 0), arr.ind = TRUE)
+  if (nrow(idx) == 0L) {
+    return(caugi::caugi(nodes = nodes, class = class))
+  }
+  i <- idx[, 1]
+  j <- idx[, 2]
+  mark_at_i <- as.character(amat[cbind(j, i)])
+  mark_at_j <- as.character(amat[cbind(i, j)])
+  swap <- rank[mark_at_i] > rank[mark_at_j]
+
+  from <- ifelse(swap, nodes[j], nodes[i])
+  to <- ifelse(swap, nodes[i], nodes[j])
+  m_from <- ifelse(swap, mark_at_j, mark_at_i)
+  m_to <- ifelse(swap, mark_at_i, mark_at_j)
+  edge <- paste0(left[m_from], "-", right[m_to])
+
+  caugi::caugi(
+    from = unname(from),
+    edge = unname(edge),
+    to = unname(to),
+    nodes = nodes,
+    class = class
+  )
 }
 
 #' @inheritParams as_disco

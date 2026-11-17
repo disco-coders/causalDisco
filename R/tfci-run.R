@@ -150,7 +150,7 @@ tfci_run <- function(
     knowledge = knowledge,
     unfaithful_triples = unfaithful_triples
   )
-  cg <- caugi::as_caugi(res, collapse = TRUE, class = "PAG")
+  cg <- .pag_amat_to_caugi(res)
 
   as_disco(cg, knowledge)
 }
