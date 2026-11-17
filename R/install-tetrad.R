@@ -18,27 +18,63 @@ tetrad_cache_dir <- function(
   tools::R_user_dir(paste0("causalDisco/tetrad_v", version), which = "cache")
 }
 
+#' Find the Tetrad JAR(s) in a directory
+#'
+#' Prefers the JAR named `tetrad-gui-<version>-launch.jar`. If that does not
+#' exist, falls back to any `tetrad*.jar` in `dir` (e.g. a manually downloaded
+#' JAR in a directory set with `options(causalDisco.tetrad_cache)`).
+#' @param dir Character. Directory to search, or `NULL`.
+#' @param version Character. The Tetrad version.
+#' @return A character vector of JAR paths: length 0 if none were found,
+#'   length 1 if a unique JAR was found, and longer if the choice is ambiguous.
+#' @keywords internal
+#' @noRd
+find_tetrad_jar <- function(
+  dir,
+  version = getOption("causalDisco.tetrad.version")
+) {
+  if (is.null(dir) || !length(dir) || !dir.exists(dir)) {
+    return(character(0))
+  }
+  jar <- file.path(dir, paste0("tetrad-gui-", version, "-launch.jar"))
+  if (file.exists(jar)) {
+    return(jar)
+  }
+  list.files(
+    dir,
+    pattern = "^tetrad.*\\.jar$",
+    full.names = TRUE,
+    ignore.case = TRUE
+  )
+}
+
+#' Message for a directory with several Tetrad JARs but none for `version`
+#' @keywords internal
+#' @noRd
+ambiguous_tetrad_jar_msg <- function(dir, version) {
+  paste0(
+    "Found several Tetrad JARs in ",
+    dir,
+    " but none named tetrad-gui-",
+    version,
+    "-launch.jar. Keep only one, or set ",
+    "`options(causalDisco.tetrad.version)` to match one of them."
+  )
+}
+
 #' Directory holding the Tetrad JAR for a version
 #'
-#' Uses the `TETRAD_DIR` environment variable if it points to an existing
-#' directory, otherwise the cache directory for `version`.
+#' The cache directory for `version` (where [install_tetrad()] installs it), or
+#' `getOption("causalDisco.tetrad_cache")` if set.
 #' @param version Character. The Tetrad version.
 #' @return The directory path, or `NULL` if it does not exist.
 #' @keywords internal
 #' @noRd
 get_tetrad_dir <- function(version = getOption("causalDisco.tetrad.version")) {
-  # user override
-  env <- Sys.getenv("TETRAD_DIR", "")
-  if (nzchar(env) && dir.exists(env)) {
-    return(env)
-  }
-
-  # package cache (default)
   cache <- tetrad_cache_dir(version)
   if (!is.null(cache) && dir.exists(cache)) {
     return(cache)
   }
-
   NULL
 }
 
@@ -129,7 +165,9 @@ verify_tetrad <- function(
   }
 
   # ---- Tetrad check ----
-  if (is.null(tetrad_dir)) {
+  jar <- find_tetrad_jar(tetrad_dir, version)
+
+  if (!length(jar)) {
     return(out(
       FALSE,
       TRUE,
@@ -138,17 +176,12 @@ verify_tetrad <- function(
     ))
   }
 
-  jar <- file.path(
-    tetrad_dir,
-    paste0("tetrad-gui-", version, "-launch.jar")
-  )
-
-  if (!file.exists(jar)) {
+  if (length(jar) > 1L) {
     return(out(
       FALSE,
       TRUE,
       java_version,
-      "Tetrad not installed. Run install_tetrad()."
+      ambiguous_tetrad_jar_msg(tetrad_dir, version)
     ))
   }
 
@@ -156,7 +189,13 @@ verify_tetrad <- function(
     TRUE,
     TRUE,
     java_version,
-    paste0("Tetrad version ", version, " is installed and ready to use.")
+    paste0(
+      "Tetrad version ",
+      version,
+      " is installed and ready to use (",
+      jar,
+      ")."
+    )
   )
 }
 

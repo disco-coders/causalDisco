@@ -29,6 +29,11 @@
 
 ## Bug fixes
 
+- `verify_tetrad()` no longer reports Tetrad as not installed after a successful
+  `install_tetrad()` when the `TETRAD_DIR` environment variable is set. The
+  (undocumented) `TETRAD_DIR` is no longer used; set
+  `options(causalDisco.tetrad_cache = )` to use a custom directory instead.
+
 - `install_tetrad(version = )` now saves a non-default Tetrad version in its own
   cache directory instead of the default version's, and Java loads only the JAR
   for the configured version.
