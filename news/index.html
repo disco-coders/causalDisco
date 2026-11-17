@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">causalDisco</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,9 +41,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="causaldisco-development-version">causalDisco (development version)<a class="anchor" aria-label="anchor" href="#causaldisco-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.3.0" id="causaldisco-130">causalDisco 1.3.0<a class="anchor" aria-label="anchor" href="#causaldisco-130"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-1-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-3-0"></a></h3>
 <ul><li><p>Added <code>max_lag()</code> / <code><a href="../reference/set_max_lag.html">set_max_lag()</a></code> to <code><a href="../reference/knowledge.html">knowledge()</a></code>, which forbids edges between variables that are more than a given number of tiers apart. <code>max_lag()</code> is set inside <code>tier()</code>, alongside its formulas: <code>tier(1 ~ V1, 2 ~ V2, max_lag(1))</code>.</p></li>
 <li>
 <p>Tetrad algorithms now expose more of Tetrad’s parameters, all defaulting to Tetrad’s own defaults:</p>
@@ -77,12 +77,12 @@
 </ul></li>
 </ul></div>
 <div class="section level3">
-<h3 id="lifecycle-changes-development-version">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-development-version"></a></h3>
+<h3 id="lifecycle-changes-1-3-0">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-1-3-0"></a></h3>
 <ul><li><p><code>orientation_method = "maj.rule"</code> in <code><a href="../reference/tpc_run.html">tpc_run()</a></code> and <code><a href="../reference/tfci_run.html">tfci_run()</a></code> is deprecated in favour of <code>"maj_rule"</code>.</p></li>
 <li><p><code>make_tikz(bend_edges, bend_angle)</code> are deprecated in favour of <code>bend</code>: <code>bend_edges = TRUE, bend_angle = 15</code> is now <code>bend = 15</code>, and <code>bend_edges = FALSE</code> is <code>bend = 0</code>.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-1-3-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-3-0"></a></h3>
 <ul><li><p><code><a href="../reference/verify_tetrad.html">verify_tetrad()</a></code> no longer reports Tetrad as not installed after a successful <code><a href="../reference/install_tetrad.html">install_tetrad()</a></code> when the <code>TETRAD_DIR</code> environment variable is set. The (undocumented) <code>TETRAD_DIR</code> is no longer used; set <code>options(causalDisco.tetrad_cache = )</code> to use a custom directory instead.</p></li>
 <li><p><code><a href="../reference/make_tikz.html">make_tikz()</a></code> now draws PAG edge marks (<code>o-&gt;</code>, <code>o-o</code>, <code>--o</code>) instead of warning.</p></li>
 <li><p><code><a href="../reference/make_tikz.html">make_tikz()</a></code> with bent edges now bends edges in both directions (<code>A --&gt; B</code>, <code>B --&gt; A</code>) to opposite sides instead of drawing them on top of each other.</p></li>
