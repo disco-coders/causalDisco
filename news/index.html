@@ -63,15 +63,28 @@
 <code><a href="../reference/boss_fci.html">boss_fci()</a></code>, <code><a href="../reference/gfci.html">gfci()</a></code> and <code><a href="../reference/sp_fci.html">sp_fci()</a></code> gain <code>exclude_selection_bias</code>.</li>
 </ul></li>
 <li><p><code><a href="../reference/tpc_run.html">tpc_run()</a></code> now supports <code>orientation_method = "standard"</code> and <code>"maj_rule"</code>.</p></li>
+<li>
+<p><code><a href="../reference/make_tikz.html">make_tikz()</a></code> gains:</p>
+<ul><li>
+<code>style = "classic"</code>: plain-text nodes, gray tier bands, and a time axis.</li>
+<li>
+<code>node_labels</code> and <code>tier_labels</code> for LaTeX labels, e.g. <code>c(X1 = "$X_1$")</code>.</li>
+<li>Edges that would pass through another node are bent around it, as in <code><a href="../reference/plot.html">plot()</a></code>, and bent edges leaving a node together are spread apart. An edge whose bend would pass through a node is bent the other way, or by the nearest angle to <code>bend</code> that clears it. <code>edge_style = list(route = FALSE)</code> turns both adjustments off.</li>
+<li>
+<code>bend</code> sets the bend of all edges in degrees (<code>0</code> = straight, negative = the other way), or of individual edges with a list, e.g. <code>list(default = 20, A = list(B = 0))</code>.</li>
+<li>The output defines named styles (<code>var</code>, <code>link</code>, <code>tier</code>, <code>tier label</code>) instead of <code>every node</code>/<code>every path</code>, which also styled the tiers.</li>
+</ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="lifecycle-changes-development-version">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-development-version"></a></h3>
-<ul><li>
-<code>orientation_method = "maj.rule"</code> in <code><a href="../reference/tpc_run.html">tpc_run()</a></code> and <code><a href="../reference/tfci_run.html">tfci_run()</a></code> is deprecated in favour of <code>"maj_rule"</code>.</li>
+<ul><li><p><code>orientation_method = "maj.rule"</code> in <code><a href="../reference/tpc_run.html">tpc_run()</a></code> and <code><a href="../reference/tfci_run.html">tfci_run()</a></code> is deprecated in favour of <code>"maj_rule"</code>.</p></li>
+<li><p><code>make_tikz(bend_edges, bend_angle)</code> are deprecated in favour of <code>bend</code>: <code>bend_edges = TRUE, bend_angle = 15</code> is now <code>bend = 15</code>, and <code>bend_edges = FALSE</code> is <code>bend = 0</code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li><p><code>install_tetrad(version = )</code> now saves a non-default Tetrad version in its own cache directory instead of the default version’s, and Java loads only the JAR for the configured version.</p></li>
+<ul><li><p><code><a href="../reference/make_tikz.html">make_tikz()</a></code> now draws PAG edge marks (<code>o-&gt;</code>, <code>o-o</code>, <code>--o</code>) instead of warning.</p></li>
+<li><p><code><a href="../reference/make_tikz.html">make_tikz()</a></code> with bent edges now bends edges in both directions (<code>A --&gt; B</code>, <code>B --&gt; A</code>) to opposite sides instead of drawing them on top of each other.</p></li>
+<li><p><code>install_tetrad(version = )</code> now saves a non-default Tetrad version in its own cache directory instead of the default version’s, and Java loads only the JAR for the configured version.</p></li>
 <li><p><code><a href="../reference/tpc_run.html">tpc_run()</a></code> now orients conservatively by default, as documented; it previously used standard orientation.</p></li>
 <li>
 <p>Removed Tetrad algorithm arguments that Tetrad ignored, so setting them had no effect:</p>

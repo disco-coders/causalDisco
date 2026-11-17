@@ -42,6 +42,26 @@
 - [`tpc_run()`](https://disco-coders.github.io/causalDisco/reference/tpc_run.md)
   now supports `orientation_method = "standard"` and `"maj_rule"`.
 
+- [`make_tikz()`](https://disco-coders.github.io/causalDisco/reference/make_tikz.md)
+  gains:
+
+  - `style = "classic"`: plain-text nodes, gray tier bands, and a time
+    axis.
+  - `node_labels` and `tier_labels` for LaTeX labels,
+    e.g. `c(X1 = "$X_1$")`.
+  - Edges that would pass through another node are bent around it, as in
+    [`plot()`](https://disco-coders.github.io/causalDisco/reference/plot.md),
+    and bent edges leaving a node together are spread apart. An edge
+    whose bend would pass through a node is bent the other way, or by
+    the nearest angle to `bend` that clears it.
+    `edge_style = list(route = FALSE)` turns both adjustments off.
+  - `bend` sets the bend of all edges in degrees (`0` = straight,
+    negative = the other way), or of individual edges with a list, e.g.
+    `list(default = 20, A = list(B = 0))`.
+  - The output defines named styles (`var`, `link`, `tier`,
+    `tier label`) instead of `every node`/`every path`, which also
+    styled the tiers.
+
 ### Lifecycle changes
 
 - `orientation_method = "maj.rule"` in
@@ -50,7 +70,19 @@
   [`tfci_run()`](https://disco-coders.github.io/causalDisco/reference/tfci_run.md)
   is deprecated in favour of `"maj_rule"`.
 
+- `make_tikz(bend_edges, bend_angle)` are deprecated in favour of
+  `bend`: `bend_edges = TRUE, bend_angle = 15` is now `bend = 15`, and
+  `bend_edges = FALSE` is `bend = 0`.
+
 ### Bug fixes
+
+- [`make_tikz()`](https://disco-coders.github.io/causalDisco/reference/make_tikz.md)
+  now draws PAG edge marks (`o->`, `o-o`, `--o`) instead of warning.
+
+- [`make_tikz()`](https://disco-coders.github.io/causalDisco/reference/make_tikz.md)
+  with bent edges now bends edges in both directions (`A --> B`,
+  `B --> A`) to opposite sides instead of drawing them on top of each
+  other.
 
 - `install_tetrad(version = )` now saves a non-default Tetrad version in
   its own cache directory instead of the default version’s, and Java

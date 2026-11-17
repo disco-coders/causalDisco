@@ -62,11 +62,15 @@ directly compiled or modified.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">make_tikz</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"classic"</span><span class="op">)</span>,</span>
 <span>  scale <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  full_doc <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  bend_edges <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  bend_angle <span class="op">=</span> <span class="fl">25</span>,</span>
-<span>  tier_label_pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"above"</span>, <span class="st">"below"</span>, <span class="st">"left"</span>, <span class="st">"right"</span><span class="op">)</span></span>
+<span>  bend <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tier_label_pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"above"</span>, <span class="st">"below"</span>, <span class="st">"left"</span>, <span class="st">"right"</span><span class="op">)</span>,</span>
+<span>  node_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tier_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  bend_edges <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  bend_angle <span class="op">=</span> <span class="fu">lifecycle</span><span class="fu">::</span><span class="fu"><a href="https://lifecycle.r-lib.org/reference/deprecated.html" class="external-link">deprecated</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -82,31 +86,57 @@ directly compiled or modified.</p>
 <dd><p>Additional arguments passed to <code><a href="plot.html">plot()</a></code> and <code><a href="https://caugi.org/reference/plot.caugi.html" class="external-link">caugi::plot()</a></code>.</p></dd>
 
 
+<dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
+<dd><p><code>"default"</code> mirrors <code><a href="plot.html">plot()</a></code>. <code>"classic"</code> is a minimal look
+with plain-text nodes, gray tier bands, and a time axis. See Details.</p></dd>
+
+
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
 <dd><p>Numeric scalar. Scaling factor for node coordinates. Default is <code>10</code>.</p></dd>
 
 
 <dt id="arg-full-doc">full_doc<a class="anchor" aria-label="anchor" href="#arg-full-doc"></a></dt>
 <dd><p>Logical. If <code>TRUE</code> (default), generates a full standalone
-LaTeX document. If <code>FALSE</code>, returns only the <code>tikzpicture</code> environment.</p></dd>
+LaTeX document. If <code>FALSE</code>, returns only the <code>tikzpicture</code> environment;
+load <code>\usetikzlibrary{arrows.meta, bending, backgrounds, fit, calc}</code> in
+your preamble.</p></dd>
 
 
-<dt id="arg-bend-edges">bend_edges<a class="anchor" aria-label="anchor" href="#arg-bend-edges"></a></dt>
-<dd><p>Logical. If <code>TRUE</code>, edges are drawn with bent edges. Default is <code>FALSE</code>.
-Edges connecting the same pair of nodes in both directions (<code>A %--&gt;% B</code> and <code>B %--&gt;% A</code>)
-are automatically bent left and right to avoid overlap. Bend direction is automatically chosen
-to reduce overlap.</p></dd>
-
-
-<dt id="arg-bend-angle">bend_angle<a class="anchor" aria-label="anchor" href="#arg-bend-angle"></a></dt>
-<dd><p>Numeric scalar. Angle in degrees for bending arrows when
-<code>bend_edges = TRUE</code>. Default is <code>25</code>.</p></dd>
+<dt id="arg-bend">bend<a class="anchor" aria-label="anchor" href="#arg-bend"></a></dt>
+<dd><p>How much edges are bent, in degrees:</p><ul><li><p>A number bends every edge by that angle; <code>0</code> draws edges straight, and
+a negative number bends them the other way (see Details). Edges may
+still be bent differently to avoid nodes.</p></li>
+<li><p>A named list sets the bend of individual edges, in the same nested
+form as <code>edge_style$by_edge</code>: <code>list(A = list(B = 20, C = -10))</code> bends
+the edge from <code>A</code> to <code>B</code> 20 degrees to the left (<code>bend left=20</code>) and the
+edge from <code>A</code> to <code>C</code> 10 degrees to the right; <code>0</code> draws an edge
+straight. Left and right are as seen going from the first to the second
+node, whichever way the edge points. These edges are drawn exactly as
+given. Add <code>default = &lt;number&gt;</code> to set the bend of all other edges, e.g.
+<code>list(default = 20, A = list(B = 0))</code>.</p></li>
+</ul><p>Default is <code>0</code> (<code>10</code> for <code>style = "classic"</code>).</p></dd>
 
 
 <dt id="arg-tier-label-pos">tier_label_pos<a class="anchor" aria-label="anchor" href="#arg-tier-label-pos"></a></dt>
 <dd><p>Character string specifying the position of tier labels
 relative to the tier rectangles. Must be one of <code>"above"</code>, <code>"below"</code>, <code>"left"</code>, or <code>"right"</code>.
-Default is <code>"above"</code>.</p></dd>
+Default is <code>"above"</code>. For <code>style = "classic"</code>, see Details.</p></dd>
+
+
+<dt id="arg-node-labels-tier-labels">node_labels, tier_labels<a class="anchor" aria-label="anchor" href="#arg-node-labels-tier-labels"></a></dt>
+<dd><p>Optional named character vectors of LaTeX
+labels for nodes or tiers, e.g. <code>c(child_x1 = "$X_1$")</code>. Unlabelled nodes
+and tiers use their name.</p></dd>
+
+
+<dt id="arg-bend-edges">bend_edges<a class="anchor" aria-label="anchor" href="#arg-bend-edges"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>bend</code> instead:
+<code>bend_edges = FALSE</code> is <code>bend = 0</code>, and <code>bend_edges = TRUE</code> is
+<code>bend = bend_angle</code>.</p></dd>
+
+
+<dt id="arg-bend-angle">bend_angle<a class="anchor" aria-label="anchor" href="#arg-bend-angle"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>bend</code> instead.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -127,9 +157,41 @@ edges. Supported features include:</p><ul><li><p><strong>Nodes</strong></p><ul><
 <li><p>Arrow scale</p></li>
 <li><p>Optional bending to reduce overlapping arrows</p></li>
 </ul></li>
-</ul><p>The generated TikZ code uses global style settings, and edges are connected
-to nodes by name (as opposed to hard-coded coordinates), making it easy to
-modify the output further if needed.</p>
+</ul><p>The output starts with named styles (<code>var</code> for nodes, <code>link</code> for edges,
+<code>tier</code> and <code>tier label</code> for tiers) for easy restyling, and edges are
+connected to nodes by name rather than coordinates.</p><div class="section">
+<h3 id="bent-edges">Bent edges<a class="anchor" aria-label="anchor" href="#bent-edges"></a></h3>
+
+
+<p>With a positive <code>bend</code> (or <code>default</code>), edges bend to the left when they
+point to the right and vice versa, so they bulge upwards; with
+<code>style = "classic"</code> they always bend to the right. A negative angle bends
+them the other way. Edges in both directions (<code>A --&gt; B</code> and <code>B --&gt; A</code>) are
+bent to opposite sides, by that angle, or if it is <code>0</code>, by <code>25</code> degrees
+(<code>10</code> for <code>style = "classic"</code>).</p>
+<p>Like <code><a href="plot.html">plot()</a></code>, edges that would pass through another node are bent around
+it. A bent edge that would pass through a node is bent the other way
+instead, or, if that also hits a node, by the angle closest to its bend
+that clears all nodes. Bent edges that leave a node in nearly the
+same direction are spread apart, by bending them the other way or more.
+Node sizes are estimated from the labels, so a bend may need a manual
+tweak.</p>
+<p>To draw edges exactly as requested, turn both adjustments off with
+<code>edge_style = list(route = FALSE)</code>, or for single edges with
+<code>edge_style$by_edge</code>. Edges given in a <code>bend</code> list are always drawn exactly
+as given.</p>
+</div>
+
+<div class="section">
+<h3 id="classic-style">Classic style<a class="anchor" aria-label="anchor" href="#classic-style"></a></h3>
+
+
+<p>Adds a <code>time axis</code> style, and the spacing is set by the <code>x</code> and <code>y</code> options
+of the <code>tikzpicture</code>. Tier labels go on the time axis: <code>"below"</code> (default)
+or <code>"above"</code> for column tiers, <code>"left"</code> (default) or <code>"right"</code> for row
+tiers.</p>
+</div>
+
     </div>
 
     <div class="section level2">
@@ -149,21 +211,23 @@ modify the output further if needed.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_kn</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \documentclass[tikz,border=2mm]{standalone}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, backgrounds, calc}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \usetikzlibrary{arrows.meta, bending, backgrounds, fit, calc}</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{document}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{every node/.style={fill=lightgray}, every path/.style={draw=red}}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{arrows={[scale=3]}, arrow/.style={-{Stealth}, thick}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={draw, circle, fill=lightgray},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={draw=red, arrows={[scale=3]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X1) at (1.667,0) {X1};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X2) at (1.667,3.333) {X2};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X3) at (3.333,6.667) {X3};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Y) at (0,6.667) {Y};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Z) at (0,10) {Z};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[draw=blue, -Latex] (X2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[, -Latex] (X3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[, -Latex] (Y)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[, -Latex] (Z);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X1) at (1.667,0) {X1};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X2) at (1.667,3.333) {X2};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X3) at (3.333,6.667) {X3};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Y) at (0,6.667) {Y};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Z) at (0,10) {Z};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[link, draw=blue, -Latex] (X2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[link, -Latex] (X3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[link, -Latex] (Y)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[link, -Latex] (Z);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \end{document}</span>
 <span class="r-in"><span></span></span>
@@ -171,40 +235,44 @@ modify the output further if needed.</p>
 <span class="r-in"><span><span class="va">tikz_kn_snippet</span> <span class="op">&lt;-</span> <span class="fu">make_tikz</span><span class="op">(</span><span class="va">kn</span>, full_doc <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_kn_snippet</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{every node/.style={fill=lightgray}, every path/.style={draw=red}}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{arrows={[scale=3]}, arrow/.style={-{Stealth}, thick}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={draw, circle, fill=lightgray},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={draw=red, arrows={[scale=3]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X1) at (1.667,0) {X1};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X2) at (1.667,3.333) {X2};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X3) at (3.333,6.667) {X3};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Y) at (0,6.667) {Y};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Z) at (0,10) {Z};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[draw=blue, -Latex] (X2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[, -Latex] (X3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[, -Latex] (Y)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[, -Latex] (Z);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X1) at (1.667,0) {X1};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X2) at (1.667,3.333) {X2};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X3) at (3.333,6.667) {X3};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Y) at (0,6.667) {Y};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Z) at (0,10) {Z};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[link, draw=blue, -Latex] (X2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[link, -Latex] (X3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[link, -Latex] (Y)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[link, -Latex] (Z);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With bent edges</span></span></span>
 <span class="r-in"><span><span class="va">tikz_bent</span> <span class="op">&lt;-</span> <span class="fu">make_tikz</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">kn</span>,</span></span>
 <span class="r-in"><span>  full_doc <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>  bend_edges <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  bend <span class="op">=</span> <span class="fl">25</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_bent</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{every node/.style={fill=lightgray}, every path/.style={draw=red}}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{arrows={[scale=3]}, arrow/.style={-{Stealth}, thick}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={draw, circle, fill=lightgray},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={draw=red, arrows={[scale=3]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X1) at (1.667,0) {X1};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X2) at (1.667,3.333) {X2};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X3) at (3.333,6.667) {X3};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Y) at (0,6.667) {Y};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Z) at (0,10) {Z};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[draw=blue, bend left=25, -Latex] (X2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[bend left=25, -Latex] (X3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[bend right=25, -Latex] (Y)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[bend left=25, -Latex] (Z);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X1) at (1.667,0) {X1};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X2) at (1.667,3.333) {X2};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X3) at (3.333,6.667) {X3};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Y) at (0,6.667) {Y};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Z) at (0,10) {Z};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[link, draw=blue, bend left=25, -Latex] (X2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[link, bend right=25, -Latex] (X3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[link, bend right=25, -Latex] (Y)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[link, bend left=25, -Latex] (Z);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With a color not supported by default TikZ colors; will fall back to RGB</span></span></span>
@@ -215,18 +283,20 @@ modify the output further if needed.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_darkblue</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{every node/.style={fill={rgb:red,0.000;green,0.000;blue,0.545}}, every path/.style={draw=red}}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{arrows={[scale=3]}, arrow/.style={-{Stealth}, thick}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={draw, circle, fill={rgb:red,0.000;green,0.000;blue,0.545}},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={draw=red, arrows={[scale=3]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X1) at (1.667,0) {X1};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X2) at (1.667,3.333) {X2};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X3) at (3.333,6.667) {X3};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Y) at (0,6.667) {Y};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Z) at (0,10) {Z};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[draw=blue, -Latex] (X2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[, -Latex] (X3)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[, -Latex] (Y)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[, -Latex] (Z);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X1) at (1.667,0) {X1};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X2) at (1.667,3.333) {X2};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X3) at (3.333,6.667) {X3};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Y) at (0,6.667) {Y};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Z) at (0,10) {Z};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[link, draw=blue, -Latex] (X2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[link, -Latex] (X3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X2) edge[link, -Latex] (Y)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[link, -Latex] (Z);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With tiered knowledge</span></span></span>
@@ -245,24 +315,151 @@ modify the output further if needed.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_tiered_kn</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{every node/.style={fill=lightgray}}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{arrows={[scale=1]}, arrow/.style={-{Stealth}, thick}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={draw, circle, fill=lightgray},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier/.style={draw, rectangle, fill=blue!20, rounded corners, inner sep=0.5cm},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier label/.style={}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (child_x1) at (0,0) {child\_x1};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (child_x2) at (0,10) {child\_x2};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (youth_x3) at (5,0) {youth\_x3};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (youth_x4) at (5,10) {youth\_x4};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (oldage_x5) at (10,0) {oldage\_x5};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (oldage_x6) at (10,10) {oldage\_x6};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (child_x1) at (0,0) {child\_x1};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (child_x2) at (0,10) {child\_x2};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (youth_x3) at (5,0) {youth\_x3};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (youth_x4) at (5,10) {youth\_x4};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (oldage_x5) at (10,0) {oldage\_x5};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (oldage_x6) at (10,10) {oldage\_x6};</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{scope}[on background layer]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, rectangle, fill=blue!20, rounded corners, inner sep=0.5cm, fit=(child_x1)(child_x2)] (child) {};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, rectangle, fill=blue!20, rounded corners, inner sep=0.5cm, fit=(oldage_x5)(oldage_x6)] (old) {};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, rectangle, fill=blue!20, rounded corners, inner sep=0.5cm, fit=(youth_x3)(youth_x4)] (youth) {};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier, fit=(child_x1)(child_x2)] (child) {};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier, fit=(oldage_x5)(oldage_x6)] (old) {};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier, fit=(youth_x3)(youth_x4)] (youth) {};</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \end{scope}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[anchor=south, draw=none, fill=none] at ($(child.north)+(0cm,0.2cm)$) {child};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[anchor=south, draw=none, fill=none] at ($(old.north)+(0cm,0.2cm)$) {old};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[anchor=south, draw=none, fill=none] at ($(youth.north)+(0cm,0.2cm)$) {youth};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier label, anchor=south] at ($(child.north)+(0cm,0.2cm)$) {child};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier label, anchor=south] at ($(old.north)+(0cm,0.2cm)$) {old};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier label, anchor=south] at ($(youth.north)+(0cm,0.2cm)$) {youth};</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \path ;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Classic style with LaTeX labels</span></span></span>
+<span class="r-in"><span><span class="va">tikz_classic</span> <span class="op">&lt;-</span> <span class="fu">make_tikz</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">kn_tiered</span>,</span></span>
+<span class="r-in"><span>  style <span class="op">=</span> <span class="st">"classic"</span>,</span></span>
+<span class="r-in"><span>  node_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>child_x1 <span class="op">=</span> <span class="st">"$X_1$"</span>, child_x2 <span class="op">=</span> <span class="st">"$X_2$"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  tier_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>child <span class="op">=</span> <span class="st">"Childhood"</span>, old <span class="op">=</span> <span class="st">"Old age"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  full_doc <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_classic</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;={Stealth[length=2.2mm, width=1.7mm]},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   o/.tip={Circle[open, length=1.6mm]},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={inner sep=2pt},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={semithick},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier/.style={fill=black!8, inner sep=4pt},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier label/.style={font=\small},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   time axis/.style={semithick, -{Stealth[length=2mm]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}[x=3.5cm, y=1.5cm]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (child_x1) at (-0.15,0) {$X_1$};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (child_x2) at (0.15,1) {$X_2$};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (youth_x3) at (0.85,0) {youth\_x3};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (youth_x4) at (1.15,1) {youth\_x4};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (oldage_x5) at (1.85,0) {oldage\_x5};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (oldage_x6) at (2.15,1) {oldage\_x6};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \begin{scope}[on background layer]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier, fit={(child_x1)(child_x2)(0,-0.5)(0,1.5)}] (tier-1) {};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier, fit={(youth_x3)(youth_x4)(1,-0.5)(1,1.5)}] (tier-2) {};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier, fit={(oldage_x5)(oldage_x6)(2,-0.5)(2,1.5)}] (tier-3) {};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \end{scope}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \draw[time axis] ([xshift=-3mm]tier-1.south west) -- ([xshift=5mm]tier-3.south east);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier label, below=3pt] at (tier-1.south) {Childhood};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier label, below=3pt] at (tier-2.south) {youth};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[tier label, below=3pt] at (tier-3.south) {Old age};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Edges are bent around nodes in the way: here A --&gt; C bends around B</span></span></span>
+<span class="r-in"><span><span class="va">cg_line</span> <span class="op">&lt;-</span> <span class="fu">caugi</span><span class="fu">::</span><span class="fu"><a href="https://caugi.org/reference/caugi.html" class="external-link">caugi</a></span><span class="op">(</span><span class="va">A</span> <span class="op">%--&gt;%</span> <span class="va">B</span> <span class="op">+</span> <span class="va">C</span>, <span class="va">B</span> <span class="op">%--&gt;%</span> <span class="va">C</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">layout_line</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span><span class="op">)</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tikz_routed</span> <span class="op">&lt;-</span> <span class="fu">make_tikz</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">cg_line</span>,</span></span>
+<span class="r-in"><span>  layout <span class="op">=</span> <span class="va">layout_line</span>,</span></span>
+<span class="r-in"><span>  style <span class="op">=</span> <span class="st">"classic"</span>,</span></span>
+<span class="r-in"><span>  full_doc <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_routed</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;={Stealth[length=2.2mm, width=1.7mm]},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   o/.tip={Circle[open, length=1.6mm]},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={inner sep=2pt},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={semithick},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier/.style={fill=black!8, inner sep=4pt},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier label/.style={font=\small},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   time axis/.style={semithick, -{Stealth[length=2mm]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (A) at (0,0) {A};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (B) at (10,0) {B};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (C) at (20,0) {C};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \path[link] (A) edge[-&gt;, bend right=10] (B)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (A) edge[-&gt;, bend left=20] (C)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (B) edge[-&gt;, bend right=10] (C);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Draw every edge exactly with the requested bend instead</span></span></span>
+<span class="r-in"><span><span class="va">tikz_exact</span> <span class="op">&lt;-</span> <span class="fu">make_tikz</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">cg_line</span>,</span></span>
+<span class="r-in"><span>  layout <span class="op">=</span> <span class="va">layout_line</span>,</span></span>
+<span class="r-in"><span>  style <span class="op">=</span> <span class="st">"classic"</span>,</span></span>
+<span class="r-in"><span>  edge_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>route <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  full_doc <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_exact</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;={Stealth[length=2.2mm, width=1.7mm]},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   o/.tip={Circle[open, length=1.6mm]},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={inner sep=2pt},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={semithick},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier/.style={fill=black!8, inner sep=4pt},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier label/.style={font=\small},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   time axis/.style={semithick, -{Stealth[length=2mm]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (A) at (0,0) {A};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (B) at (10,0) {B};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (C) at (20,0) {C};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \path[link] (A) edge[-&gt;, bend right=10] (B)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (A) edge[-&gt;, bend right=10] (C)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (B) edge[-&gt;, bend right=10] (C);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Set the bend of single edges (positive = bend left, negative = bend right);</span></span></span>
+<span class="r-in"><span><span class="co"># these are always drawn exactly as given</span></span></span>
+<span class="r-in"><span><span class="va">tikz_bends</span> <span class="op">&lt;-</span> <span class="fu">make_tikz</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">cg_line</span>,</span></span>
+<span class="r-in"><span>  layout <span class="op">=</span> <span class="va">layout_line</span>,</span></span>
+<span class="r-in"><span>  style <span class="op">=</span> <span class="st">"classic"</span>,</span></span>
+<span class="r-in"><span>  bend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>B <span class="op">=</span> <span class="fl">30</span>, C <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  full_doc <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_bends</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;={Stealth[length=2.2mm, width=1.7mm]},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   o/.tip={Circle[open, length=1.6mm]},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={inner sep=2pt},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={semithick},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier/.style={fill=black!8, inner sep=4pt},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   tier label/.style={font=\small},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   time axis/.style={semithick, -{Stealth[length=2mm]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (A) at (0,0) {A};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (B) at (10,0) {B};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (C) at (20,0) {C};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \path[link] (A) edge[-&gt;, bend left=30] (B)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (A) edge[-&gt;] (C)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (B) edge[-&gt;, bend right=30] (C);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
@@ -282,21 +479,23 @@ modify the output further if needed.</p>
 <span class="r-in"><span><span class="va">tikz_snippet</span> <span class="op">&lt;-</span> <span class="fu">make_tikz</span><span class="op">(</span><span class="va">disco_kn</span>, scale <span class="op">=</span> <span class="fl">10</span>, full_doc <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_snippet</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{every node/.style={fill=lightgray}, every path/.style={draw=blue}}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{arrows={[scale=3]}, arrow/.style={-{Stealth}, thick}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={draw, circle, fill=lightgray},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={draw=blue, arrows={[scale=3]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X1) at (7.401,3.504) {X1};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X2) at (2.595,3.504) {X2};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (X3) at (0,0) {X3};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Z) at (10,0.001) {Z};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (Y) at (4.999,0.188) {Y};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[, -Latex] (X2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X1) edge[, -Latex] (Y)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X1) edge[, -] (Z)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X3) edge[, -Latex] (X2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (X3) edge[, -Latex] (Y)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[, -Latex] (X2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (Z) edge[, -Latex] (Y);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X1) at (7.401,3.504) {X1};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X2) at (2.595,3.504) {X2};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (X3) at (0,0) {X3};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Z) at (10,0.001) {Z};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (Y) at (4.999,0.188) {Y};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \path (X1) edge[link, -Latex] (X2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X1) edge[link, -Latex] (Y)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X1) edge[link, -] (Z)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X3) edge[link, -Latex] (X2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (X3) edge[link, -Latex] (Y)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (Y) edge[link, -Latex] (X2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (Z) edge[link, -Latex] (Y);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">################# Convert caugi objects to Tikz ################</span></span></span>
@@ -311,14 +510,16 @@ modify the output further if needed.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">tikz_snippet</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> %%% Generated by causalDisco (version 1.2.1.9000)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{every node/.style={fill=red}}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{arrows={[scale=3]}, arrow/.style={-{Stealth}, thick}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \tikzset{</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   var/.style={draw, circle, fill=red},</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   link/.style={arrows={[scale=3]}}</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tikzpicture}</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (A) at (5,0) {A};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (B) at (10,10) {B};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \node[draw, circle] (C) at (0,10) {C};</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> \path (A) edge[, -Latex] (B)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       (A) edge[, -Latex] (C);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (A) at (5,0) {A};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (B) at (10,10) {B};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \node[var] (C) at (0,10) {C};</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> \path (A) edge[link, -Latex] (B)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       (A) edge[link, -Latex] (C);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \end{tikzpicture}</span>
 </code></pre></div>
     </div>
