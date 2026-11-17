@@ -42,6 +42,7 @@ Kalish
 Kristensen
 Kummerfeld
 Kun
+Lifecycle
 MCAR
 MPDAGs
 Maathuis
@@ -83,12 +84,14 @@ TPC
 Temurin
 Terpstra
 Tetrad
+Tetrad's
 TetradSearch
 Thrun
 Tidyselect
 TikZ
 Tsamardinos
 Uhler's
+Unlabelled
 Welch
 Zanga
 Zhang
@@ -99,6 +102,7 @@ al
 alg
 amat
 bdeu
+behaviour
 bic
 bidirected
 bnlearn
@@ -111,6 +115,7 @@ doi
 ebic
 et
 factorised
+favour
 fci
 fges
 honouring
@@ -140,6 +145,7 @@ rJava
 rJavaEnv
 scalable
 sem
+sep
 simDAG
 simGausFromDAG
 tamat
@@ -154,4 +160,6 @@ tpdag
 tskeleton
 un
 underfit
+unoriented
+unshielded
 untiered
