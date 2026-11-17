@@ -76,6 +76,14 @@
 
 ### Bug fixes
 
+- [`verify_tetrad()`](https://disco-coders.github.io/causalDisco/reference/verify_tetrad.md)
+  no longer reports Tetrad as not installed after a successful
+  [`install_tetrad()`](https://disco-coders.github.io/causalDisco/reference/install_tetrad.md)
+  when the `TETRAD_DIR` environment variable is set. The (undocumented)
+  `TETRAD_DIR` is no longer used; set
+  `options(causalDisco.tetrad_cache = )` to use a custom directory
+  instead.
+
 - [`make_tikz()`](https://disco-coders.github.io/causalDisco/reference/make_tikz.md)
   now draws PAG edge marks (`o->`, `o-o`, `--o`) instead of warning.
 

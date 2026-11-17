@@ -82,7 +82,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/make_tikz.html">make_tikz()</a></code> now draws PAG edge marks (<code>o-&gt;</code>, <code>o-o</code>, <code>--o</code>) instead of warning.</p></li>
+<ul><li><p><code><a href="../reference/verify_tetrad.html">verify_tetrad()</a></code> no longer reports Tetrad as not installed after a successful <code><a href="../reference/install_tetrad.html">install_tetrad()</a></code> when the <code>TETRAD_DIR</code> environment variable is set. The (undocumented) <code>TETRAD_DIR</code> is no longer used; set <code>options(causalDisco.tetrad_cache = )</code> to use a custom directory instead.</p></li>
+<li><p><code><a href="../reference/make_tikz.html">make_tikz()</a></code> now draws PAG edge marks (<code>o-&gt;</code>, <code>o-o</code>, <code>--o</code>) instead of warning.</p></li>
 <li><p><code><a href="../reference/make_tikz.html">make_tikz()</a></code> with bent edges now bends edges in both directions (<code>A --&gt; B</code>, <code>B --&gt; A</code>) to opposite sides instead of drawing them on top of each other.</p></li>
 <li><p><code>install_tetrad(version = )</code> now saves a non-default Tetrad version in its own cache directory instead of the default version’s, and Java loads only the JAR for the configured version.</p></li>
 <li><p><code><a href="../reference/tpc_run.html">tpc_run()</a></code> now orients conservatively by default, as documented; it previously used standard orientation.</p></li>

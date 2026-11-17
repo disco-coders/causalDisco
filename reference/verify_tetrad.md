@@ -46,6 +46,6 @@ verify_tetrad()
 #> [1] "25.0.5"
 #> 
 #> $message
-#> [1] "Tetrad version 7.6.10 is installed and ready to use."
+#> [1] "Tetrad version 7.6.10 is installed and ready to use (/home/runner/.cache/R/causalDisco/tetrad_v7.6.10/tetrad-gui-7.6.10-launch.jar)."
 #> 
 ```
