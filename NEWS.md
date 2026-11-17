@@ -20,6 +20,10 @@
   - `ges()` gains `num_threads`; `boss()` gains `num_threads` and `seed`.
   - `boss_fci()`, `gfci()` and `sp_fci()` gain `exclude_selection_bias`.
 
+- `plot()` gains `equal_node_size`. By default, all nodes are now drawn the same
+  size, fitted to the longest label. Use `equal_node_size = FALSE` for the
+  previous behaviour, where each node is sized to its own label.
+
 - `tpc_run()` now supports `orientation_method = "standard"` and `"maj_rule"`.
 
 - `make_tikz()` gains:

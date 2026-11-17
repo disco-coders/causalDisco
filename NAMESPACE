@@ -116,6 +116,7 @@ importFrom(lifecycle,deprecated)
 importFrom(methods,new)
 importFrom(rlang,
   "!!",
+  "%||%",
   .data
 )
 importFrom(tidyselect,
