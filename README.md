@@ -79,8 +79,7 @@ automatically for rJava. You can install Java using the
 `rJavaEnv::java_quick_install()` function:
 
 ``` r
-# pak::pak("e-kotov/rJavaEnv")
-rJavaEnv::java_quick_install(version = 25, distribution = "Temurin")
+rJavaEnv::java_quick_install(version = 21, distribution = "Corretto")
 ```
 
 Once you have Java JDK set up correctly, the current supported version
