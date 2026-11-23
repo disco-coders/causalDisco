@@ -4,6 +4,8 @@
 
 ## causalDisco 1.3.0
 
+CRAN release: 2026-11-17
+
 ### New features
 
 - Added `max_lag()` /
