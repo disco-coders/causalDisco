@@ -13,7 +13,7 @@ nlsy97
 
 ## Format
 
-A tibble with 8,974 rows and 9 columns:
+A tibble with 6,047 rows and 9 columns:
 
 - r1_hhchildren:
 
