@@ -222,7 +222,7 @@
 #' cleaned.
 #'
 #' @format
-#' A tibble with 8,974 rows and 9 columns:
+#' A tibble with `r format(nrow(nlsy97), big.mark = ",")` rows and `r ncol(nlsy97)` columns:
 #' \describe{
 #'   \item{r1_hhchildren}{Number of household members younger than 18. Measured in Round 1, 1997.}
 #'   \item{r1_mcollege}{Did biological mother attend college? Binary factor (levels: No, Yes). Measured in Round 1, 1997.}

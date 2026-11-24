@@ -5,7 +5,7 @@
 \alias{nlsy97}
 \title{US National Longitudinal Survey of Youth 1997}
 \format{
-A tibble with 8,974 rows and 9 columns:
+A tibble with 6,047 rows and 9 columns:
 \describe{
 \item{r1_hhchildren}{Number of household members younger than 18. Measured in Round 1, 1997.}
 \item{r1_mcollege}{Did biological mother attend college? Binary factor (levels: No, Yes). Measured in Round 1, 1997.}
